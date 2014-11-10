@@ -1,0 +1,471 @@
+//
+//  RegisterScreen.m
+//  Keo
+//
+//  Created by Gauthier Petetin on 14/03/2014.
+//  Copyright (c) 2014 Gauthier Petetin. All rights reserved.
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////(GO TO APPDELEGATE.M FOR MORE INFO ABOUT THE GLOBAL VARIABLES)/////////////////////////////////
+
+#include <CommonCrypto/CommonDigest.h>
+#import "GPRequests.h"
+#import "RegisterScreen.h"
+#import <AWSiOSSDKv2/AWSMobileAnalytics.h>
+#import <AWSiOSSDKv2/AWSCore.h>
+#import "myConstants.h"
+
+@interface RegisterScreen ()
+
+//@property (nonatomic, strong) NSMutableData *responseData2;
+
+
+@end
+
+@implementation RegisterScreen
+
+bool firstUseEver;
+
+NSString * backgroundImage; //global
+
+bool openingWindow;
+NSString *storyboardName;
+
+NSString *adresseIp2;
+
+NSString *mytimeStamp;
+
+//size if the screen
+CGFloat screenWidth;//global
+CGFloat screenHeight;//global
+CGFloat tabBarHeight;//global
+
+NSUserDefaults *prefs;
+
+CGSize keyboardSize;
+CGRect rect;
+
+UITextField *textFieldUsername;
+UITextField *textFieldPassword1;
+UITextField *textFieldPassword2;
+
+
+UILabel *myWelcomeLabel;
+UILabel *monLabelPassword1;
+
+UIButton *backButton;
+UIButton *signUpButton;
+
+NSString *username;//global
+NSString *hashPassword;//global
+NSString *myCurrentPhoneNumber;//global
+
+bool logIn;//global
+
+NSString *password;
+NSString *password1;
+NSString *reponseLogIn;
+NSString *myDeviceToken;
+
+bool *connectionDidFinishLoadingOver;
+
+
+int height;
+int yInitial;
+int xPassword;
+int xButton;
+int xUsername;
+int yUsername;
+int yEspace;
+int elevation;
+int xUsernameTitle;
+
+UIActivityIndicatorView *registerSpinner;
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    
+    logIn = false;
+    
+    
+    
+    connectionDidFinishLoadingOver = false;
+    
+
+    
+    rect = self.view.frame;
+    height = rect.size.height;
+    
+    
+    //----------create labels and buttons ----------
+    [self initControls];
+    
+}
+
+
+//--------------hide the keyboard when screen touched------------
+
+- (IBAction)respondToTapGesture2:(UITapGestureRecognizer *)recognizer {
+    [textFieldPassword1 resignFirstResponder];
+    [textFieldPassword2 resignFirstResponder];
+    [textFieldUsername resignFirstResponder];
+}
+
+//---------------return pressed------------------------
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if(textFieldUsername.isFirstResponder){
+        [textFieldPassword1 becomeFirstResponder];
+    }
+    else if (textFieldPassword1.isFirstResponder){
+        [textFieldPassword2 becomeFirstResponder];
+    }
+    else{
+        [textFieldPassword1 resignFirstResponder];
+        [textFieldPassword2 resignFirstResponder];
+        [textFieldUsername resignFirstResponder];
+    }
+    
+    return YES;
+}
+
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+//---------------------sign up pressed (to create a new account)---------------------------
+
+- (IBAction)myActionLogIn:(id)sender {
+    if([textFieldUsername.text isEqualToString:@""]){
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:@"Error"
+                              message:@"Please enter your username first!" delegate:self
+                              cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alert show];
+        textFieldPassword1.text=@"";
+        textFieldPassword2.text=@"";
+    }
+    else if ([textFieldPassword1.text isEqualToString:@""]){
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:@"Error"
+                              message:@"Please enter your password first!" delegate:self
+                              cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alert show];
+        textFieldPassword1.text=@"";
+        textFieldPassword2.text=@"";
+    }
+    else if (![textFieldPassword1.text isEqualToString:textFieldPassword2.text]){
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:@"Error"
+                              message:@"Re-enter two different passwords" delegate:self
+                              cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alert show];
+        textFieldPassword1.text=@"";
+        textFieldPassword2.text=@"";
+    }
+    else if ([textFieldPassword1.text length] < 6){
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:@"Error"
+                              message:@"Please enter a password with at least 6 characters" delegate:self
+                              cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alert show];
+        textFieldPassword1.text=@"";
+        textFieldPassword2.text=@"";
+    }
+    else{
+        username = textFieldUsername.text;
+        password1 = textFieldPassword1.text;
+        
+        hashPassword = [GPRequests sha256HashFor:password1];
+        
+        //self.responseData2 = [NSMutableData data];
+        
+        //-------------------asynchronous register request---------------
+        [self localAsynchronousRegisterWithEmail:username withHashPass:hashPassword for:self];
+        
+        
+        //----------------synchronous sign up request---------------------------
+        //NSInteger myErrorCode = [GPRequests signUpWithEmail:username withPassWord:hashPassword for:self];
+        /*
+        APLLog([NSString stringWithFormat:@"THE error code: %d", myErrorCode]);
+        if(myErrorCode!=200){
+            if(myErrorCode==406){
+                logIn = false;
+                [prefs setBool:logIn forKey:@"logIn"];
+                //------- Switch screen to logIn -------account already exists------------
+                UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+                UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"logInScreen"];
+                [self presentViewController:vc animated:NO completion:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"setUsername" object: nil];
+            }
+        }
+        else{
+            //----------save user info in preferences-------------------
+            logIn = true;
+            [prefs setBool:logIn forKey:@"logIn"];
+            [prefs setObject:username forKey:@"username"];
+            [prefs setObject:hashPassword forKey:@"password"];
+            [prefs setObject:@"" forKey:@"phoneNumber"];
+            
+            //----------Switch screen to phone number screen -------------
+            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"phoneScreen"];
+            vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+            [self presentViewController:vc animated:YES completion:nil];
+            
+            
+        }*/
+    }
+}
+
+-(void)localAsynchronousRegisterWithEmail:(NSString *) userN withHashPass:(NSString *)hashP for:(id)sender{
+    
+    if ([GPRequests connected]){
+        signUpButton.enabled = NO;
+        signUpButton.highlighted = YES;
+        [self.view addSubview:registerSpinner];
+        [registerSpinner startAnimating];
+        
+        // 1
+        NSURL *loginUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@",adresseIp2,my_registerRequestName]];
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
+        
+        // 2
+        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:loginUrl];
+        request.HTTPMethod = @"POST";
+        
+        // 3
+        
+        
+        
+        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@",@"email=",userN,@"&password=",hashP];
+        APLLog([NSString stringWithFormat:@" local asynchronous register session post: %@",postString]);
+        NSData* data = [postString dataUsingEncoding:NSUTF8StringEncoding];
+        
+        NSError *error = nil;
+        
+        if (!error) {
+            // 4
+            APLLog(@"local login session: %@", loginUrl);
+            NSURLSessionUploadTask *uploadTask = [session uploadTaskWithRequest:request
+                                                                       fromData:data completionHandler:^(NSData *data,NSURLResponse *response,NSError *error) {
+                                                                           dispatch_async(dispatch_get_main_queue(), ^{
+                                                                               signUpButton.enabled=YES;
+                                                                               signUpButton.highlighted=NO;
+                                                                               [registerSpinner stopAnimating];
+                                                                               [registerSpinner removeFromSuperview];
+                                                                           });
+                                                                           if(error != nil){
+                                                                               APLLog(@"New login Error: [%@]", [error description]);
+                                                                               dispatch_async(dispatch_get_main_queue(), ^{
+                                                                                   UIAlertView *alert = [[UIAlertView alloc]
+                                                                                                         initWithTitle:@"Error"
+                                                                                                         message:@"Wrong identifier or password" delegate:self
+                                                                                                         cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                                                                                   [alert show];
+                                                                               });
+                                                                           }
+                                                                           else{
+                                                                               NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                                                                               NSInteger sessionErrorCode = [httpResponse statusCode];
+                                                                               [self localRegisterSucceeded:data withErrorCode:sessionErrorCode from:self];
+                                                                           }
+                                                                       }];
+            
+            // 5
+            [uploadTask resume];
+        }
+    }
+}
+
+-(void)localRegisterSucceeded:(NSData *)data withErrorCode:(NSInteger)sessionErrorCode from:(id)sender{
+    APLLog(@"local register session did receive response with error code: %i",sessionErrorCode);
+    if(sessionErrorCode!=200){
+        if(sessionErrorCode==406){
+            logIn = false;
+            [prefs setBool:logIn forKey:@"logIn"];
+            //------- Switch screen to logIn -------account already exists------------
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:@"Account already exists"
+                                      message:@"Please login" delegate:self
+                                      cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+                
+                UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+                UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"logInScreen"];
+                vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+                [self presentViewController:vc animated:YES completion:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"setUsername" object: nil];
+            });
+        }
+    }
+    else{
+        firstUseEver = true;
+        
+        //----------save user info in preferences-------------------
+        logIn = true;
+        [prefs setBool:logIn forKey:@"logIn"];
+        [prefs setObject:username forKey:@"username"];
+        [prefs setObject:hashPassword forKey:@"password"];
+        [prefs setObject:@"" forKey:@"phoneNumber"];
+        
+        //-----------update timestamp-------------------------------
+        mytimeStamp = @"1412932000";
+        [prefs setObject:mytimeStamp forKey:my_prefs_timestamp_key];
+        
+        
+        //----------Switch screen to phone number screen -------------
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"phoneScreen"];
+            vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+            [self presentViewController:vc animated:YES completion:nil];
+        });
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        signUpButton.enabled=YES;
+        signUpButton.highlighted=NO;
+        [registerSpinner stopAnimating];
+        [registerSpinner removeFromSuperview];
+    });
+}
+
+
+//-------------initialization of all labels and buttons---------------------
+
+-(void)initControls{
+    yInitial=110;
+    xPassword=190;
+    xUsername=250;
+    xUsernameTitle=300;
+    yEspace=50;
+    //xButton=100;
+    xButton=250;
+    yUsername=30;
+    
+    //------------Create tap gesture recognizer
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture2:)];
+    tapRecognizer.numberOfTapsRequired = 1;
+    [self.view addGestureRecognizer:tapRecognizer];
+    
+    
+    //---------------creation of label Pictever
+    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsernameTitle),40,xUsernameTitle,60);
+    myWelcomeLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
+    [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
+    [myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
+    myWelcomeLabel.text = @"Sign Up on Pictever!";
+    
+    //---------------Création du textField Username
+    CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername); // Définition d'un rectangle
+    textFieldUsername = [[UITextField alloc] initWithFrame:rectTFUsername];
+    textFieldUsername.textAlignment = NSTextAlignmentCenter;
+    textFieldUsername.borderStyle = UITextBorderStyleLine;
+    textFieldUsername.delegate=self;
+    textFieldUsername.backgroundColor = [UIColor whiteColor];
+    textFieldUsername.placeholder = @"Enter your email";
+    textFieldUsername.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    textFieldUsername.borderStyle = UITextBorderStyleRoundedRect;
+    
+    //----------------Creation of textField Password1
+    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername,xUsername,yUsername);; // Définition d'un rectangle
+    textFieldPassword1 = [[UITextField alloc] initWithFrame:rectTFPassword1];
+    textFieldPassword1.textAlignment = NSTextAlignmentCenter;
+    textFieldPassword1.borderStyle = UITextBorderStyleLine;
+    textFieldPassword1.delegate=self;
+    textFieldPassword1.backgroundColor = [UIColor whiteColor];
+    textFieldPassword1.placeholder = @"Enter a password";
+    textFieldPassword1.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldPassword1.secureTextEntry = YES;
+    
+    //------------Creation of textField Password2
+    CGRect rectTFPassword2 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername+yUsername,xUsername,yUsername);; // Définition d'un rectangle
+    textFieldPassword2 = [[UITextField alloc] initWithFrame:rectTFPassword2];
+    textFieldPassword2.textAlignment = NSTextAlignmentCenter;
+    textFieldPassword2.borderStyle = UITextBorderStyleLine;
+    textFieldPassword2.delegate=self;
+    textFieldPassword2.backgroundColor = [UIColor whiteColor];
+    textFieldPassword2.placeholder = @"Re-Enter your password";
+    textFieldPassword2.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldPassword2.secureTextEntry = YES;
+    
+    
+    //------------Creation of Sign Up button
+    signUpButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    signUpButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+2*yUsername+20,xButton,yUsername);
+    signUpButton.backgroundColor = [UIColor whiteColor];
+     [signUpButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    signUpButton.layer.cornerRadius = 10; // arrondir les
+    signUpButton.clipsToBounds = YES;     // angles du bouton
+    [signUpButton setTitle:@"Sign Up" forState:UIControlStateNormal];
+    [signUpButton.titleLabel setFont:[UIFont fontWithName:@"System-Bold" size:15]];
+    [[signUpButton layer] setBorderWidth:1.0f];
+    [signUpButton addTarget:self
+                     action:@selector(myActionLogIn:)
+           forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    //---------Creation of back button
+    backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    backButton.frame = CGRectMake(5,screenHeight-45,70,30);
+    backButton.backgroundColor = [UIColor clearColor];
+    [backButton setTitle:@"Back" forState:UIControlStateNormal];
+    [backButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [backButton.titleLabel setFont:[UIFont systemFontOfSize:18]];
+    [backButton addTarget:self
+                     action:@selector(backPressed)
+           forControlEvents:UIControlEventTouchUpInside];
+    
+    //-----------------Creation of register spinner---------
+    registerSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    registerSpinner.center = CGPointMake(0.5*screenWidth+105,yInitial+yUsername+0.5*yUsername+80);
+    registerSpinner.color = [UIColor blackColor];
+    registerSpinner.hidesWhenStopped = YES;
+    
+    [self.view addSubview: backButton];
+    [self.view addSubview: myWelcomeLabel];
+    [self.view addSubview: textFieldUsername];
+    [self.view addSubview: textFieldPassword1];
+    [self.view addSubview: textFieldPassword2];
+    [self.view addSubview: signUpButton];
+    [textFieldUsername becomeFirstResponder];
+}
+
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [registerSpinner stopAnimating];
+    [registerSpinner removeFromSuperview];
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    signUpButton.enabled = YES;
+    signUpButton.highlighted = NO;
+}
+
+
+//-------------back to welcome screen pressed--------------
+
+-(void) backPressed{
+    /*UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"WelcomeScreen"];
+    [self presentViewController:vc animated:NO completion:nil];*/
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+
+@end
+
+
+
