@@ -228,7 +228,7 @@ GPSession *myUploadContactSession;//global
             if(loginCheckAnswer == 200){
                 APLLog(@"restart receive request");
                 logIn = true;
-                [prefs setBool:logIn forKey:@"logIn"];
+                [prefs setBool:logIn forKey:my_prefs_login_key];
                 [[[GPSession alloc] init] receiveRequest:sender];
             }
         }
@@ -402,7 +402,7 @@ GPSession *myUploadContactSession;//global
             NSInteger loginCheckAnswer =[GPRequests loginWithEmail:username withPassWord:hashPassword for:sender];
             if(loginCheckAnswer == 200){
                 logIn = true;
-                [prefs setBool:logIn forKey:@"logIn"];
+                [prefs setBool:logIn forKey:my_prefs_login_key];
                 APLLog(@"restart send request with saveCurrentSendMessage: %@",[_sendDictionary description]);
                 NSString *lccMessage = @"";
                 NSString *lccReceiverIds = @"";
@@ -552,7 +552,7 @@ GPSession *myUploadContactSession;//global
             NSInteger loginCheckAnswer =[GPRequests loginWithEmail:username withPassWord:hashPassword for:sender];
             if(loginCheckAnswer == 200){
                 logIn = true;
-                [prefs setBool:logIn forKey:@"logIn"];
+                [prefs setBool:logIn forKey:my_prefs_login_key];
                 APLLog(@"restart resend request with resendString: %@",_resendString);
 
                 [[[GPSession alloc] init] resendRequest:_resendString for:sender];
@@ -637,9 +637,6 @@ GPSession *myUploadContactSession;//global
     
     numberOfMessagesInTheFuture = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
-    if([numberOfMessagesInTheFuture isEqualToString:@"0"]){
-        numberOfMessagesInTheFuture = @"1";
-    }
     [prefs setObject:numberOfMessagesInTheFuture forKey:@"numberOfMessagesInTheFuture"];
     
     NSMutableDictionary *dicForNotif = [[NSMutableDictionary alloc] init];
@@ -1052,7 +1049,7 @@ GPSession *myUploadContactSession;//global
         }
         if(loginErrorCode==401){
             logIn = false;
-            [prefs setBool:logIn forKey:@"logIn"];
+            [prefs setBool:logIn forKey:my_prefs_login_key];
         }
     }
     else{
@@ -1234,6 +1231,71 @@ GPSession *myUploadContactSession;//global
         }
     }
 }
+
+
+
+#pragma mark - send reset mail
+
+
+-(void)sendResetMailRequest:(NSString *)email for:(id)sender{
+    if([GPRequests connected]){
+        NSString *resetUrl = @"";
+        
+        resetUrl = [NSString stringWithFormat:@"%@%@%@%@",adresseIp2,my_sendResetMail,@"?email=",email];
+        
+        
+        APLLog(@"resetMail session: %@", resetUrl);
+        NSURLSession *session = [NSURLSession sharedSession];
+        [[session dataTaskWithURL:[NSURL URLWithString:resetUrl]
+                completionHandler:^(NSData *data,
+                                    NSURLResponse *response,
+                                    NSError *error) {
+                    if(error != nil){
+                        APLLog(@"New resetMail Error: [%@]", [error description]);
+                    }
+                    else{
+                        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                        NSInteger sessionErrorCode = [httpResponse statusCode];
+                        [self resetMailDidReceiveResponse:data withErrorCode:sessionErrorCode from:sender];
+                    }
+                    
+                }] resume];
+    }
+}
+
+-(void)resetMailDidReceiveResponse:(NSData *)data withErrorCode:(NSInteger)resetMailErrorCode from:(id)sender{
+    
+    APLLog(@"receive session did receive response with error code: %i",resetMailErrorCode);
+    if(resetMailErrorCode != 200){
+        if(resetMailErrorCode==500){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:@"Error: reset"
+                                      message:@"Server problem" delegate:self
+                                      cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            });
+            [GPRequests goBackToFirstServer];
+        }
+        if(resetMailErrorCode==404){
+            [GPRequests goBackToFirstServer];
+        }
+    }
+    else{
+        [self resetMailSucceeded:data];
+    }
+}
+
+-(void)resetMailSucceeded:(NSData *)data{
+    
+    APLLog(@"Session succeeded! Received %d bytes of data resetMail",[data length]);
+    NSError *myError = nil;
+    id serverAnswer = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&myError];
+    APLLog(@"Server answer: %@",[serverAnswer description]);
+    
+}
+
+
 
 
 @end

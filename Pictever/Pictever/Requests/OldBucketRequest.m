@@ -94,11 +94,7 @@ bool downloadPhotoOnAmazon;//global
             APLLog(@"OK FOR AMAZON");
             
             if(newShyft3 != nil){
-                /*UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-                
-                KeoMessages * vck = (KeoMessages *)[storyboard instantiateViewControllerWithIdentifier:my_storyboard_timeline_Name];
-                
-                [vck vibrateForNewShyft:newShyft3];*/
+
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"vibrateForNewShyft" object:self userInfo:newShyft3];
                 });

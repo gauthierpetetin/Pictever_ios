@@ -47,6 +47,9 @@ UILabel *infoLabel;
     myDatePickerPhoto.minimumDate = [[NSDate date] dateByAddingTimeInterval:60];
     myDatePickerPhoto.maximumDate = [[NSDate date] dateByAddingTimeInterval:31536000];
     
+    
+    int xButton = 122;
+    int yButton = 30;
     UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [button addTarget:self
                action:@selector(sendKeo)
@@ -56,7 +59,7 @@ UILabel *infoLabel;
     button.backgroundColor = [UIColor whiteColor];
     [button setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
     [button setTitle:@"Confirm" forState:UIControlStateNormal];
-    button.frame = CGRectMake(100.0, 370.0, 122.0, 30.0);
+    button.frame = CGRectMake(0.5*screenWidth-0.5*xButton, 0.77*screenHeight, xButton, yButton);
     [self.view addSubview:button];
     
     int xInfo = 200;

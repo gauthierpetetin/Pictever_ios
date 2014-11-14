@@ -214,7 +214,8 @@ NSString *mytimeStamp;//global
             }
         }
         APLLog(@"replace downloaded photo");
-        if([[shyftFromSession objectForKey:my_loaded_Key] isEqualToString:@"yes"]){
+        
+        /*if([[shyftFromSession objectForKey:my_loaded_Key] isEqualToString:@"yes"]){
             if(indexOfPhotoReceived != -1){
                 [myGeneralMethods replaceMessage:shyftFromSession andDeleteLoadBoxAtIndex:indexOfPhotoReceived];//TO DEBUG
             }
@@ -223,7 +224,14 @@ NSString *mytimeStamp;//global
             [shyftFromSession setObject:@"yes" forKey:my_loaded_Key];
             [myGeneralMethods replaceMessage:shyftFromSession];
             return shyftFromSession;
+        }*/
+        
+        
+        [shyftFromSession setObject:@"yes" forKey:my_loaded_Key];
+        if(indexOfPhotoReceived != -1){
+            [myGeneralMethods replaceMessage:shyftFromSession andDeleteLoadBoxAtIndex:indexOfPhotoReceived];//TO DEBUG
         }
+        return shyftFromSession;
     }
     else{//--------------------if photoPath is false------------------------------
         if([[shyftFromSession objectForKey:my_loaded_Key] isEqualToString:@"yes"]){

@@ -169,7 +169,7 @@ int myBlinkingCounter;
                 //// Switch screen to phone number
                 dispatch_async(dispatch_get_main_queue(), ^{
                     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-                    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"phoneScreen"];
+                    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_phone_screen];
                     vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
                     [self presentViewController:vc animated:YES completion:nil];
                 });
@@ -178,7 +178,7 @@ int myBlinkingCounter;
                 APLLog(@"okay for phoneNumber");
                 dispatch_async(dispatch_get_main_queue(), ^{
                     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-                    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"MasterController"];
+                    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_master_controller];
                     vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
                     [self presentViewController:vc animated:YES completion:nil];
                 });
@@ -322,7 +322,7 @@ int myBlinkingCounter;
     yButton2 = 30;
     
     //--------------creation of welcome label
-    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xLabel),70,xLabel,60);
+    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xLabel),0.15*screenHeight,xLabel,60);
     myWelcomeLabel2 = [[UILabel alloc] initWithFrame: rectLabUsername];
     [myWelcomeLabel2 setTextAlignment:NSTextAlignmentCenter];
     [myWelcomeLabel2 setFont:[UIFont fontWithName:@"Gabriola" size:42]];
@@ -332,7 +332,7 @@ int myBlinkingCounter;
     
     //---------------Creation of Sign Up button
     signUpButton2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    signUpButton2.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial,xButton,yButton);
+    signUpButton2.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),0.6*screenHeight,xButton,yButton);
     signUpButton2.backgroundColor = [UIColor clearColor];
     signUpButton2.layer.cornerRadius = 8;
     signUpButton2.clipsToBounds = YES;
@@ -361,7 +361,7 @@ int myBlinkingCounter;
            forControlEvents:UIControlEventTouchUpInside];
     
     //--------------creation of label Update app version(in the case we want to force a new version installation)
-    CGRect rectLabUpdate = CGRectMake(0.5*screenWidth-(0.5*xLabel),50,xLabel,60);
+    CGRect rectLabUpdate = CGRectMake(0.5*screenWidth-(0.5*xLabel),0.1*screenHeight,xLabel,60);
     myUpdateVersionLabel = [[UILabel alloc] initWithFrame: rectLabUpdate];
     [myUpdateVersionLabel setTextAlignment:NSTextAlignmentCenter];
     [myUpdateVersionLabel setFont:[UIFont systemFontOfSize:18]];
@@ -370,7 +370,7 @@ int myBlinkingCounter;
     
     //----------------Creation of Install button (in the case we want to force a new version installation)
     installButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    installButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial,xButton,yButton);
+    installButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),0.6*screenHeight,xButton,yButton);
     installButton.backgroundColor = [UIColor clearColor];
     [installButton setTitle:@"INSTALL NOW" forState:UIControlStateNormal];
     [installButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];

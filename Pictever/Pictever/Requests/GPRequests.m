@@ -366,7 +366,7 @@ bool localWork;//global
             
             if(myErrorCode==401){
                 logIn = false;
-                [prefs setBool:logIn forKey:@"logIn"];
+                [prefs setBool:logIn forKey:my_prefs_login_key];
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"Log In"
                                       message:@"Wrong identifiers" delegate:self
@@ -392,7 +392,7 @@ bool localWork;//global
         }
         
         
-        [prefs setBool:logIn forKey:@"logIn"];
+        [prefs setBool:logIn forKey:my_prefs_login_key];
         
         return myErrorCode;
     }

@@ -45,6 +45,8 @@ NSString *const my_defineFirstPhoneRequestName = @"define_first_phone_number";
 NSString *const my_futureMessagesRequestName = @"get_number_of_future_messages";
 NSString *const my_getStatusRequestName = @"get_my_status";
 NSString *const my_resendRequestName = @"resend";
+NSString *const my_sendResetMail = @"send_reset_mail";
+NSString *const my_defineNewPassword = @"define_new_password";
 
 
 NSString *const my_default_adresseIp=@"http://instant-pictever.herokuapp.com/";
@@ -75,6 +77,8 @@ NSString *const my_storyboard_picture_Name = @"TakePicture3";
 NSString *const my_storyboard_timeline_Name = @"KeoMessages";
 NSString *const my_storyboard_pickContact_Name = @"PickContact";
 NSString *const my_storyboard_master_controller = @"MasterController";
+NSString *const my_storyboard_phone_screen = @"phoneScreen";
+NSString *const my_storyboard_password_recovery = @"passwordRecovery";
 
 
 //------------------send request fields-------------------------------------------
@@ -116,6 +120,13 @@ NSString *const my_login_force_update_key = @"force_update";
 NSString *const my_prefs_S3BucketName_key = @"S3BucketName";
 NSString *const my_prefs_keo_occurences_key = @"importKeoOccurences";
 NSString *const my_prefs_timestamp_key = @"timeStamp";
+NSString *const my_prefs_login_key = @"logIn";
+NSString *const my_prefs_username_key = @"username";
+NSString *const my_prefs_password_key = @"password";
+NSString *const my_prefs_phoneNumber_key = @"phoneNumber";
+NSString *const my_prefs_countryCode_key = @"countryCode";
+
+
 
 
 //-------------------------sendBoxContent------------------------------------------

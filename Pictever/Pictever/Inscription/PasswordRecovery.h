@@ -6,8 +6,14 @@
 //  Copyright (c) 2014 Pictever. All rights reserved.
 //
 
-#ifndef Pictever_PasswordRecovery_h
-#define Pictever_PasswordRecovery_h
+#import <UIKit/UIKit.h>
+
+/////APPLAUSE
+#import <Applause/APLLogger.h>
 
 
-#endif
+@interface PasswordRecovery : UIViewController <UITextFieldDelegate>{}
+
+
+
+@end

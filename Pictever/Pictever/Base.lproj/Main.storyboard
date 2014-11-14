@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="awT-vN-4iO">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
@@ -136,13 +137,13 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <button autoresizesSubviews="NO" opaque="NO" contentMode="scaleToFill" restorationIdentifier="fb_button" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cXP-Xd-0FE" userLabel="FacebookButton">
-                                            <rect key="frame" x="285" y="289" width="30" height="34"/>
+                                            <rect key="frame" x="285" y="279" width="30" height="34"/>
                                             <state key="normal">
                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                             </state>
                                         </button>
                                         <button opaque="NO" contentMode="scaleAspectFill" restorationIdentifier="resend_button" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0af-rg-WJS" userLabel="ResendButton">
-                                            <rect key="frame" x="285" y="323" width="30" height="34"/>
+                                            <rect key="frame" x="285" y="313" width="30" height="34"/>
                                             <state key="normal">
                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                             </state>
@@ -156,7 +157,7 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="6F4-m4-41K" firstAttribute="top" secondItem="90B-Gb-hwi" secondAttribute="bottom" id="2fF-d8-jOu" userLabel="17-message-period-Ver-space"/>
-                                        <constraint firstItem="0af-rg-WJS" firstAttribute="bottom" secondItem="2ui-zP-aVh" secondAttribute="bottom" constant="-4" id="3Uc-an-NWI" userLabel="24-resend-imgV-Ver-space"/>
+                                        <constraint firstItem="0af-rg-WJS" firstAttribute="bottom" secondItem="2ui-zP-aVh" secondAttribute="bottom" constant="-14" id="3Uc-an-NWI" userLabel="24-resend-imgV-Ver-space"/>
                                         <constraint firstItem="bmO-IU-Ymg" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="WOb-6p-KA2" secondAttribute="trailing" constant="5" id="4Pf-2h-Nch" userLabel="19-name-date-hor-liminf"/>
                                         <constraint firstItem="0af-rg-WJS" firstAttribute="trailing" secondItem="2ui-zP-aVh" secondAttribute="trailing" priority="999" constant="-5" id="9qY-oz-8kx" userLabel="25-resend-imgV-Hor-space"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="2ui-zP-aVh" secondAttribute="trailing" constant="-8" id="BVd-eI-1cO" userLabel="6-IMGV-Hor-space-1"/>
@@ -167,6 +168,7 @@
                                         <constraint firstItem="5EC-l8-tAX" firstAttribute="centerY" secondItem="bmO-IU-Ymg" secondAttribute="centerY" id="MeV-p2-9ez" userLabel="1-date-Ver-center"/>
                                         <constraint firstItem="5EC-l8-tAX" firstAttribute="leading" secondItem="Pa6-4o-hIu" secondAttribute="leadingMargin" constant="-8" id="NBO-7E-zs6" userLabel="BackG-Hor-space-1"/>
                                         <constraint firstItem="WOb-6p-KA2" firstAttribute="centerY" secondItem="5EC-l8-tAX" secondAttribute="centerY" id="NXb-qZ-wyF" userLabel="14-name-Ver-center"/>
+                                        <constraint firstItem="5EC-l8-tAX" firstAttribute="top" secondItem="Pa6-4o-hIu" secondAttribute="topMargin" constant="-7" id="Rwm-ne-5sT"/>
                                         <constraint firstItem="2ui-zP-aVh" firstAttribute="leading" secondItem="6F4-m4-41K" secondAttribute="leading" constant="-20" id="Si8-Yx-RLu" userLabel="8-Message-IMGV-Hor-space"/>
                                         <constraint firstItem="5EC-l8-tAX" firstAttribute="centerY" secondItem="dbv-oY-6ss" secondAttribute="centerY" id="TKQ-LG-Tg4" userLabel="ppic-Ver-center"/>
                                         <constraint firstItem="cXP-Xd-0FE" firstAttribute="width" secondItem="0af-rg-WJS" secondAttribute="width" id="U7J-AN-OZd" userLabel="21-fb-resend-widths"/>
@@ -387,6 +389,24 @@
             </objects>
             <point key="canvasLocation" x="-1234" y="287"/>
         </scene>
+        <!--Password Recovery-->
+        <scene sceneID="9d1-KK-EzU">
+            <objects>
+                <viewController storyboardIdentifier="passwordRecovery" id="uyl-yy-N1k" customClass="PasswordRecovery" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="muk-Fl-1pt"/>
+                        <viewControllerLayoutGuide type="bottom" id="wv8-EJ-ecD"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="s5T-D5-hiU">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gCc-Di-SJf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1064" y="934"/>
+        </scene>
         <!--Master-->
         <scene sceneID="fsp-ps-5JI">
             <objects>
@@ -565,13 +585,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="nbr-kN-lHp">
+                            <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="nbr-kN-lHp">
                                 <rect key="frame" x="0.0" y="119" width="320" height="162"/>
                                 <date key="date" timeIntervalSinceReferenceDate="423239114.759408">
                                     <!--2014-05-31 14:25:14 +0000-->
                                 </date>
                             </datePicker>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Pick a date for your Shyft!" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ok5-kn-k9f">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pick a date for your Shyft!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ok5-kn-k9f">
                                 <rect key="frame" x="61" y="81" width="199" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -579,6 +599,14 @@
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="nbr-kN-lHp" firstAttribute="leading" secondItem="i9x-bf-LjM" secondAttribute="leadingMargin" constant="-16" id="0vM-QV-sxF"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Ok5-kn-k9f" secondAttribute="trailing" constant="44" id="4mt-EQ-zuM"/>
+                            <constraint firstItem="Ok5-kn-k9f" firstAttribute="leading" secondItem="i9x-bf-LjM" secondAttribute="leadingMargin" constant="45" id="Ydb-QO-6hA"/>
+                            <constraint firstItem="Ok5-kn-k9f" firstAttribute="top" secondItem="jYM-5u-DPw" secondAttribute="bottom" constant="17" id="bpv-Vl-Gs7"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="nbr-kN-lHp" secondAttribute="trailing" constant="-16" id="f86-7D-XuL"/>
+                            <constraint firstItem="nbr-kN-lHp" firstAttribute="top" secondItem="Ok5-kn-k9f" secondAttribute="bottom" constant="17" id="s1B-47-tne"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="URY-bW-Y4p">
                         <barButtonItem key="leftBarButtonItem" id="LkA-yX-VaL">

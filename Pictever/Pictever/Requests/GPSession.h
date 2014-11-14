@@ -39,4 +39,6 @@
 
 -(void)asynchronousLoginWithEmailfor:(id)sender;
 
+-(void)sendResetMailRequest:(NSString *)email for:(id)sender;
+
 @end

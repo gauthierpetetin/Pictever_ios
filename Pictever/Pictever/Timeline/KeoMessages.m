@@ -185,9 +185,7 @@ myTabBarController *myController;
     
     lightGrayColor = [UIColor colorWithRed:240/255.0f green:245/255.0f blue:248/255.0f alpha:1.0f];
     
-    //[keoTableView setDelegate:self];
-    //[keoTableView setDataSource:self];
-    [self.tableView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    //[self.tableView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     
     //----------if the gallery contains messages----------------------------
@@ -267,7 +265,7 @@ myTabBarController *myController;
      spinner.hidesWhenStopped = YES;
      [self.view addSubview:spinner];*/
     
-    CGFloat navBarHeight = self.navigationController.navigationBar.frame.size.height+20;
+    CGFloat navBarHeight = self.navigationController.navigationBar.frame.size.height+0.04*screenHeight;
     
     _loadTbvLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,navBarHeight,screenWidth,screenHeight-navBarHeight)];
     _loadTbvLabel.text = @"";
@@ -294,8 +292,13 @@ myTabBarController *myController;
 }
 
 -(void)initHeaderView{
+    //----------------subview to show the refresh spinner and label----------------------
+    hdView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, 210)];//50 before Billy
+    hdView.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
+    
+    
     //---------------add Billy with flag-----------------------------
-    myBillyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, screenWidth-40, 180)];
+    myBillyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.06*screenWidth, 0.02*screenHeight, screenWidth*0.875, 180)];
     myBillyImageView.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:@"panda_top_timeline.png"] withFactor:2];
     myBillyImageView.contentMode = UIViewContentModeCenter;
     
@@ -304,23 +307,21 @@ myTabBarController *myController;
     [myBillyImageView addGestureRecognizer:billyTapRecognizer];
     myBillyImageView.userInteractionEnabled = YES;
     
-    billyLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 165, screenWidth-40, 40)];
+    //billyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.06*screenWidth, 0.34*screenHeight, screenWidth*0.875, 40)];
+    billyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.06*screenWidth, hdView.frame.size.height-45, screenWidth*0.875, 40)];
     billyLabel.numberOfLines = 0;
     billyLabel.lineBreakMode = NSLineBreakByWordWrapping;
     billyLabel.textAlignment = NSTextAlignmentCenter;
     billyLabel.text = @"Wanna know how many messages you will receive in the future? Ask Billy!";
     [billyLabel setFont:[UIFont fontWithName:@"Gabriola" size:18]];
     
-    futureLabel = [[UILabel alloc] initWithFrame:CGRectMake(140, 58, 114, 40)];
+    futureLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.43*screenWidth, 0.28
+                                                            *hdView.frame.size.height, 0.36*screenWidth, 40)];
     futureLabel.textAlignment = NSTextAlignmentCenter;
     futureLabel.font = [UIFont fontWithName:@"Gabriola" size:30];
     futureLabel.textColor = [UIColor whiteColor];
     //futureLabel.backgroundColor = [UIColor yellowColor];
     
-    
-    //----------------subview to show the refresh spinner and label----------------------
-    hdView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, 210)];//50 before Billy
-    hdView.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
     [hdView addSubview:spinner];
     [hdView addSubview:refreshLabel];
     [hdView addSubview:myBillyImageView];
@@ -356,7 +357,7 @@ myTabBarController *myController;
         newNumber = [dicFromNotif objectForKey:@"numberOfMessagesInTheFuture"];
     }
     else{
-        newNumber = @"1";
+        newNumber = @"";
     }
     
     APLLog(@"futurelabeltext before: %@",futureLabel.text);

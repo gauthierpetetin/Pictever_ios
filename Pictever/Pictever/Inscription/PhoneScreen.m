@@ -846,20 +846,20 @@ numberOfRowsInComponent:(NSInteger)component{
             
             APLLog(@"definePhone200");
             logIn = true;
-            [prefs setBool:logIn forKey:@"logIn"];
+            [prefs setBool:logIn forKey:my_prefs_login_key];
             myCurrentPhoneNumber = phoneNumberToCheck;
             
             //--------------Save Number
-            [prefs setObject:myCurrentPhoneNumber forKey:@"phoneNumber"];
+            [prefs setObject:myCurrentPhoneNumber forKey:my_prefs_phoneNumber_key];
             
             //--------------save regional code
             myCountryCode = localCountryCode;
-            [prefs setObject:localCountryCode forKey:@"countryCode"];
+            [prefs setObject:localCountryCode forKey:my_prefs_countryCode_key];
             //
             
             [self createContactMyself];
             
-            APLLog(@"Phone number is saved: %@",[prefs objectForKey:@"phoneNumber"]);
+            APLLog(@"Phone number is saved: %@",[prefs objectForKey:my_prefs_phoneNumber_key]);
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
                 UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"WelcomeScreen"];
@@ -904,7 +904,8 @@ numberOfRowsInComponent:(NSInteger)component{
     CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),50-15,xUsername,60);
     myWelcomeLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
     [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
-    [myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
+    //[myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
+    [myWelcomeLabel setFont:[UIFont fontWithName:@"Gabriola" size:42]];
     myWelcomeLabel.text = @"Phone Number";
     
     //--------------creation of label information
@@ -966,7 +967,7 @@ numberOfRowsInComponent:(NSInteger)component{
     
     
     phoneSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    phoneSpinner.center = CGPointMake(0.5*screenWidth+100,yInitial+yUsername+0.5*yUsername+20);
+    phoneSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+20);
     phoneSpinner.color = [UIColor blackColor];
     phoneSpinner.hidesWhenStopped = YES;
     

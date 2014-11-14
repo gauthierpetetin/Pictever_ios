@@ -25,6 +25,7 @@
 		951D4DF81A0BC14B00DCC674 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 951D4DF71A0BC14B00DCC674 /* UIKit.framework */; };
 		951D4DFA1A0BC15500DCC674 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 951D4DF91A0BC15500DCC674 /* CoreGraphics.framework */; };
 		954DD77E1A0BD62900F0B763 /* GZIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 954DD77D1A0BD62900F0B763 /* GZIP.framework */; };
+		955A789B1A1396F60007FF90 /* PasswordRecovery.m in Sources */ = {isa = PBXBuildFile; fileRef = 955A789A1A1396F60007FF90 /* PasswordRecovery.m */; };
 		9560FE681A0E9D6B00210060 /* LauchScreen6plus.png in Resources */ = {isa = PBXBuildFile; fileRef = 9560FE641A0E9D6B00210060 /* LauchScreen6plus.png */; };
 		9560FE691A0E9D6B00210060 /* LaunchScreen4.png in Resources */ = {isa = PBXBuildFile; fileRef = 9560FE651A0E9D6B00210060 /* LaunchScreen4.png */; };
 		9560FE6A1A0E9D6B00210060 /* LaunchScreen5.png in Resources */ = {isa = PBXBuildFile; fileRef = 9560FE661A0E9D6B00210060 /* LaunchScreen5.png */; };
@@ -355,6 +356,8 @@
 		951D4DF91A0BC15500DCC674 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		954DD7791A0BD4D800F0B763 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Pictever/importedFrameworks/Reachability.framework; sourceTree = "<group>"; };
 		954DD77D1A0BD62900F0B763 /* GZIP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GZIP.framework; path = Pictever/importedFrameworks/GZIP.framework; sourceTree = "<group>"; };
+		955A789A1A1396F60007FF90 /* PasswordRecovery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordRecovery.m; sourceTree = "<group>"; };
+		955A789C1A1397210007FF90 /* PasswordRecovery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PasswordRecovery.h; sourceTree = "<group>"; };
 		9560FE641A0E9D6B00210060 /* LauchScreen6plus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LauchScreen6plus.png; sourceTree = "<group>"; };
 		9560FE651A0E9D6B00210060 /* LaunchScreen4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LaunchScreen4.png; sourceTree = "<group>"; };
 		9560FE661A0E9D6B00210060 /* LaunchScreen5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LaunchScreen5.png; sourceTree = "<group>"; };
@@ -966,6 +969,8 @@
 		95CEFA511A0A86E300643E6B /* Inscription */ = {
 			isa = PBXGroup;
 			children = (
+				955A789C1A1397210007FF90 /* PasswordRecovery.h */,
+				955A789A1A1396F60007FF90 /* PasswordRecovery.m */,
 				95CEFA521A0A86E300643E6B /* LogInScreen.h */,
 				95CEFA531A0A86E300643E6B /* LogInScreen.m */,
 				95CEFA541A0A86E300643E6B /* PhoneScreen.h */,
@@ -1622,6 +1627,7 @@
 				95CEF9A91A0A7FAF00643E6B /* AppDelegate.m in Sources */,
 				95CEF9D91A0A818F00643E6B /* SettingsController.m in Sources */,
 				951D4DB21A0B745900DCC674 /* myGeneralMethods.m in Sources */,
+				955A789B1A1396F60007FF90 /* PasswordRecovery.m in Sources */,
 				95CEFA321A0A858B00643E6B /* ShyftSet.m in Sources */,
 				95CEFA5C1A0A86E300643E6B /* RegisterScreen.m in Sources */,
 				95CEF9A61A0A7FAF00643E6B /* main.m in Sources */,
@@ -1762,11 +1768,11 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				INFOPLIST_FILE = Pictever/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "89475989-d8e3-45a0-9c60-baf757bd3c68";
+				PROVISIONING_PROFILE = "895729ee-88a6-498e-9f1e-f19922231edf";
 			};
 			name = Debug;
 		};
@@ -1782,7 +1788,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				INFOPLIST_FILE = Pictever/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

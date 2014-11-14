@@ -244,7 +244,7 @@ bool sendSMS;
 -(void)switchScreenToKeo{
     openingWindow = 2;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"MasterController"];
+    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_master_controller];
     
     [self presentViewController:vc animated:NO completion:nil];
 }

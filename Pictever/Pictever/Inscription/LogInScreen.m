@@ -14,6 +14,7 @@
 #import <AWSiOSSDKv2/AWSMobileAnalytics.h>
 #import <AWSiOSSDKv2/AWSCore.h>
 #import "myConstants.h"
+#import "GPSession.h"
 
 
 @interface LogInScreen ()
@@ -53,9 +54,9 @@ UITextField *textFieldPassword1;
 UILabel *myWelcomeLabel;
 UILabel *monLabelPassword1;
 
-
+UITapGestureRecognizer *tapRecognizer;
 UIButton *backButton2;
-
+UIButton *passwordRecoveryButton;
 
 UIButton *logInButton;
 
@@ -94,95 +95,8 @@ UIActivityIndicatorView *loginSpinner;
     
     
     connectionDidFinishLoadingOver = false;
-    yInitial=130;
-    xPassword=190;
-    xUsername=250;
-    yEspace=50;
-    //xButton=100;
-    xButton=250;
-    yUsername=30;
     
-    
-    rect = self.view.frame;
-    height = rect.size.height;
-
-    
-    //-------------Create tap gesture recognizer---------------------
-    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture2:)];
-    tapRecognizer.numberOfTapsRequired = 1;
-    [self.view addGestureRecognizer:tapRecognizer];
-
-    
-    
-    //--------------------CREATION OF CONTROLS---------------------
-    
-    //-------------------creation of title label
-    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),50,xUsername,60);
-    myWelcomeLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
-    [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
-    [myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
-    myWelcomeLabel.text = @"Log In to Pictever!";
-    
-    //----------------Creation of textField Username
-    CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername); // Définition d'un rectangle
-    textFieldUsername = [[UITextField alloc] initWithFrame:rectTFUsername];
-    textFieldUsername.textAlignment = NSTextAlignmentCenter;
-    textFieldUsername.borderStyle = UITextBorderStyleLine;
-    textFieldUsername.delegate=self;
-    textFieldUsername.backgroundColor = [UIColor whiteColor];
-    textFieldUsername.placeholder = @"Enter your email";
-    textFieldUsername.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    textFieldUsername.borderStyle = UITextBorderStyleRoundedRect;
-     
-    //------------------Creation of textField Password1
-    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername,xUsername,yUsername);; // Définition d'un rectangle
-    textFieldPassword1 = [[UITextField alloc] initWithFrame:rectTFPassword1];
-    textFieldPassword1.textAlignment = NSTextAlignmentCenter;
-    textFieldPassword1.borderStyle = UITextBorderStyleLine;
-    textFieldPassword1.delegate=self;
-    textFieldPassword1.backgroundColor = [UIColor whiteColor];
-    textFieldPassword1.placeholder = @"Enter your password";
-    textFieldPassword1.borderStyle = UITextBorderStyleRoundedRect;
-    textFieldPassword1.secureTextEntry = YES;
-    
-    
-    //----------------------Creation du button LOG IN
-    logInButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    logInButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+yUsername+20,xButton,yUsername);
-    logInButton.backgroundColor = [UIColor whiteColor];
-    logInButton.layer.cornerRadius = 10; // arrondir les
-    logInButton.clipsToBounds = YES;     // angles du bouton
-    [logInButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [logInButton setTitle:@"Log In" forState:UIControlStateNormal];
-    [logInButton.titleLabel setFont:[UIFont fontWithName:@"System-Bold" size:15]];
-    [[logInButton layer] setBorderWidth:1.0f];
-    [logInButton addTarget:self
-                    action:@selector(myActionLogIn:)
-          forControlEvents:UIControlEventTouchUpInside];
-    
-    //-----------------Creation of back button
-    backButton2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    backButton2.frame = CGRectMake(5,screenHeight-45,70,30);
-    backButton2.backgroundColor = [UIColor clearColor];
-    [backButton2 setTitle:@"Back" forState:UIControlStateNormal];
-    [backButton2 setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [backButton2.titleLabel setFont:[UIFont systemFontOfSize:18]];
-    [backButton2 addTarget:self
-                   action:@selector(backPressed2)
-         forControlEvents:UIControlEventTouchUpInside];
-    
-    //-----------------Creation of loading spinner---------
-    loginSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    loginSpinner.center = CGPointMake(0.5*screenWidth+105,yInitial+yUsername+0.5*yUsername+50);
-    loginSpinner.color = [UIColor blackColor];
-    loginSpinner.hidesWhenStopped = YES;
-    
-    [self.view addSubview: backButton2];
-    [self.view addSubview: myWelcomeLabel];
-    [self.view addSubview: textFieldUsername];
-    [self.view addSubview: textFieldPassword1];
-    [self.view addSubview: logInButton];
-    [textFieldUsername becomeFirstResponder];
+    [self initControls];
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setUsernameByNotif) name:@"setUsername" object: nil];
 
@@ -192,6 +106,17 @@ UIActivityIndicatorView *loginSpinner;
     [super viewDidAppear:animated];
     logInButton.enabled = YES;
     logInButton.highlighted = NO;
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self.view addSubview: backButton2];
+    [self.view addSubview: myWelcomeLabel];
+    [self.view addSubview: textFieldUsername];
+    [self.view addSubview: textFieldPassword1];
+    [self.view addSubview: logInButton];
+    [self.view addGestureRecognizer:tapRecognizer];
+    [textFieldUsername becomeFirstResponder];
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -214,6 +139,20 @@ UIActivityIndicatorView *loginSpinner;
 - (IBAction)respondToTapGesture2:(UITapGestureRecognizer *)recognizer {
     [textFieldPassword1 resignFirstResponder];
     [textFieldUsername resignFirstResponder];
+}
+
+//---------------recover password pressed------------------------
+-(void)recoverPasswordPressed{
+    NSLog(@"recover password pressed");
+    
+    if([GPRequests connected]){
+        [[[GPSession alloc] init] sendResetMailRequest:username for:self];
+        
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+        UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_password_recovery];
+        vc.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        [self presentViewController:vc animated:YES completion:nil];
+    }
 }
 
 
@@ -242,7 +181,6 @@ UIActivityIndicatorView *loginSpinner;
 //-----------------go back to welcome screen ------------------------------
 
 -(void) backPressed2{
-
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -275,34 +213,6 @@ UIActivityIndicatorView *loginSpinner;
         
         [self localAsynchronousLoginWithEmail:username withHashPass:hashPassword for:self];
         
-        //NSInteger logInAnswer = [GPRequests loginWithEmail:username withPassWord:hashPassword for:self];
-        
-        /*
-        if(logInAnswer != 200){
-            UIAlertView *alert = [[UIAlertView alloc]
-                                  initWithTitle:@"Error"
-                                  message:@"Wrong identifier or password" delegate:self
-                                  cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alert show];
-        }
-        else{
-            logIn = true;
-            
-            //---------saves user info--------------
-
-            [prefs setBool:logIn forKey:@"logIn"];
-            [prefs setObject:username forKey:@"username"];
-            [prefs setObject:hashPassword forKey:@"password"];
-            
-            NSString *newLogInTimeStamp = [NSString stringWithFormat:@"%f",[[NSDate date] timeIntervalSince1970]];
-            [prefs setObject:newLogInTimeStamp forKey:@"timeStamp"];
- 
-            //--------------Switch screen to phone number------
-            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"phoneScreen"];
-            vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-            [self presentViewController:vc animated:YES completion:nil];
-        }*/
     }
 }
 
@@ -371,6 +281,9 @@ UIActivityIndicatorView *loginSpinner;
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
                 textFieldPassword1.text = @"";
+                
+                [prefs setObject:username forKey:my_prefs_username_key];
+                [self.view addSubview:passwordRecoveryButton];
             });
         }
         else{
@@ -390,9 +303,9 @@ UIActivityIndicatorView *loginSpinner;
         
         //---------saves user info--------------
         
-        [prefs setBool:logIn forKey:@"logIn"];
-        [prefs setObject:username forKey:@"username"];
-        [prefs setObject:hashPassword forKey:@"password"];
+        [prefs setBool:logIn forKey:my_prefs_login_key];
+        [prefs setObject:username forKey:my_prefs_username_key];
+        [prefs setObject:hashPassword forKey:my_prefs_password_key];
         
         //-----------update timestamp-------------------------------
         NSString *newLogInTimeStamp = [NSString stringWithFormat:@"%f",[[NSDate date] timeIntervalSince1970]];
@@ -403,7 +316,7 @@ UIActivityIndicatorView *loginSpinner;
         //--------------Switch screen to phone number------
         dispatch_async(dispatch_get_main_queue(), ^{
             UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"phoneScreen"];
+            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_phone_screen];
             vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
             [self presentViewController:vc animated:YES completion:nil];
         });
@@ -418,6 +331,104 @@ UIActivityIndicatorView *loginSpinner;
 }
 
 
+-(void)initControls{
+
+    yInitial=115;
+    xPassword=190;
+    xUsername=250;
+    yEspace=50;
+    //xButton=100;
+    xButton=250;
+    yUsername=30;
+    
+    
+    rect = self.view.frame;
+    height = rect.size.height;
+    
+    
+    //-------------Create tap gesture recognizer---------------------
+    tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture2:)];
+    tapRecognizer.numberOfTapsRequired = 1;
+    
+    
+    //--------------------CREATION OF CONTROLS---------------------
+    
+    //-------------------creation of title label
+    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),45,xUsername,60);
+    myWelcomeLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
+    [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
+    //[myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
+    [myWelcomeLabel setFont:[UIFont fontWithName:@"Gabriola" size:42]];
+    myWelcomeLabel.text = @"Log In to Pictever!";
+    
+    //----------------Creation of textField Username
+    CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername); // Définition d'un rectangle
+    textFieldUsername = [[UITextField alloc] initWithFrame:rectTFUsername];
+    textFieldUsername.textAlignment = NSTextAlignmentCenter;
+    textFieldUsername.borderStyle = UITextBorderStyleLine;
+    textFieldUsername.delegate=self;
+    textFieldUsername.backgroundColor = [UIColor whiteColor];
+    textFieldUsername.placeholder = @"Enter your email";
+    textFieldUsername.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    textFieldUsername.borderStyle = UITextBorderStyleRoundedRect;
+    
+    //------------------Creation of textField Password1
+    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername,xUsername,yUsername);; // Définition d'un rectangle
+    textFieldPassword1 = [[UITextField alloc] initWithFrame:rectTFPassword1];
+    textFieldPassword1.textAlignment = NSTextAlignmentCenter;
+    textFieldPassword1.borderStyle = UITextBorderStyleLine;
+    textFieldPassword1.delegate=self;
+    textFieldPassword1.backgroundColor = [UIColor whiteColor];
+    textFieldPassword1.placeholder = @"Enter your password";
+    textFieldPassword1.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldPassword1.secureTextEntry = YES;
+    
+    
+    //----------------------Creation du button LOG IN
+    logInButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    logInButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+yUsername+20,xButton,yUsername);
+    logInButton.backgroundColor = [UIColor whiteColor];
+    logInButton.layer.cornerRadius = 10; // arrondir les
+    logInButton.clipsToBounds = YES;     // angles du bouton
+    [logInButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    [logInButton setTitle:@"Log In" forState:UIControlStateNormal];
+    [logInButton.titleLabel setFont:[UIFont fontWithName:@"System-Bold" size:15]];
+    [[logInButton layer] setBorderWidth:1.0f];
+    [logInButton addTarget:self
+                    action:@selector(myActionLogIn:)
+          forControlEvents:UIControlEventTouchUpInside];
+    
+    //-----------------Creation of back button
+    backButton2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    backButton2.frame = CGRectMake(5,screenHeight-45,70,30);
+    backButton2.backgroundColor = [UIColor clearColor];
+    [backButton2 setTitle:@"Back" forState:UIControlStateNormal];
+    [backButton2 setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [backButton2.titleLabel setFont:[UIFont systemFontOfSize:18]];
+    [backButton2 addTarget:self
+                    action:@selector(backPressed2)
+          forControlEvents:UIControlEventTouchUpInside];
+    
+    //-----------------Creation of loading spinner---------
+    loginSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    loginSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+50);
+    loginSpinner.color = [UIColor blackColor];
+    loginSpinner.hidesWhenStopped = YES;
+    
+    
+    //-----------------Creation of password_recovery button
+    passwordRecoveryButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    passwordRecoveryButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+2*yUsername+yUsername+30,xButton,yUsername);
+    passwordRecoveryButton.backgroundColor = [UIColor clearColor];
+    [passwordRecoveryButton setTitle:@"Reset my password" forState:UIControlStateNormal];
+    [passwordRecoveryButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [passwordRecoveryButton.titleLabel setFont:[UIFont systemFontOfSize:12]];
+    [passwordRecoveryButton addTarget:self
+                               action:@selector(recoverPasswordPressed)
+                     forControlEvents:UIControlEventTouchUpInside];
+    
+    
+}
 
 
 @end

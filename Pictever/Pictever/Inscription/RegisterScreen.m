@@ -165,7 +165,7 @@ UIActivityIndicatorView *registerSpinner;
     else if (![textFieldPassword1.text isEqualToString:textFieldPassword2.text]){
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Error"
-                              message:@"Re-enter two different passwords" delegate:self
+                              message:@"The two passwords are different!    " delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
         textFieldPassword1.text=@"";
@@ -185,44 +185,9 @@ UIActivityIndicatorView *registerSpinner;
         password1 = textFieldPassword1.text;
         
         hashPassword = [GPRequests sha256HashFor:password1];
-        
-        //self.responseData2 = [NSMutableData data];
-        
+
         //-------------------asynchronous register request---------------
         [self localAsynchronousRegisterWithEmail:username withHashPass:hashPassword for:self];
-        
-        
-        //----------------synchronous sign up request---------------------------
-        //NSInteger myErrorCode = [GPRequests signUpWithEmail:username withPassWord:hashPassword for:self];
-        /*
-        APLLog([NSString stringWithFormat:@"THE error code: %d", myErrorCode]);
-        if(myErrorCode!=200){
-            if(myErrorCode==406){
-                logIn = false;
-                [prefs setBool:logIn forKey:@"logIn"];
-                //------- Switch screen to logIn -------account already exists------------
-                UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-                UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"logInScreen"];
-                [self presentViewController:vc animated:NO completion:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"setUsername" object: nil];
-            }
-        }
-        else{
-            //----------save user info in preferences-------------------
-            logIn = true;
-            [prefs setBool:logIn forKey:@"logIn"];
-            [prefs setObject:username forKey:@"username"];
-            [prefs setObject:hashPassword forKey:@"password"];
-            [prefs setObject:@"" forKey:@"phoneNumber"];
-            
-            //----------Switch screen to phone number screen -------------
-            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"phoneScreen"];
-            vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-            [self presentViewController:vc animated:YES completion:nil];
-            
-            
-        }*/
     }
 }
 
@@ -292,7 +257,7 @@ UIActivityIndicatorView *registerSpinner;
     if(sessionErrorCode!=200){
         if(sessionErrorCode==406){
             logIn = false;
-            [prefs setBool:logIn forKey:@"logIn"];
+            [prefs setBool:logIn forKey:my_prefs_login_key];
             //------- Switch screen to logIn -------account already exists------------
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
@@ -314,10 +279,10 @@ UIActivityIndicatorView *registerSpinner;
         
         //----------save user info in preferences-------------------
         logIn = true;
-        [prefs setBool:logIn forKey:@"logIn"];
-        [prefs setObject:username forKey:@"username"];
-        [prefs setObject:hashPassword forKey:@"password"];
-        [prefs setObject:@"" forKey:@"phoneNumber"];
+        [prefs setBool:logIn forKey:my_prefs_login_key];
+        [prefs setObject:username forKey:my_prefs_username_key];
+        [prefs setObject:hashPassword forKey:my_prefs_password_key];
+        [prefs setObject:@"" forKey:my_prefs_phoneNumber_key];
         
         //-----------update timestamp-------------------------------
         mytimeStamp = @"1412932000";
@@ -327,7 +292,7 @@ UIActivityIndicatorView *registerSpinner;
         //----------Switch screen to phone number screen -------------
         dispatch_async(dispatch_get_main_queue(), ^{
             UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"phoneScreen"];
+            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_phone_screen];
             vc.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
             [self presentViewController:vc animated:YES completion:nil];
         });
@@ -338,6 +303,32 @@ UIActivityIndicatorView *registerSpinner;
         [registerSpinner stopAnimating];
         [registerSpinner removeFromSuperview];
     });
+}
+
+
+
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [registerSpinner stopAnimating];
+    [registerSpinner removeFromSuperview];
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    signUpButton.enabled = YES;
+    signUpButton.highlighted = NO;
+}
+
+
+
+
+//-------------back to welcome screen pressed--------------
+
+-(void) backPressed{
+    /*UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"WelcomeScreen"];
+    [self presentViewController:vc animated:NO completion:nil];*/
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 
@@ -364,6 +355,7 @@ UIActivityIndicatorView *registerSpinner;
     myWelcomeLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
     [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
     [myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
+    [myWelcomeLabel setFont:[UIFont fontWithName:@"Gabriola" size:42]];
     myWelcomeLabel.text = @"Sign Up on Pictever!";
     
     //---------------Création du textField Username
@@ -404,7 +396,7 @@ UIActivityIndicatorView *registerSpinner;
     signUpButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     signUpButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+2*yUsername+20,xButton,yUsername);
     signUpButton.backgroundColor = [UIColor whiteColor];
-     [signUpButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    [signUpButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
     signUpButton.layer.cornerRadius = 10; // arrondir les
     signUpButton.clipsToBounds = YES;     // angles du bouton
     [signUpButton setTitle:@"Sign Up" forState:UIControlStateNormal];
@@ -423,12 +415,12 @@ UIActivityIndicatorView *registerSpinner;
     [backButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [backButton.titleLabel setFont:[UIFont systemFontOfSize:18]];
     [backButton addTarget:self
-                     action:@selector(backPressed)
-           forControlEvents:UIControlEventTouchUpInside];
+                   action:@selector(backPressed)
+         forControlEvents:UIControlEventTouchUpInside];
     
     //-----------------Creation of register spinner---------
     registerSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    registerSpinner.center = CGPointMake(0.5*screenWidth+105,yInitial+yUsername+0.5*yUsername+80);
+    registerSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+80);
     registerSpinner.color = [UIColor blackColor];
     registerSpinner.hidesWhenStopped = YES;
     
@@ -439,28 +431,6 @@ UIActivityIndicatorView *registerSpinner;
     [self.view addSubview: textFieldPassword2];
     [self.view addSubview: signUpButton];
     [textFieldUsername becomeFirstResponder];
-}
-
--(void)viewWillDisappear:(BOOL)animated{
-    [super viewWillDisappear:animated];
-    [registerSpinner stopAnimating];
-    [registerSpinner removeFromSuperview];
-}
-
--(void)viewDidAppear:(BOOL)animated{
-    [super viewDidAppear:animated];
-    signUpButton.enabled = YES;
-    signUpButton.highlighted = NO;
-}
-
-
-//-------------back to welcome screen pressed--------------
-
--(void) backPressed{
-    /*UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"WelcomeScreen"];
-    [self presentViewController:vc animated:NO completion:nil];*/
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 

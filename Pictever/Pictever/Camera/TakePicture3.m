@@ -240,6 +240,17 @@ int colorCounter;
         [progressView setUserInteractionEnabled:NO];
         [progressView setProgressViewStyle:UIProgressViewStyleBar];
         [progressView setTrackTintColor:[UIColor clearColor]];
+        
+        if(firstUseEver){
+            UIAlertView *myAlertView = [[UIAlertView alloc] initWithTitle:@"Tap screen see the menu bar!"
+                                                                  message:@""
+                                                                 delegate:nil
+                                                        cancelButtonTitle:@"OK"
+                                                        otherButtonTitles: nil];
+            
+            [myAlertView show];
+        }
+        
     }
     
     [[NSNotificationCenter defaultCenter]removeObserver:self];
@@ -1135,27 +1146,19 @@ int colorCounter;
 }
 
 -(void)switchScreenToMessages{
-    /*openingWindow = 0;
-     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-     UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"MasterController"];
-     
-     [self presentViewController:vc animated:NO completion:nil];*/
+
     [self.tabBarController setSelectedIndex:0];
 }
 
 -(void)switchScreenToKeo{
-    /*openingWindow = 2;
-     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-     UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"MasterController"];
-     
-     [self presentViewController:vc animated:NO completion:nil];*/
+
     [self.tabBarController setSelectedIndex:2];
 }
 
 -(void)switchScreenToCamera{
     openingWindow = 1;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"MasterController"];
+    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_master_controller];
     [self presentViewController:vc animated:NO completion:nil];
 }
 

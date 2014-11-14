@@ -37,6 +37,8 @@ extern NSString *const my_defineFirstPhoneRequestName;
 extern NSString *const my_futureMessagesRequestName;
 extern NSString *const my_getStatusRequestName;
 extern NSString *const my_resendRequestName;
+extern NSString *const my_sendResetMail;
+extern NSString *const my_defineNewPassword;
 
 extern NSString *const my_default_adresseIp;
 
@@ -60,6 +62,8 @@ extern NSString *const my_storyboard_picture_Name;
 extern NSString *const my_storyboard_timeline_Name;
 extern NSString *const my_storyboard_pickContact_Name;
 extern NSString *const my_storyboard_master_controller;
+extern NSString *const my_storyboard_phone_screen;
+extern NSString *const my_storyboard_password_recovery;
 
 //------------------send request fields-------------------------------------------
 extern NSString *const my_message_send_request_field;
@@ -99,6 +103,11 @@ extern NSString *const my_login_force_update_key;
 extern NSString *const my_prefs_S3BucketName_key;
 extern NSString *const my_prefs_keo_occurences_key;
 extern NSString *const my_prefs_timestamp_key;
+extern NSString *const my_prefs_login_key;
+extern NSString *const my_prefs_username_key;
+extern NSString *const my_prefs_password_key;
+extern NSString *const my_prefs_phoneNumber_key;
+extern NSString *const my_prefs_countryCode_key;
 
 //-------------------------sendBoxContent------------------------------------------
 extern NSString *const my_sendbox_date;

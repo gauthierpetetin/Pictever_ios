@@ -368,7 +368,7 @@ GPSession *myUploadContactSession;//global
     
     
     
-    bool logInCopy = [prefs boolForKey:@"logIn"];
+    bool logInCopy = [prefs boolForKey:my_prefs_login_key];
     if(logInCopy){
         logIn = true;
         APLLog(@"logIn true");
@@ -409,18 +409,18 @@ GPSession *myUploadContactSession;//global
     }
     
     
-    if([prefs objectForKey:@"username"]){
+    if([prefs objectForKey:my_prefs_username_key]){
         NSString *usernameCopy;
-        usernameCopy = [prefs objectForKey:@"username"];
+        usernameCopy = [prefs objectForKey:my_prefs_username_key];
         username = [[NSString alloc] initWithString:usernameCopy];
     }
     else{
         APLLog(@"no username");
     }
     
-    if([prefs objectForKey:@"password"]){
+    if([prefs objectForKey:my_prefs_password_key]){
         NSString *hashPasswordCopy;
-        hashPasswordCopy = [prefs objectForKey:@"password"];
+        hashPasswordCopy = [prefs objectForKey:my_prefs_password_key];
         hashPassword = [[NSString alloc] initWithString:hashPasswordCopy];
     }
     else{
@@ -439,9 +439,9 @@ GPSession *myUploadContactSession;//global
     APLLog(@"My initial mystatus is: %@", myStatus);
     
     
-    if([prefs objectForKey:@"phoneNumber"]){
+    if([prefs objectForKey:my_prefs_phoneNumber_key]){
         NSString *myCurrentPhoneNumberCopy;
-        myCurrentPhoneNumberCopy = [prefs objectForKey:@"phoneNumber"];
+        myCurrentPhoneNumberCopy = [prefs objectForKey:my_prefs_phoneNumber_key];
         myCurrentPhoneNumber = [[NSString alloc] initWithString:myCurrentPhoneNumberCopy];
     }
     else{
@@ -449,9 +449,9 @@ GPSession *myUploadContactSession;//global
     }
     
     
-    if([prefs objectForKey:@"countryCode"]){
+    if([prefs objectForKey:my_prefs_countryCode_key]){
         NSString *myCountryCodeCopy;
-        myCountryCodeCopy = [prefs objectForKey:@"countryCode"];
+        myCountryCodeCopy = [prefs objectForKey:my_prefs_countryCode_key];
         myCountryCode = [[NSString alloc] initWithString:myCountryCodeCopy];
     }
     else{
