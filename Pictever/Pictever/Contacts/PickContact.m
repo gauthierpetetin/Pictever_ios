@@ -707,15 +707,22 @@ bool sendSMS;
 //----------------update status--------------------------------
 +(void)updateMyStatus{
     APLLog(@"updateMyStatus");
-    for(NSString *contKey in [importKeoContacts allKeys]){
-        NSMutableDictionary *contToUpdate = [importKeoContacts objectForKey:contKey];
+    NSMutableDictionary *importKeoContactsCopy = [importKeoContacts mutableCopy];
+    for(NSString *contKey in [importKeoContactsCopy allKeys]){
+        //NSLog(@"contKey: %@", contKey);
+        NSMutableDictionary *contToUpdate = [[importKeoContactsCopy objectForKey:contKey] mutableCopy];
         if([contToUpdate objectForKey:@"phoneNumber1"]){
             NSString *phoneToUpadate = [contToUpdate objectForKey:@"phoneNumber1"];
+            //NSLog(@"phoneToUpadate: %@", phoneToUpadate);
             if([phoneToUpadate isEqualToString:myCurrentPhoneNumber]){
+                //NSLog(@"setStatus: %@ to contact: %@",myStatus, [contToUpdate description]);
                 [contToUpdate setObject:myStatus forKey:@"status"];
+                [importKeoContactsCopy setObject:contToUpdate forKey:contKey];
             }
         }
     }
+    //NSLog(@"importKeoContactsCopy description: %@", [importKeoContactsCopy description]);
+    importKeoContacts = [importKeoContactsCopy mutableCopy];
     [prefs setObject:importKeoContacts forKey:@"importKeoContacts"];
     APLLog(@"updateMyStatus-end");
 }
