@@ -194,7 +194,6 @@ NSString *mytimeStamp;//global
         UIImage *imageInKeoIfExists = [myGeneralMethods loadImageAtPath:[NSString stringWithFormat:@"%@/%@",myCurrentPhotoPath,amzPhotoID]];
         if(imageInKeoIfExists != nil){
             imageInKeo = imageInKeoIfExists;
-            //UIImageWriteToSavedPhotosAlbum(imageInKeo, nil, nil, nil);
         }
         else{
             imageInKeo = [UIImage imageNamed:default_image_name];
@@ -228,9 +227,9 @@ NSString *mytimeStamp;//global
         
         
         [shyftFromSession setObject:@"yes" forKey:my_loaded_Key];
-        if(indexOfPhotoReceived != -1){
-            [myGeneralMethods replaceMessage:shyftFromSession andDeleteLoadBoxAtIndex:indexOfPhotoReceived];//TO DEBUG
-        }
+
+        [myGeneralMethods replaceMessage:shyftFromSession andDeleteLoadBoxAtIndex:indexOfPhotoReceived];
+        
         return shyftFromSession;
     }
     else{//--------------------if photoPath is false------------------------------
@@ -250,9 +249,10 @@ NSString *mytimeStamp;//global
 
 +(void)replaceMessage:(NSMutableDictionary *)replacingMessage andDeleteLoadBoxAtIndex:(NSUInteger)deleteIndex{
     [myGeneralMethods replaceMessage:replacingMessage];
-    
-    [loadBox removeObjectAtIndex:deleteIndex];
-    APLLog(@"remove object from loadBox: %@", [loadBox description]);
+    if(deleteIndex != -1){
+        [loadBox removeObjectAtIndex:deleteIndex];
+        APLLog(@"remove object from loadBox: %@", [loadBox description]);
+    }
 
 }
 
@@ -291,8 +291,8 @@ NSString *mytimeStamp;//global
     APLLog(@"saveImage");
     if (imageInKeo != nil)
     {
-        NSError *error;
         UIImageWriteToSavedPhotosAlbum(imageInKeo, nil, nil, nil);
+        NSError *error;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString* pathMK = [documentsDirectory stringByAppendingPathComponent:@"/Keo"];
@@ -563,10 +563,6 @@ NSString *mytimeStamp;//global
         }
         else{
             APLLog(@"-----new text message");
-            /*UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-             KeoMessages * vck = (KeoMessages *)[storyboard instantiateViewControllerWithIdentifier:my_storyboard_timeline_Name];
-             
-             [vck vibrateForNewShyft:newMessage];*/
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"vibrateForNewShyft" object:self userInfo:newMessage];
             });

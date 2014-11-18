@@ -100,6 +100,7 @@ NSMutableDictionary * selectedLocalDic;//global (message selected by the user to
 
 bool viewDidAppear;
 
+NSMutableArray *vibrateBox;
 
 
 //-----------colors--------------------------
@@ -179,6 +180,8 @@ myTabBarController *myController;
     nameBarHeight1 = 60;
     nameBarHeight2 = 50;
     spaceHeight = 2;
+    
+    vibrateBox = [[NSMutableArray alloc] init];
     
     theKeoToResend = [[NSMutableDictionary alloc] init];
     theResendIndexPath = [[NSIndexPath alloc] init];
@@ -415,13 +418,7 @@ myTabBarController *myController;
     }];
     
     billyTapRecognizer.enabled = YES;
-    
-    /*if(!zoomOn){
-     _shownIndexes = [NSMutableSet set];
-     }
-     else{
-     zoomOn = false;
-     }*/
+
     
     //------------progressview to inform the user he is currently still uploading a photo (in the TakePicture2 view)
     [progressView2 setProgress:uploadProgress animated:NO];
@@ -532,13 +529,21 @@ myTabBarController *myController;
 //------------alert the user he received a new message AND the photo has been downloaded----------------
 -(void)vibrateForNewShyft:(NSNotification *)notification{
     APLLog(@"vibrateForNewShyft: %@",[notification.userInfo description]);
-    NSMutableDictionary *newPhotoMessage = [notification.userInfo mutableCopy];
+    NSMutableDictionary *newPhotoMessage2 = [notification.userInfo mutableCopy];
+
+    if([myShyftSet isLoaded]){
+        [self vibrateNow:newPhotoMessage2];
+    }
+    else{
+        [self vibrateLater:newPhotoMessage2];
+    }
     
+}
+
+-(void)vibrateNow:(NSMutableDictionary *)newPhotoMessage{
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
     KeoMessages * vck = (KeoMessages *)[storyboard instantiateViewControllerWithIdentifier:my_storyboard_timeline_Name];
-    
     // viewController is visible
-    
     if([vck.tableView numberOfRowsInSection:0]>0){
         APLLog(@"not first message");
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -558,10 +563,13 @@ myTabBarController *myController;
         });
     }
     
-    
     APLLog(@"vibrate for new shyft: %@", [newPhotoMessage description]);
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
     
+}
+
+-(void)vibrateLater:(NSMutableDictionary *)newPhotoMessage{
+    [vibrateBox insertObject:newPhotoMessage atIndex:[vibrateBox count]];
 }
 
 -(void)hideProgressBar2{
@@ -606,8 +614,11 @@ myTabBarController *myController;
         for(NSMutableDictionary *loadDic in messagesDataFile){
             if([loadDic objectForKey:my_photo_Key]){
                 if([[loadDic objectForKey:my_photo_Key] isEqualToString:image_not_downloaded_string]||[[loadDic objectForKey:my_loaded_Key] isEqualToString:@"no"]){
-                    if(![loadBox containsObject:loadDic]){
-                        [loadBox insertObject:loadDic atIndex:0];
+                    if(![[loadDic objectForKey:my_loaded_Key] isEqualToString:my_inprogress_string]){
+                        if(![loadBox containsObject:loadDic]){
+                            [loadBox insertObject:loadDic atIndex:0];
+                            [loadDic setObject:my_inprogress_string forKey:my_loaded_Key];// in_progress
+                        }
                     }
                 }
                 else{
@@ -648,6 +659,19 @@ myTabBarController *myController;
     _loadingLabel.text = @"";
 }
 
+-(void)emptyVibrateBox{
+    if([vibrateBox count]>0){
+        for(NSMutableDictionary *newDic in [vibrateBox mutableCopy]){
+            if(newDic != nil){
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"vibrateForNewShyft" object:self userInfo:newDic];
+                });
+                [vibrateBox removeObjectAtIndex:[vibrateBox indexOfObject:newDic]];
+            }
+        }
+    }
+}
+
 
 
 //------------prepare the array ShyftSet which will feed the tableview -------------------------
@@ -671,6 +695,7 @@ myTabBarController *myController;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self hideLoadTbvLabel];
         [myShyftSet setLoaded];
+        [self emptyVibrateBox];
     });
     APLLog(@"everything reloaded");
 }
@@ -829,7 +854,7 @@ myTabBarController *myController;
         
         PandaCell *pandaCell = (PandaCell *)cell;
         
-        pandaCell.pandaSpeakLabel.text = @"Be careful! The timeline contains only your 10 last Shyfts. Resend them in the future if you want to remember them!";
+        pandaCell.pandaSpeakLabel.text = @"Be careful! The timeline contains only your 10 last messages. Resend them in the future if you want to remember them!";
         pandaCell.pandaSpeakLabel.font = [UIFont fontWithName:@"Gabriola" size:20];
         pandaCell.contentMode = UIViewContentModeCenter;
         pandaCell.pandaImgv.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:@"little_billy_disco.png"] withFactor:1.7];

@@ -25,6 +25,8 @@ extern NSString *const my_first_name_Key;
 extern NSString *const my_last_name_Key;
 extern NSString *const my_full_name_Key;
 
+extern NSString *const my_inprogress_string;
+
 
 //--------Request Names----------------
 extern NSString *const my_sendRequestName;

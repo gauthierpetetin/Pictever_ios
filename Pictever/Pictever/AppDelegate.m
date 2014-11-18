@@ -1,6 +1,6 @@
 //
 //  AppDelegate.m
-//  Keo    --> for information SHYFT USED TO BE CALLED KEO  , that is the reason of all the "Keo" in the variable names
+//  Pictever    --> for information SHYFT USED TO BE CALLED KEO  , that is the reason of all the "Keo" in the variable names
 //
 //  Created by Gauthier Petetin on 18/04/2014.
 //  Copyright (c) 2014 Gauthier Petetin. All rights reserved.
@@ -364,7 +364,8 @@ GPSession *myUploadContactSession;//global
     
     //--------work in local or not
     localWork=false;
-    //adresseIp2=@"http://192.168.42.81:5000/";
+    //localWork=true;
+    //adresseIp2=@"http://192.168.0.15:5000/";
     
     
     
@@ -609,7 +610,6 @@ GPSession *myUploadContactSession;//global
             APLLog(@"mytimestamp (null)");
         }
     }
-    
     APLLog(@"myActualTimeStamp %@", mytimeStamp);
     
     

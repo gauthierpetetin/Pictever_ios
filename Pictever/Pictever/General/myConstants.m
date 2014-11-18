@@ -27,12 +27,14 @@ NSString *const my_received_at_Key = @"received_at";
 NSString *const my_photo_Key = @"photo";
 NSString *const my_receive_label_Key = @"receive_label";
 NSString *const my_receive_color_Key = @"receive_color";
-NSString *const my_loaded_Key = @"loaded";
+NSString *const my_loaded_Key = @"loaded";//"yes", "no" or "in_progress"
 NSString *const my_color_Key = @"color";
 NSString *const my_uicontrol_Key = @"UIControl";
 NSString *const my_first_name_Key = @"firstNames";
 NSString *const my_last_name_Key = @"lastNames";
 NSString *const my_full_name_Key = @"fullName";
+
+NSString *const my_inprogress_string = @"in_progress";
 
 //--------Request Names----------------
 NSString *const my_sendRequestName = @"send";

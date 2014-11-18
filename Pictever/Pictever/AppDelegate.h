@@ -1,6 +1,6 @@
 //
 //  AppDelegate.h
-//  Keo
+//  Pictever
 //
 //  Created by Gauthier Petetin on 18/04/2014.
 //  Copyright (c) 2014 Gauthier Petetin. All rights reserved.
