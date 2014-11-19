@@ -106,8 +106,9 @@ NSMutableArray *importContactIDs;
         
         
         ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, error);
-        ABRecordRef source = ABAddressBookCopyDefaultSource(addressBook);
-        CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(addressBook, source, kABPersonSortByLastName);
+        //ABRecordRef source = ABAddressBookCopyDefaultSource(addressBook);
+        //CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeopleInSourceWithSortOrdering(addressBook, source, kABPersonSortByLastName);
+        CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeople (addressBook);
         CFIndex nPeople = ABAddressBookGetPersonCount(addressBook);
         NSMutableArray* items = [NSMutableArray arrayWithCapacity:nPeople];
         NSMutableArray *nnnPeople = (__bridge NSMutableArray *)allPeople;
@@ -276,7 +277,8 @@ NSMutableArray *importContactIDs;
         
         CFRelease(allPeople);
         CFRelease(addressBook);
-        CFRelease(source);
+        
+        //CFRelease(source);
         
         if(myCurrentPhoneNumber){
             NSMutableDictionary * contactMe = [[NSMutableDictionary alloc] init];
