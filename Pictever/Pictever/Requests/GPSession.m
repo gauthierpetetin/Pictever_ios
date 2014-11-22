@@ -66,6 +66,9 @@ bool localWork;
 
 GPSession *myUploadContactSession;//global
 
+NSString* sendTips;//counter of messages sent to give some tips to the user once he sent his first messages
+NSString* receiveTips;//counter of messages received to give some tips to the user once he received his first messages
+
 - (instancetype)init{
     if ((self = [super init])) {
         _resendString = @"";
@@ -426,12 +429,12 @@ GPSession *myUploadContactSession;//global
         }
     }
     else{
-        [self sendSucceeded:data];
+        [self sendSucceeded:data from:sender];
     }
 }
 
 
--(void)sendSucceeded:(NSData *)data{
+-(void)sendSucceeded:(NSData *)data from:(id)sender{
     APLLog(@"Session succeeded! Received %d bytes of data Send",[data length]);
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -475,6 +478,8 @@ GPSession *myUploadContactSession;//global
         }
     });
     [[[GPSession alloc] init] getStatusRequest:self];
+    
+    [self increaseSendTipCounter:sender];
 }
 
 
@@ -975,6 +980,7 @@ GPSession *myUploadContactSession;//global
         
         APLLog(@"Save send choices: %@", [importKeoChoices description]);
         [prefs setObject:importKeoChoices forKey:@"importKeoChoices2"];
+        
     }
     
     
@@ -1187,7 +1193,7 @@ GPSession *myUploadContactSession;//global
                 dispatch_async(dispatch_get_main_queue(), ^{
                     UIAlertView *versionAlert = [[UIAlertView alloc]
                                                  initWithTitle:versionAlertTitle
-                                                 message:@"Do you want to install it now?" delegate:self
+                                                 message:my_actionsheet_install_it_now delegate:self
                                                  cancelButtonTitle:@"Cancel" otherButtonTitles:@"Install",nil];
                     [versionAlert show];
                 });
@@ -1295,6 +1301,67 @@ GPSession *myUploadContactSession;//global
     
 }
 
+
+
+# pragma mark - first use tips
+
+
+-(void)increaseSendTipCounter:(id)sender{
+
+    int sendTipCounter = [sendTips intValue];
+    sendTipCounter += 1;
+    if(sendTipCounter < 6){
+        if (sendTipCounter == 1) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:@"Congrats, your message is sent!!"
+                                      message:@"Little tip: you can send a message to anybody in your adress book ;)" delegate:sender
+                                      cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            });
+        }
+        else if (sendTipCounter == 3) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:my_actionsheet_wanna_help_us
+                                      message:@"Please like us or leave a comment on the AppStore!" delegate:sender
+                                      cancelButtonTitle:@"No, thanks" otherButtonTitles:@"Yes I like Pictever :)",nil];
+                [alert show];
+            });
+        }
+        else if (sendTipCounter == 5){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:my_actionsheet_you_are_great
+                                      message:@"Please join our community on facebook!" delegate:sender
+                                      cancelButtonTitle:@"No, thanks" otherButtonTitles:@"Yes I want to join the community!",nil];
+                [alert show];
+            });
+        }
+    }
+    sendTips = [NSString stringWithFormat:@"%d", sendTipCounter];
+    [prefs setObject:sendTips forKey:my_prefs_send_tips_key];
+}
+
+
+-(void)increaseReceiveTipCounter{
+    int receiveTipCounter = [receiveTips intValue];
+    receiveTipCounter += 1;
+    if(receiveTipCounter < 4){
+        if (receiveTipCounter == 1 || receiveTipCounter == 4) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:@"You just received a message in your timeline!"
+                                      message:@"Little tip: if you like a message you receive, press the orange button to resend it, so you can be surprised again!" delegate:self
+                                      cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            });
+        }
+        
+    }
+    receiveTips = [NSString stringWithFormat:@"%d", receiveTipCounter];
+    [prefs setObject:receiveTips forKey:my_prefs_receive_tips_key];
+}
 
 
 

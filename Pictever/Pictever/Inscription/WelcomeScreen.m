@@ -123,6 +123,7 @@ int myBlinkingCounter;
     [super viewDidLoad];
     APLLog(@"Welcome screen");
     
+    
     if(![GPRequests connected]){
         UIAlertView *alert5 = [[UIAlertView alloc]
                                initWithTitle:@"Connection problem"
@@ -248,15 +249,30 @@ int myBlinkingCounter;
 //------------------alertview to inform the user (not force) about a new version-------------------
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    NSString *locTitle = [alertView buttonTitleAtIndex:buttonIndex];
     
-    if([locTitle isEqualToString:@"Install"]){
-        APLLog(@"Install was selected.");
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString: myVersionInstallUrl]];
+    if([alertView.title isEqualToString:my_actionsheet_install_it_now]){
+        NSString *locTitle = [alertView buttonTitleAtIndex:buttonIndex];
+        
+        if([locTitle isEqualToString:@"Install"]){
+            APLLog(@"Install was selected.");
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString: myVersionInstallUrl]];
+        }
+        if([locTitle isEqualToString:@"Cancel"]){
+            APLLog(@"Cancel (install new version) was selected.");
+        }
     }
-    if([locTitle isEqualToString:@"Cancel"]){
-        APLLog(@"Cancel (install new version) was selected.");
+    else if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+        if (buttonIndex == 1) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
+        }
     }
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+        if (buttonIndex == 1) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
+        }
+    }
+    
+    
 }
 
 
@@ -402,5 +418,6 @@ int myBlinkingCounter;
         }
     }];
 }
+
 
 @end

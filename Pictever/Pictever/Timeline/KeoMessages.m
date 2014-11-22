@@ -64,6 +64,8 @@ NSString *hashPassword;//global
 
 NSString* numberOfMessagesInTheFuture;//global
 
+NSString* myVersionInstallUrl;//global
+
 ShyftMessage * theShyftToResend;
 NSMutableDictionary *theKeoToResend;
 NSIndexPath *theResendIndexPath;
@@ -152,6 +154,7 @@ bool isLoadingLoadBox;//global
 
 
 myTabBarController *myController;
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -565,6 +568,8 @@ myTabBarController *myController;
     
     APLLog(@"vibrate for new shyft: %@", [newPhotoMessage description]);
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    
+    [[[GPSession alloc] init] increaseReceiveTipCounter];
     
 }
 
@@ -1048,12 +1053,12 @@ myTabBarController *myController;
             theResendIndexPath = indexPath;
             
             if(![theShyftToResend.shyft_id isEqualToString:@""]){//----------------new way to resend (to keep)--------------
-                UIAlertView *resendAlert = [[UIAlertView alloc] initWithTitle:@"Want to remember this message?" message:@"Resend it to yourself randomly in the future!"  delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles: @"Resend", nil];
+                UIAlertView *resendAlert = [[UIAlertView alloc] initWithTitle:my_actionsheet_want_to_remember message:@"Resend it to yourself randomly in the future!"  delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles: @"Resend", nil];
                 [resendAlert show];
             }
             else{
                 //--------------old way to resend (to delete in a few weeks)---------------------
-                UIAlertView *resendAlert = [[UIAlertView alloc] initWithTitle:@"Want to remember this message?" message:@"Resend it to yourself randomly in the future!"  delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles: @"Resend", nil];
+                UIAlertView *resendAlert = [[UIAlertView alloc] initWithTitle:my_actionsheet_want_to_remember message:@"Resend it to yourself randomly in the future!"  delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles: @"Resend", nil];
                 [resendAlert show];
                 
             }
@@ -1080,64 +1085,79 @@ myTabBarController *myController;
 //--------the user has to confirm he wants to resend the photo---------------
 
 
-- (void)alertView:(UIAlertView *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    // the user clicked one of the OK/Cancel buttons
-    if (buttonIndex == 0)
-    {
-        APLLog(@"Cancel");
-    }
-    else
-    {
-        if([GPRequests connected]){
-            
-            [self activateResendRequest];
-            
-            [self alertAnalyticsResendSent];
-            
-            ShyftMessage *shyftToDeleteR = [myShyftSet getShyftAtIndex:theResendIndexPath.row];
-            NSUInteger delIndexR = [KeoMessages getIndexPathOfShyft:shyftToDeleteR];
-            
-            if(delIndexR != -1){
-                [messagesDataFile removeObjectAtIndex:delIndexR];
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    
+    
+    if([alertView.title isEqualToString:my_actionsheet_want_to_remember]){
+        // the user clicked one of the OK/Cancel buttons
+        if (buttonIndex == 0)
+        {
+            APLLog(@"Cancel");
+        }
+        else
+        {
+            if([GPRequests connected]){
                 
-                NSString *deletePhotoID = shyftToDeleteR.photo;
-                //Supression from the memory of the phone
-                if(![deletePhotoID isEqualToString:@""]){
-                    NSString *photoField = [deletePhotoID stringByReplacingOccurrencesOfString:@" " withString:@""];
-                    APLLog(@"photoField: %@",photoField);
-                    if(![photoField isEqualToString:@"None"]){
-                        NSString *deletePath = [NSString stringWithFormat:@"%@/%@",myCurrentPhotoPath,deletePhotoID];
-                        APLLog(@"DELETE PHOTO AT PATH (commiteditingstyle): %@",deletePath);
-                        [myGeneralMethods deletePhotoAtPath:deletePath];
+                [self activateResendRequest];
+                
+                [self alertAnalyticsResendSent];
+                
+                ShyftMessage *shyftToDeleteR = [myShyftSet getShyftAtIndex:theResendIndexPath.row];
+                NSUInteger delIndexR = [KeoMessages getIndexPathOfShyft:shyftToDeleteR];
+                
+                if(delIndexR != -1){
+                    [messagesDataFile removeObjectAtIndex:delIndexR];
+                    
+                    NSString *deletePhotoID = shyftToDeleteR.photo;
+                    //Supression from the memory of the phone
+                    if(![deletePhotoID isEqualToString:@""]){
+                        NSString *photoField = [deletePhotoID stringByReplacingOccurrencesOfString:@" " withString:@""];
+                        APLLog(@"photoField: %@",photoField);
+                        if(![photoField isEqualToString:@"None"]){
+                            NSString *deletePath = [NSString stringWithFormat:@"%@/%@",myCurrentPhotoPath,deletePhotoID];
+                            APLLog(@"DELETE PHOTO AT PATH (commiteditingstyle): %@",deletePath);
+                            [myGeneralMethods deletePhotoAtPath:deletePath];
+                        }
                     }
+                    
+                    if([self.tableView numberOfRowsInSection:0]>2){//-------not the last row (number 2 because of Billy row)-----
+                        APLLog(@"not the last row");
+                        [self.tableView beginUpdates];
+                        [myShyftSet deleteShyftAtIndex:theResendIndexPath.row];
+                        [self.tableView deleteRowsAtIndexPaths:@[theResendIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                        [self.tableView endUpdates];
+                    }
+                    else{//------in the case of last row, remove the whole section-----
+                        APLLog(@"last row");
+                        [myShyftSet deleteShyftAtIndex:theResendIndexPath.row];
+                        [self.tableView reloadData];
+                    }
+                    [myGeneralMethods saveMessagesData];
+                    
+                    
                 }
-                
-                if([self.tableView numberOfRowsInSection:0]>2){//-------not the last row (number 2 because of Billy row)-----
-                    APLLog(@"not the last row");
-                    [self.tableView beginUpdates];
-                    [myShyftSet deleteShyftAtIndex:theResendIndexPath.row];
-                    [self.tableView deleteRowsAtIndexPaths:@[theResendIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [self.tableView endUpdates];
-                }
-                else{//------in the case of last row, remove the whole section-----
-                    APLLog(@"last row");
-                    [myShyftSet deleteShyftAtIndex:theResendIndexPath.row];
-                    [self.tableView reloadData];
-                }
-                [myGeneralMethods saveMessagesData];
-                
                 
             }
-            
-        }
-        else{
-            UIAlertView *alert5 = [[UIAlertView alloc]
-                                   initWithTitle:@"Connection problem"
-                                   message:@"You have no internet connection" delegate:self
-                                   cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alert5 show];
+            else{
+                UIAlertView *alert5 = [[UIAlertView alloc]
+                                       initWithTitle:@"Connection problem"
+                                       message:@"You have no internet connection" delegate:self
+                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert5 show];
+            }
         }
     }
+    else if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+        if (buttonIndex == 1) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
+        }
+    }
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+        if (buttonIndex == 1) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
+        }
+    }
+    
 }
 
 //-----------the photo is resent-------------
@@ -1497,5 +1517,6 @@ myTabBarController *myController;
     downloadPhotoOnAmazon = true;
     [[[NewBucketRequest alloc] init] sessionNewBucket:newMessage];
 }
+
 
 @end

@@ -178,6 +178,8 @@ bool sendSMS;//
 
 GPSession *myUploadContactSession;//global
 
+NSString* sendTips;//counter of messages sent to give some tips to the user once he sent his first messages
+NSString* receiveTips;//counter of messages received to give some tips to the user once he received his first messages
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -185,6 +187,7 @@ GPSession *myUploadContactSession;//global
     APLLog(@"didFinishLaunchingWithOptions");
     
     firstUseEver = false;
+    
     
     /////APPLAUSE// service pour le débuggage/////
     [[APLLogger settings] setReportOnShakeEnabled:YES];
@@ -477,9 +480,10 @@ GPSession *myUploadContactSession;//global
         APLLog(@"numberOfMessagesInTheFuture: %@",numberOfMessagesInTheFuture);
     }
     else{
-        numberOfMessagesInTheFuture = @"1";
+        numberOfMessagesInTheFuture = @"0";
         APLLog(@"no numberOfMessagesInTheFuture");
     }
+    
     
     
     messagesDataFile = [[NSMutableArray alloc] init];
@@ -611,6 +615,7 @@ GPSession *myUploadContactSession;//global
         }
     }
     APLLog(@"myActualTimeStamp %@", mytimeStamp);
+
     
     
     if([prefs objectForKey:@"deviceToken"]){
@@ -666,6 +671,32 @@ GPSession *myUploadContactSession;//global
     if([importKeoChoices count] > 0){
         APLLog(@"importKeoChoices: %@", [importKeoChoices description]);
     }
+    
+    
+    
+    //----------------tips-----------------------
+    if([prefs objectForKey:my_prefs_send_tips_key]){
+        NSString *sendTipsCopy;
+        sendTipsCopy = [prefs objectForKey:my_prefs_send_tips_key];
+        sendTips = [[NSString alloc] initWithString:sendTipsCopy];
+        APLLog(@"sendTipsCounter: %@",sendTips);
+    }
+    else{
+        sendTips = @"0";
+        APLLog(@"no sendTipsCounter");
+    }
+    
+    if([prefs objectForKey:my_prefs_receive_tips_key]){
+        NSString *receiveTipsCopy;
+        receiveTipsCopy = [prefs objectForKey:my_prefs_receive_tips_key];
+        receiveTips = [[NSString alloc] initWithString:receiveTipsCopy];
+        APLLog(@"receiveTipsCounter: %@",receiveTips);
+    }
+    else{
+        receiveTips = @"0";
+        APLLog(@"no receiveTipsCounter");
+    }
+    
     
     
     //----------------if the app was opened on a notification, I can switch directly to the gallery------------------

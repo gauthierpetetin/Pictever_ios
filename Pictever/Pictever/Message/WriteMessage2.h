@@ -18,7 +18,7 @@
 
 @class myGeneralMethods;
 
-@interface WriteMessage2 : UIViewController  <MFMessageComposeViewControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate, UIActionSheetDelegate>
+@interface WriteMessage2 : UIViewController  <MFMessageComposeViewControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
 
 - (IBAction)settingsPressed2:(id)sender;
 

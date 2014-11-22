@@ -15,7 +15,7 @@
 /////APPLAUSE
 #import <Applause/APLLogger.h>
 
-@interface WelcomeScreen : UIViewController
+@interface WelcomeScreen : UIViewController <UIAlertViewDelegate>
 
 -(void)signUpPressed;
 

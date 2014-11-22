@@ -150,6 +150,9 @@ extern bool sendSMS;//global
 
 extern GPSession *myUploadContactSession;//global
 
+extern NSString* sendTips;
+extern NSString* receiveTips;
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;

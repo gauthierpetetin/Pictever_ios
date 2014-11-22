@@ -34,7 +34,7 @@
 #import "myTabBarController.h"
 
 
-@interface KeoMessages : UITableViewController 
+@interface KeoMessages : UITableViewController <UIAlertViewDelegate>
 
 @property (strong, nonatomic) IBOutlet UILabel *loadingLabel;
 @property (nonatomic, retain) UIActivityIndicatorView *spinnerTop;

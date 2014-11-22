@@ -43,6 +43,8 @@ NSString *hashPassword;//global
 
 NSString *mytimeStamp;//global
 
+NSString *myVersionInstallUrl;//global
+
 NSMutableArray *messagesDataFile;
 
 NSString *storyboardName;//global
@@ -337,7 +339,7 @@ bool sendSMS;
     APLLog(@"importKeoChoicesSize: %d",[importKeoChoices count]);
     
     ////new
-    actionSheet = [[UIActionSheet alloc] initWithTitle:@"Pick a date!"
+    actionSheet = [[UIActionSheet alloc] initWithTitle:my_actionsheet_pick_a_date
                                               delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil
                                      otherButtonTitles:@"Calendar", nil];
     
@@ -642,59 +644,62 @@ bool sendSMS;
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
     
-    sendToDate = @"0";
-    if (!(buttonIndex == ([importKeoChoices count]+1))) { // Cancel
-        
-        if(!(buttonIndex == 0)){ // pickDate
-            if(buttonIndex > 0){
-                if([importKeoChoices count] > (buttonIndex-1)){
-                    sendToDate = [[importKeoChoices objectAtIndex:(buttonIndex-1)] objectForKey:@"key"];
-                    sendToDateAsText = [[importKeoChoices objectAtIndex:(buttonIndex-1)] objectForKey:@"send_label"];
+    
+    if ([actionSheet.title isEqualToString:my_actionsheet_pick_a_date]){
+        sendToDate = @"0";
+        if (!(buttonIndex == ([importKeoChoices count]+1))) { // Cancel
+            
+            if(!(buttonIndex == 0)){ // pickDate
+                if(buttonIndex > 0){
+                    if([importKeoChoices count] > (buttonIndex-1)){
+                        sendToDate = [[importKeoChoices objectAtIndex:(buttonIndex-1)] objectForKey:@"key"];
+                        sendToDateAsText = [[importKeoChoices objectAtIndex:(buttonIndex-1)] objectForKey:@"send_label"];
+                    }
                 }
-            }
-            if([sendToMail count] > 0){
-                destinataire3 = [self stringFromArray:sendToMail];
-                if(![sendToDate isEqualToString:@""]){
-                    APLLog([NSString stringWithFormat:@"Send to friend: %@  at date: %@", destinataire3, sendToDateAsText]);
-                    lastLabelSelected = sendToDateAsText;
-                    [self saveOccurences:sendToMail];
-                    [self sendPostRequestAtDate:sendToDate];
-                    
+                if([sendToMail count] > 0){
+                    destinataire3 = [self stringFromArray:sendToMail];
+                    if(![sendToDate isEqualToString:@""]){
+                        APLLog([NSString stringWithFormat:@"Send to friend: %@  at date: %@", destinataire3, sendToDateAsText]);
+                        lastLabelSelected = sendToDateAsText;
+                        [self saveOccurences:sendToMail];
+                        [self sendPostRequestAtDate:sendToDate];
+                        
+                    }
+                    else{
+                        UIAlertView *alert4 = [[UIAlertView alloc]
+                                               initWithTitle:@"No date selected"
+                                               message:@"Pick a date first!" delegate:self
+                                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                        [alert4 show];
+                    }
                 }
                 else{
-                    UIAlertView *alert4 = [[UIAlertView alloc]
-                                           initWithTitle:@"No date selected"
-                                           message:@"Pick a date first!" delegate:self
+                    UIAlertView *alert3 = [[UIAlertView alloc]
+                                           initWithTitle:@"No contact selected"
+                                           message:@"Pick a contact first!" delegate:self
                                            cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert4 show];
+                    [alert3 show];
                 }
+                
             }
-            else{
-                UIAlertView *alert3 = [[UIAlertView alloc]
-                                       initWithTitle:@"No contact selected"
-                                       message:@"Pick a contact first!" delegate:self
-                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert3 show];
+            else{ //open calendar
+                APLLog(@"Calendar selected");
+                UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+                UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"DatePickerPhotoController"];
+                APLLog(@"YES");
+                [self presentViewController:vc animated:YES completion:nil];
+                
+                sendToDate = @"calendar";
             }
             
         }
-        else{ //open calendar
-            APLLog(@"Calendar selected");
-            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"DatePickerPhotoController"];
-            APLLog(@"YES");
-            [self presentViewController:vc animated:YES completion:nil];
-            
-            sendToDate = @"calendar";
+        else{
+            APLLog(@"CancelPressed");
+            sendToDate = @"";
+            sendToMail = [[NSMutableArray alloc] init];
+            sendToName = @"";
+            sendToDateAsText = @"";
         }
-        
-    }
-    else{
-        APLLog(@"CancelPressed");
-        sendToDate = @"";
-        sendToMail = [[NSMutableArray alloc] init];
-        sendToName = @"";
-        sendToDateAsText = @"";
     }
     
 }
@@ -835,6 +840,27 @@ bool sendSMS;
 // know the current state
 - (BOOL)tabBarIsVisible {
     return self.tabBarController.tabBar.frame.origin.y < CGRectGetMaxY(self.view.frame);
+}
+
+
+//------------------alertView delegate (first tips for the user)-----------------------------------
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+        if (buttonIndex == 1) {
+            APLLog(@"Give a good comment on the app store! %@",myVersionInstallUrl);
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
+        }
+    }
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+        if (buttonIndex == 1) {
+            APLLog(@"Like our facebook page! %@", my_facebook_page_adress);
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
+        }
+    }
+    else{
+        APLLog(@"other alertview");
+    }
 }
 
 

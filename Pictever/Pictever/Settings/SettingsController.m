@@ -13,6 +13,8 @@
 
 #import "InfosCell.h"
 
+#import "myConstants.h"
+
 #import "ShyftMessage.h"
 #import "ShyftSet.h"
 
@@ -45,6 +47,8 @@ UIColor *theBackgroundColor;//global
 UIColor *theKeoOrangeColor;//global
 
 NSString *backgroundImage;//global
+
+NSString *myVersionInstallUrl;
 
 CGFloat screenWidth;//global
 CGFloat screenHeight;//global
@@ -219,7 +223,20 @@ NSTimer *myFutureTimer;
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+//------------------alertView delegate (first tips for the user)-----------------------------------
 
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+        if (buttonIndex == 1) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
+        }
+    }
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+        if (buttonIndex == 1) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
+        }
+    }
+}
 
 
 

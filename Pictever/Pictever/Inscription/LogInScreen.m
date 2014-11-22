@@ -47,8 +47,8 @@ NSUserDefaults *prefs;
 CGSize keyboardSize;
 CGRect rect;
 
-UITextField *textFieldUsername;
-UITextField *textFieldPassword1;
+UITextField *textFieldUsernameLogin;
+UITextField *textFieldPassword1Login;
 
 
 UILabel *myWelcomeLabel;
@@ -83,7 +83,7 @@ int yUsername;
 int yEspace;
 int elevation;
 
-UIActivityIndicatorView *loginSpinner;
+UIActivityIndicatorView *loginSpinnerLogin;
 
 - (void)viewDidLoad
 {
@@ -112,33 +112,33 @@ UIActivityIndicatorView *loginSpinner;
     [super viewWillAppear:animated];
     [self.view addSubview: backButton2];
     [self.view addSubview: myWelcomeLabel];
-    [self.view addSubview: textFieldUsername];
-    [self.view addSubview: textFieldPassword1];
+    [self.view addSubview: textFieldUsernameLogin];
+    [self.view addSubview: textFieldPassword1Login];
     [self.view addSubview: logInButton];
     [self.view addGestureRecognizer:tapRecognizer];
-    [textFieldUsername becomeFirstResponder];
+    [textFieldUsernameLogin becomeFirstResponder];
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     
-    [loginSpinner stopAnimating];
-    [loginSpinner removeFromSuperview];
+    [loginSpinnerLogin stopAnimating];
+    [loginSpinnerLogin removeFromSuperview];
 }
 
 //----------set username when user comes from Register screen ------------------------
 
 -(void)setUsernameByNotif{
     APLLog(@"setUsername");
-    textFieldUsername.text=username;
+    textFieldUsernameLogin.text=username;
 }
 
 
 //---------------hide keyboard when user taps the screen---------
 
 - (IBAction)respondToTapGesture2:(UITapGestureRecognizer *)recognizer {
-    [textFieldPassword1 resignFirstResponder];
-    [textFieldUsername resignFirstResponder];
+    [textFieldPassword1Login resignFirstResponder];
+    [textFieldUsernameLogin resignFirstResponder];
 }
 
 //---------------recover password pressed------------------------
@@ -160,12 +160,12 @@ UIActivityIndicatorView *loginSpinner;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    if(textFieldUsername.isFirstResponder){
-        [textFieldPassword1 becomeFirstResponder];
+    if(textFieldUsernameLogin.isFirstResponder){
+        [textFieldPassword1Login becomeFirstResponder];
     }
     else{
-        [textFieldPassword1 resignFirstResponder];
-        [textFieldUsername resignFirstResponder];
+        [textFieldPassword1Login resignFirstResponder];
+        [textFieldUsernameLogin resignFirstResponder];
     }
     
     return YES;
@@ -188,15 +188,15 @@ UIActivityIndicatorView *loginSpinner;
 //-------------------user presses login button-----------------------------------
 
 - (IBAction)myActionLogIn:(id)sender {
-    if([textFieldUsername.text isEqualToString:@""]){
+    if([textFieldUsernameLogin.text isEqualToString:@""]){
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Error"
                               message:@"Please enter your username first!" delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
-        textFieldPassword1.text=@"";
+        textFieldPassword1Login.text=@"";
     }
-    else if ([textFieldPassword1.text isEqualToString:@""]){
+    else if ([textFieldPassword1Login.text isEqualToString:@""]){
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Error"
                               message:@"Please enter your password first!" delegate:self
@@ -204,8 +204,8 @@ UIActivityIndicatorView *loginSpinner;
         [alert show];
     }
     else{
-        username = textFieldUsername.text;
-        password1 = textFieldPassword1.text;
+        username = textFieldUsernameLogin.text;
+        password1 = textFieldPassword1Login.text;
         
         //self.responseData2 = [NSMutableData data];
         
@@ -221,8 +221,8 @@ UIActivityIndicatorView *loginSpinner;
     if ([GPRequests connected]){
         logInButton.enabled = NO;
         logInButton.highlighted = YES;
-        [self.view addSubview:loginSpinner];
-        [loginSpinner startAnimating];
+        [self.view addSubview:loginSpinnerLogin];
+        [loginSpinnerLogin startAnimating];
         
         // 1
         NSURL *loginUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@",adresseIp2,my_loginRequestName]];
@@ -250,8 +250,8 @@ UIActivityIndicatorView *loginSpinner;
                                                                            dispatch_async(dispatch_get_main_queue(), ^{
                                                                                logInButton.enabled=YES;
                                                                                logInButton.highlighted=NO;
-                                                                               [loginSpinner stopAnimating];
-                                                                               [loginSpinner removeFromSuperview];
+                                                                               [loginSpinnerLogin stopAnimating];
+                                                                               [loginSpinnerLogin removeFromSuperview];
                                                                            });
                                                                            if(error != nil){
                                                                                APLLog(@"New login Error: [%@]", [error description]);
@@ -280,7 +280,7 @@ UIActivityIndicatorView *loginSpinner;
                                       message:@"Wrong password" delegate:self
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
-                textFieldPassword1.text = @"";
+                textFieldPassword1Login.text = @"";
                 
                 [prefs setObject:username forKey:my_prefs_username_key];
                 [self.view addSubview:passwordRecoveryButton];
@@ -325,8 +325,8 @@ UIActivityIndicatorView *loginSpinner;
     dispatch_async(dispatch_get_main_queue(), ^{
         logInButton.enabled=YES;
         logInButton.highlighted=NO;
-        [loginSpinner stopAnimating];
-        [loginSpinner removeFromSuperview];
+        [loginSpinnerLogin stopAnimating];
+        [loginSpinnerLogin removeFromSuperview];
     });
 }
 
@@ -363,25 +363,26 @@ UIActivityIndicatorView *loginSpinner;
     
     //----------------Creation of textField Username
     CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername); // Définition d'un rectangle
-    textFieldUsername = [[UITextField alloc] initWithFrame:rectTFUsername];
-    textFieldUsername.textAlignment = NSTextAlignmentCenter;
-    textFieldUsername.borderStyle = UITextBorderStyleLine;
-    textFieldUsername.delegate=self;
-    textFieldUsername.backgroundColor = [UIColor whiteColor];
-    textFieldUsername.placeholder = @"Enter your email";
-    textFieldUsername.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    textFieldUsername.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldUsernameLogin = [[UITextField alloc] initWithFrame:rectTFUsername];
+    textFieldUsernameLogin.textAlignment = NSTextAlignmentCenter;
+    textFieldUsernameLogin.borderStyle = UITextBorderStyleLine;
+    textFieldUsernameLogin.delegate=self;
+    textFieldUsernameLogin.backgroundColor = [UIColor whiteColor];
+    textFieldUsernameLogin.placeholder = @"Enter your email";
+    textFieldUsernameLogin.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    textFieldUsernameLogin.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldUsernameLogin.keyboardType = UIKeyboardTypeEmailAddress;
     
     //------------------Creation of textField Password1
     CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername,xUsername,yUsername);; // Définition d'un rectangle
-    textFieldPassword1 = [[UITextField alloc] initWithFrame:rectTFPassword1];
-    textFieldPassword1.textAlignment = NSTextAlignmentCenter;
-    textFieldPassword1.borderStyle = UITextBorderStyleLine;
-    textFieldPassword1.delegate=self;
-    textFieldPassword1.backgroundColor = [UIColor whiteColor];
-    textFieldPassword1.placeholder = @"Enter your password";
-    textFieldPassword1.borderStyle = UITextBorderStyleRoundedRect;
-    textFieldPassword1.secureTextEntry = YES;
+    textFieldPassword1Login = [[UITextField alloc] initWithFrame:rectTFPassword1];
+    textFieldPassword1Login.textAlignment = NSTextAlignmentCenter;
+    textFieldPassword1Login.borderStyle = UITextBorderStyleLine;
+    textFieldPassword1Login.delegate=self;
+    textFieldPassword1Login.backgroundColor = [UIColor whiteColor];
+    textFieldPassword1Login.placeholder = @"Enter your password";
+    textFieldPassword1Login.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldPassword1Login.secureTextEntry = YES;
     
     
     //----------------------Creation du button LOG IN
@@ -410,10 +411,10 @@ UIActivityIndicatorView *loginSpinner;
           forControlEvents:UIControlEventTouchUpInside];
     
     //-----------------Creation of loading spinner---------
-    loginSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    loginSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+50);
-    loginSpinner.color = [UIColor blackColor];
-    loginSpinner.hidesWhenStopped = YES;
+    loginSpinnerLogin = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    loginSpinnerLogin.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+50);
+    loginSpinnerLogin.color = [UIColor blackColor];
+    loginSpinnerLogin.hidesWhenStopped = YES;
     
     
     //-----------------Creation of password_recovery button

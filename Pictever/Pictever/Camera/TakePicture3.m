@@ -94,6 +94,7 @@ NSString *adresseIp2;//global
 NSString *username;//global
 NSString *hashPassword;//global
 
+NSString *myVersionInstallUrl;
 
 UIImage *myKeoImage;//global
 
@@ -974,7 +975,7 @@ int colorCounter;
     APLLog(@"importKeoChoicesSize: %d",[importKeoChoices count]);
     
     ////new
-    actionSheet = [[UIActionSheet alloc] initWithTitle:@"Pick a date!"
+    actionSheet = [[UIActionSheet alloc] initWithTitle:my_actionsheet_pick_a_date
                                               delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil
                                      otherButtonTitles:@"Calendar", nil];
     
@@ -992,46 +993,50 @@ int colorCounter;
     [actionSheet showInView:[[UIApplication sharedApplication].delegate window]];
 }
 
+
 //------------------the user selects a send_choice-----------------------
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    sendToDate = @"0";
-    
-    if (!(buttonIndex == ([importKeoChoices count]+1))) { // Cancel
+
+    if ([actionSheet.title isEqualToString:my_actionsheet_pick_a_date]){
+        sendToDate = @"0";
         
-        if(!(buttonIndex == 0)){ // pickDate
-            if(buttonIndex > 0){
-                if([importKeoChoices count] > (buttonIndex-1)){
-                    sendToDate = [[importKeoChoices objectAtIndex:(buttonIndex-1)] objectForKey:@"key"];
-                    sendToDateAsText = [[importKeoChoices objectAtIndex:(buttonIndex-1)] objectForKey:@"send_label"];
+        if (!(buttonIndex == ([importKeoChoices count]+1))) { // Cancel
+            
+            if(!(buttonIndex == 0)){ // pickDate
+                if(buttonIndex > 0){
+                    if([importKeoChoices count] > (buttonIndex-1)){
+                        sendToDate = [[importKeoChoices objectAtIndex:(buttonIndex-1)] objectForKey:@"key"];
+                        sendToDateAsText = [[importKeoChoices objectAtIndex:(buttonIndex-1)] objectForKey:@"send_label"];
+                    }
                 }
+                
+                sendButtonPh.hidden = YES;
+                cancelButtonPh.hidden = YES;
+                labelCancelPh.hidden = YES;
+                mySendTimer = [NSTimer scheduledTimerWithTimeInterval: 0.2 target: self selector: @selector(send) userInfo: nil repeats: NO];
+                //[self send];
+                
+                
+            }
+            else{ //open calendar
+                APLLog(@"Calendar selectedP");
+                UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+                UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"DatePickerPhotoController"];
+                APLLog(@"YES");
+                [self presentViewController:vc animated:YES completion:nil];
+                
+                sendToDate = @"calendar";
             }
             
-            sendButtonPh.hidden = YES;
-            cancelButtonPh.hidden = YES;
-            labelCancelPh.hidden = YES;
-            mySendTimer = [NSTimer scheduledTimerWithTimeInterval: 0.2 target: self selector: @selector(send) userInfo: nil repeats: NO];
-            //[self send];
-            
-            
         }
-        else{ //open calendar
-            APLLog(@"Calendar selectedP");
-            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-            UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"DatePickerPhotoController"];
-            APLLog(@"YES");
-            [self presentViewController:vc animated:YES completion:nil];
-            
-            sendToDate = @"calendar";
+        else{
+            APLLog(@"CancelPressedP");
+            sendToDate = @"";
+            sendToMail = [[NSMutableArray alloc] init];
+            sendToName = @"";
+            sendToDateAsText = @"";
         }
-        
-    }
-    else{
-        APLLog(@"CancelPressedP");
-        sendToDate = @"";
-        sendToMail = [[NSMutableArray alloc] init];
-        sendToName = @"";
-        sendToDateAsText = @"";
     }
     
 }
@@ -1653,6 +1658,22 @@ int colorCounter;
     }
     
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+//------------------alertView delegate (first tips for the user)-----------------------------------
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+        if (buttonIndex == 1) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
+        }
+    }
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+        if (buttonIndex == 1) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
+        }
+    }
 }
 
 

@@ -8,7 +8,7 @@
 
 @class myGeneralMethods;
 
-@interface GPSession: NSObject
+@interface GPSession: NSObject 
 
 @property (strong, nonatomic) NSString *resendString;
 
@@ -40,5 +40,7 @@
 -(void)asynchronousLoginWithEmailfor:(id)sender;
 
 -(void)sendResetMailRequest:(NSString *)email for:(id)sender;
+
+-(void)increaseReceiveTipCounter;
 
 @end

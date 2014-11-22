@@ -371,6 +371,13 @@ NSInteger definePhoneErrorCode;
     
     
     [self addPickerView];
+    
+    if([allMyCountries count]>0){
+        NSString *cNumber = [[allMyCountries objectAtIndex:0] objectForKey:@"number"];
+        [textFieldPhoneNumber setText:[NSString stringWithFormat:@"%@ ",cNumber]];
+        UIImage *flagImage = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png",[[allMyCountries objectAtIndex:0] objectForKey:@"code"]]];
+        [flagImageView setImage:flagImage];
+    }
 }
 
 -(void)addPickerView{
@@ -470,6 +477,19 @@ numberOfRowsInComponent:(NSInteger)component{
 
 -(NSMutableArray *)initializeCountries{
     APLLog(@"initializeCountries");
+    
+    NSLocale *mylocale = [NSLocale currentLocale];//-----my locale
+    NSString *mymyCountryCode = [mylocale objectForKey: NSLocaleCountryCode];
+    NSString *mymyCountry = [mylocale displayNameForKey: NSLocaleCountryCode value: mymyCountryCode];
+    bool myCountryIsOk = false;
+    if(mymyCountry){
+        APLLog(@"my country is ok");
+        myCountryIsOk = true;
+    }
+    else{
+        APLLog(@"my country is not ok");
+    }
+    APLLog(@"mycontrycode: %@ mycountry: %@", mymyCountryCode, mymyCountry);
 
     NSMutableDictionary* Spain = [[NSMutableDictionary alloc] init];
     NSMutableDictionary* Italy = [[NSMutableDictionary alloc] init];
@@ -477,6 +497,8 @@ numberOfRowsInComponent:(NSInteger)component{
     NSMutableDictionary* UnitedStates = [[NSMutableDictionary alloc] init];
     NSMutableDictionary* France = [[NSMutableDictionary alloc] init];
     NSMutableDictionary* UnitedKingdom = [[NSMutableDictionary alloc] init];
+    
+    NSMutableDictionary* MyOwnCountry = [[NSMutableDictionary alloc] init];
     
     
     NSMutableArray *returnCountries = [[NSMutableArray alloc] init];
@@ -497,24 +519,27 @@ numberOfRowsInComponent:(NSInteger)component{
             [countryDic setObject:countryNum forKey:@"number"];
             
             if([countryNum isEqualToString:@"+39"]){
-                Italy = countryDic;
+                Italy = [countryDic mutableCopy];
             }
             if([countryNum isEqualToString:@"+34"]){
-                Spain = countryDic;
+                Spain = [countryDic mutableCopy];
             }
             if([countryNum isEqualToString:@"+49"]){
-                Germany = countryDic;
+                Germany = [countryDic mutableCopy];
             }
             if([countryNum isEqualToString:@"+1"]){
-                UnitedStates = countryDic;
+                UnitedStates = [countryDic mutableCopy];
             }
             if([countryNum isEqualToString:@"+33"]){
-                France = countryDic;
+                France = [countryDic mutableCopy];
             }
             if([countryNum isEqualToString:@"+44"]){
-                UnitedKingdom = countryDic;
+                UnitedKingdom = [countryDic mutableCopy];
             }
             
+            if([country isEqualToString:mymyCountry]){
+                MyOwnCountry = [countryDic mutableCopy];
+            }
             
             [returnCountries insertObject:countryDic atIndex:[returnCountries count]];
         }
@@ -532,6 +557,11 @@ numberOfRowsInComponent:(NSInteger)component{
     [returnCountries insertObject:UnitedKingdom atIndex:0];
     [returnCountries insertObject:France atIndex:0];
     [returnCountries insertObject:UnitedStates atIndex:0];
+    
+    if(myCountryIsOk){
+        [returnCountries removeObject:MyOwnCountry];
+        [returnCountries insertObject:MyOwnCountry atIndex:0];
+    }
 
     return returnCountries;
 }

@@ -45,12 +45,12 @@ NSUserDefaults *prefs;
 CGSize keyboardSize;
 CGRect rect;
 
-UITextField *textFieldUsername;
-UITextField *textFieldPassword1;
-UITextField *textFieldPassword2;
+UITextField *textFieldUsernameSignUp;
+UITextField *textFieldPassword1SignUp;
+UITextField *textFieldPassword2SignUp;
 
 
-UILabel *myWelcomeLabel;
+UILabel *myWelcomeLabelSignUp;
 UILabel *monLabelPassword1;
 
 UIButton *backButton;
@@ -109,25 +109,25 @@ UIActivityIndicatorView *registerSpinner;
 //--------------hide the keyboard when screen touched------------
 
 - (IBAction)respondToTapGesture2:(UITapGestureRecognizer *)recognizer {
-    [textFieldPassword1 resignFirstResponder];
-    [textFieldPassword2 resignFirstResponder];
-    [textFieldUsername resignFirstResponder];
+    [textFieldPassword1SignUp resignFirstResponder];
+    [textFieldPassword2SignUp resignFirstResponder];
+    [textFieldUsernameSignUp resignFirstResponder];
 }
 
 //---------------return pressed------------------------
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    if(textFieldUsername.isFirstResponder){
-        [textFieldPassword1 becomeFirstResponder];
+    if(textFieldUsernameSignUp.isFirstResponder){
+        [textFieldPassword1SignUp becomeFirstResponder];
     }
-    else if (textFieldPassword1.isFirstResponder){
-        [textFieldPassword2 becomeFirstResponder];
+    else if (textFieldPassword1SignUp.isFirstResponder){
+        [textFieldPassword2SignUp becomeFirstResponder];
     }
     else{
-        [textFieldPassword1 resignFirstResponder];
-        [textFieldPassword2 resignFirstResponder];
-        [textFieldUsername resignFirstResponder];
+        [textFieldPassword1SignUp resignFirstResponder];
+        [textFieldPassword2SignUp resignFirstResponder];
+        [textFieldUsernameSignUp resignFirstResponder];
     }
     
     return YES;
@@ -144,45 +144,45 @@ UIActivityIndicatorView *registerSpinner;
 //---------------------sign up pressed (to create a new account)---------------------------
 
 - (IBAction)myActionLogIn:(id)sender {
-    if([textFieldUsername.text isEqualToString:@""]){
+    if([textFieldUsernameSignUp.text isEqualToString:@""]){
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Error"
                               message:@"Please enter your username first!" delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
-        textFieldPassword1.text=@"";
-        textFieldPassword2.text=@"";
+        textFieldPassword1SignUp.text=@"";
+        textFieldPassword2SignUp.text=@"";
     }
-    else if ([textFieldPassword1.text isEqualToString:@""]){
+    else if ([textFieldPassword1SignUp.text isEqualToString:@""]){
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Error"
                               message:@"Please enter your password first!" delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
-        textFieldPassword1.text=@"";
-        textFieldPassword2.text=@"";
+        textFieldPassword1SignUp.text=@"";
+        textFieldPassword2SignUp.text=@"";
     }
-    else if (![textFieldPassword1.text isEqualToString:textFieldPassword2.text]){
+    else if (![textFieldPassword1SignUp.text isEqualToString:textFieldPassword2SignUp.text]){
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Error"
                               message:@"The two passwords are different!    " delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
-        textFieldPassword1.text=@"";
-        textFieldPassword2.text=@"";
+        textFieldPassword1SignUp.text=@"";
+        textFieldPassword2SignUp.text=@"";
     }
-    else if ([textFieldPassword1.text length] < 6){
+    else if ([textFieldPassword1SignUp.text length] < 6){
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Error"
                               message:@"Please enter a password with at least 6 characters" delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
-        textFieldPassword1.text=@"";
-        textFieldPassword2.text=@"";
+        textFieldPassword1SignUp.text=@"";
+        textFieldPassword2SignUp.text=@"";
     }
     else{
-        username = textFieldUsername.text;
-        password1 = textFieldPassword1.text;
+        username = textFieldUsernameSignUp.text;
+        password1 = textFieldPassword1SignUp.text;
         
         hashPassword = [GPRequests sha256HashFor:password1];
 
@@ -352,44 +352,45 @@ UIActivityIndicatorView *registerSpinner;
     
     //---------------creation of label Pictever
     CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsernameTitle),40,xUsernameTitle,60);
-    myWelcomeLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
-    [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
-    [myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
-    [myWelcomeLabel setFont:[UIFont fontWithName:@"Gabriola" size:42]];
-    myWelcomeLabel.text = @"Sign Up on Pictever!";
+    myWelcomeLabelSignUp = [[UILabel alloc] initWithFrame: rectLabUsername];
+    [myWelcomeLabelSignUp setTextAlignment:NSTextAlignmentCenter];
+    [myWelcomeLabelSignUp setFont:[UIFont systemFontOfSize:30]];
+    [myWelcomeLabelSignUp setFont:[UIFont fontWithName:@"Gabriola" size:42]];
+    myWelcomeLabelSignUp.text = @"Sign Up on Pictever!";
     
     //---------------Création du textField Username
     CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername); // Définition d'un rectangle
-    textFieldUsername = [[UITextField alloc] initWithFrame:rectTFUsername];
-    textFieldUsername.textAlignment = NSTextAlignmentCenter;
-    textFieldUsername.borderStyle = UITextBorderStyleLine;
-    textFieldUsername.delegate=self;
-    textFieldUsername.backgroundColor = [UIColor whiteColor];
-    textFieldUsername.placeholder = @"Enter your email";
-    textFieldUsername.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    textFieldUsername.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldUsernameSignUp = [[UITextField alloc] initWithFrame:rectTFUsername];
+    textFieldUsernameSignUp.textAlignment = NSTextAlignmentCenter;
+    textFieldUsernameSignUp.borderStyle = UITextBorderStyleLine;
+    textFieldUsernameSignUp.delegate=self;
+    textFieldUsernameSignUp.backgroundColor = [UIColor whiteColor];
+    textFieldUsernameSignUp.placeholder = @"Enter your email";
+    textFieldUsernameSignUp.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    textFieldUsernameSignUp.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldUsernameSignUp.keyboardType = UIKeyboardTypeEmailAddress;
     
     //----------------Creation of textField Password1
     CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername,xUsername,yUsername);; // Définition d'un rectangle
-    textFieldPassword1 = [[UITextField alloc] initWithFrame:rectTFPassword1];
-    textFieldPassword1.textAlignment = NSTextAlignmentCenter;
-    textFieldPassword1.borderStyle = UITextBorderStyleLine;
-    textFieldPassword1.delegate=self;
-    textFieldPassword1.backgroundColor = [UIColor whiteColor];
-    textFieldPassword1.placeholder = @"Enter a password";
-    textFieldPassword1.borderStyle = UITextBorderStyleRoundedRect;
-    textFieldPassword1.secureTextEntry = YES;
+    textFieldPassword1SignUp = [[UITextField alloc] initWithFrame:rectTFPassword1];
+    textFieldPassword1SignUp.textAlignment = NSTextAlignmentCenter;
+    textFieldPassword1SignUp.borderStyle = UITextBorderStyleLine;
+    textFieldPassword1SignUp.delegate=self;
+    textFieldPassword1SignUp.backgroundColor = [UIColor whiteColor];
+    textFieldPassword1SignUp.placeholder = @"Enter a password";
+    textFieldPassword1SignUp.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldPassword1SignUp.secureTextEntry = YES;
     
     //------------Creation of textField Password2
     CGRect rectTFPassword2 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername+yUsername,xUsername,yUsername);; // Définition d'un rectangle
-    textFieldPassword2 = [[UITextField alloc] initWithFrame:rectTFPassword2];
-    textFieldPassword2.textAlignment = NSTextAlignmentCenter;
-    textFieldPassword2.borderStyle = UITextBorderStyleLine;
-    textFieldPassword2.delegate=self;
-    textFieldPassword2.backgroundColor = [UIColor whiteColor];
-    textFieldPassword2.placeholder = @"Re-Enter your password";
-    textFieldPassword2.borderStyle = UITextBorderStyleRoundedRect;
-    textFieldPassword2.secureTextEntry = YES;
+    textFieldPassword2SignUp = [[UITextField alloc] initWithFrame:rectTFPassword2];
+    textFieldPassword2SignUp.textAlignment = NSTextAlignmentCenter;
+    textFieldPassword2SignUp.borderStyle = UITextBorderStyleLine;
+    textFieldPassword2SignUp.delegate=self;
+    textFieldPassword2SignUp.backgroundColor = [UIColor whiteColor];
+    textFieldPassword2SignUp.placeholder = @"Re-Enter your password";
+    textFieldPassword2SignUp.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldPassword2SignUp.secureTextEntry = YES;
     
     
     //------------Creation of Sign Up button
@@ -425,12 +426,12 @@ UIActivityIndicatorView *registerSpinner;
     registerSpinner.hidesWhenStopped = YES;
     
     [self.view addSubview: backButton];
-    [self.view addSubview: myWelcomeLabel];
-    [self.view addSubview: textFieldUsername];
-    [self.view addSubview: textFieldPassword1];
-    [self.view addSubview: textFieldPassword2];
+    [self.view addSubview: myWelcomeLabelSignUp];
+    [self.view addSubview: textFieldUsernameSignUp];
+    [self.view addSubview: textFieldPassword1SignUp];
+    [self.view addSubview: textFieldPassword2SignUp];
     [self.view addSubview: signUpButton];
-    [textFieldUsername becomeFirstResponder];
+    [textFieldUsernameSignUp becomeFirstResponder];
 }
 
 

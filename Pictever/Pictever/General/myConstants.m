@@ -53,6 +53,8 @@ NSString *const my_defineNewPassword = @"define_new_password";
 
 NSString *const my_default_adresseIp=@"http://instant-pictever.herokuapp.com/";
 
+NSString *const my_facebook_page_adress = @"https://www.facebook.com/pictever";
+
 
 //------------string if the field "photo" if the message is a text message--------
 NSString *const no_photo_string = @"None";
@@ -127,7 +129,8 @@ NSString *const my_prefs_username_key = @"username";
 NSString *const my_prefs_password_key = @"password";
 NSString *const my_prefs_phoneNumber_key = @"phoneNumber";
 NSString *const my_prefs_countryCode_key = @"countryCode";
-
+NSString *const my_prefs_send_tips_key = @"sendTips";
+NSString *const my_prefs_receive_tips_key = @"receiveTips";
 
 
 
@@ -137,6 +140,14 @@ NSString *const my_sendbox_recipient = @"recipient";
 NSString *const my_sendbox_key = @"key";
 NSString *const my_sendbox_keoTime = @"keoTime";
 NSString *const my_sendbox_path = @"path";
+
+
+//---------------------------actionsheet titles----------------------------------
+NSString *const my_actionsheet_pick_a_date = @"Pick a date!";
+NSString *const my_actionsheet_wanna_help_us = @"Wanna help us?";
+NSString *const my_actionsheet_you_are_great = @"You're great!";
+NSString *const my_actionsheet_want_to_remember = @"Want to remember this message?";
+NSString *const my_actionsheet_install_it_now = @"Do you want to install it now?";
 
 @end
 

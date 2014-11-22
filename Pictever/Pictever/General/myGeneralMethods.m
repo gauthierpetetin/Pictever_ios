@@ -434,9 +434,6 @@ NSString *mytimeStamp;//global
 //-------------------deal with the new message received and add them to messagesDataFile (and inform the user)--------------
 
 +(void)receiveAllMessagesTogether:(NSArray *)res withTimeStamp:(NSString *)timeStampToSave{
-
-    
-    NSMutableDictionary *newMessage = [[NSMutableDictionary alloc] init];
     
     APLLog([NSString stringWithFormat:@"You received %lu new messages!",(unsigned long)[res count]]);
     
@@ -444,6 +441,8 @@ NSString *mytimeStamp;//global
     
     ////WE RECEIVE ALL THE NEW SMS
     for(id sms in res) {
+        
+        NSMutableDictionary *newMessage = [[NSMutableDictionary alloc] init];
         
         id shyft_id = [sms objectForKey:my_shyft_id_Key];
         id from = [sms objectForKey:my_from_email_Key];
@@ -558,13 +557,13 @@ NSString *mytimeStamp;//global
             dispatch_async(dispatch_get_main_queue(), ^{
                 APLLog(@"send notif startLoadingAnimation");
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"startLoadingAnimation" object: nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"downloadPhotoOnNewBucket" object:self userInfo:newMessage];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"downloadPhotoOnNewBucket" object:self userInfo:[newMessage mutableCopy]];
             });
         }
         else{
             APLLog(@"-----new text message");
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"vibrateForNewShyft" object:self userInfo:newMessage];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"vibrateForNewShyft" object:self userInfo:[newMessage mutableCopy]];
             });
         }
         

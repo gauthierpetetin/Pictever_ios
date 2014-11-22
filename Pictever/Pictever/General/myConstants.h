@@ -44,6 +44,7 @@ extern NSString *const my_defineNewPassword;
 
 extern NSString *const my_default_adresseIp;
 
+extern NSString *const my_facebook_page_adress;
 
 extern NSString *const no_photo_string;
 
@@ -110,6 +111,8 @@ extern NSString *const my_prefs_username_key;
 extern NSString *const my_prefs_password_key;
 extern NSString *const my_prefs_phoneNumber_key;
 extern NSString *const my_prefs_countryCode_key;
+extern NSString *const my_prefs_send_tips_key;
+extern NSString *const my_prefs_receive_tips_key;
 
 //-------------------------sendBoxContent------------------------------------------
 extern NSString *const my_sendbox_date;
@@ -117,6 +120,13 @@ extern NSString *const my_sendbox_recipient;
 extern NSString *const my_sendbox_key;
 extern NSString *const my_sendbox_keoTime;
 extern NSString *const my_sendbox_path;
+
+//---------------------------actionsheet titles----------------------------------
+extern NSString *const my_actionsheet_pick_a_date;
+extern NSString *const my_actionsheet_wanna_help_us;
+extern NSString *const my_actionsheet_you_are_great;
+extern NSString *const my_actionsheet_want_to_remember;
+extern NSString *const my_actionsheet_install_it_now;
 
 
 @interface myConstants: NSObject
