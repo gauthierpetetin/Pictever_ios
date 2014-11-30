@@ -131,6 +131,9 @@ NSString *const my_prefs_phoneNumber_key = @"phoneNumber";
 NSString *const my_prefs_countryCode_key = @"countryCode";
 NSString *const my_prefs_send_tips_key = @"sendTips";
 NSString *const my_prefs_receive_tips_key = @"receiveTips";
+NSString *const my_prefs_fb_name_key = @"fb_name";
+NSString *const my_prefs_fb_id_key = @"fb_id";
+NSString *const my_prefs_fb_birthday_key = @"fb_birthday";
 
 
 

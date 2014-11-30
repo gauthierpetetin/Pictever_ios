@@ -14,6 +14,7 @@
 #import <AWSiOSSDKv2/AWSMobileAnalytics.h>
 #import <AWSiOSSDKv2/AWSCore.h>
 #import "myConstants.h"
+#import "myGeneralMethods.h"
 
 @interface RegisterScreen ()
 
@@ -69,6 +70,7 @@ NSString *myDeviceToken;
 
 bool *connectionDidFinishLoadingOver;
 
+UIColor *theKeoOrangeColor;
 
 int height;
 int yInitial;
@@ -86,7 +88,8 @@ UIActivityIndicatorView *registerSpinner;
 {
     [super viewDidLoad];
 
-    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FilleBleEmpty@2x.png"]]];
     
     logIn = false;
     
@@ -341,7 +344,7 @@ UIActivityIndicatorView *registerSpinner;
     xUsernameTitle=300;
     yEspace=50;
     //xButton=100;
-    xButton=250;
+    xButton=90;
     yUsername=30;
     
     //------------Create tap gesture recognizer
@@ -356,7 +359,8 @@ UIActivityIndicatorView *registerSpinner;
     [myWelcomeLabelSignUp setTextAlignment:NSTextAlignmentCenter];
     [myWelcomeLabelSignUp setFont:[UIFont systemFontOfSize:30]];
     [myWelcomeLabelSignUp setFont:[UIFont fontWithName:@"Gabriola" size:42]];
-    myWelcomeLabelSignUp.text = @"Sign Up on Pictever!";
+    myWelcomeLabelSignUp.textColor = theKeoOrangeColor;
+    myWelcomeLabelSignUp.text = @"Register with email";
     
     //---------------Création du textField Username
     CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername); // Définition d'un rectangle
@@ -392,7 +396,7 @@ UIActivityIndicatorView *registerSpinner;
     textFieldPassword2SignUp.borderStyle = UITextBorderStyleRoundedRect;
     textFieldPassword2SignUp.secureTextEntry = YES;
     
-    
+
     //------------Creation of Sign Up button
     signUpButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     signUpButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+2*yUsername+20,xButton,yUsername);
@@ -400,9 +404,10 @@ UIActivityIndicatorView *registerSpinner;
     [signUpButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
     signUpButton.layer.cornerRadius = 10; // arrondir les
     signUpButton.clipsToBounds = YES;     // angles du bouton
-    [signUpButton setTitle:@"Sign Up" forState:UIControlStateNormal];
+    [signUpButton setTitle:@"Let's go!" forState:UIControlStateNormal];
     [signUpButton.titleLabel setFont:[UIFont fontWithName:@"System-Bold" size:15]];
     [[signUpButton layer] setBorderWidth:1.0f];
+    [[signUpButton layer] setBorderColor:[[UIColor grayColor] CGColor]];
     [signUpButton addTarget:self
                      action:@selector(myActionLogIn:)
            forControlEvents:UIControlEventTouchUpInside];

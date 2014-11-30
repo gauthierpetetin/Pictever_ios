@@ -69,6 +69,9 @@ NSString *myCurrentPhoneNumber;
 NSString *myCountryCode;
 NSString *myUserID;
 NSString *myStatus;
+NSString *myFacebookName;
+NSString *myFacebookID;
+NSString *myFacebookBirthDay;
 ///////////////////////
 
 
@@ -184,36 +187,17 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    APLLog(@"didFinishLaunchingWithOptions");
+    APLLog(@"didFinishLaunchingWithOptions-------Pictever---------");
     
     firstUseEver = false;
     
     
-    /////APPLAUSE// service pour le débuggage/////
-    [[APLLogger settings] setReportOnShakeEnabled:YES];
-    [[APLLogger settings] setDefaultUser:@"gauthierpetetin@hotmail.com"];
-    [[APLLogger settings] setServerURL:@"https://aph.applause.com"];
-    [APLLogger startNewSessionWithApplicationKey:@"af94f31a47659c5d3f1bd14cb884abdd9949b0c8"];
-    APLLog(@"Hello %@",@"Shyft");
-    ////////////////
+    //--------------initialize Applause--------------
+    [self initializeApplause];
     
-    // Let the device know we want to receive push notifications
-    //-- Set Notification
-    if ([application respondsToSelector:@selector(isRegisteredForRemoteNotifications)])
-    {
-        // iOS 8 Notifications
-        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
-        
-        [application registerForRemoteNotifications];
-    }
-    else
-    {
-        // iOS < 8 Notifications
-        [application registerForRemoteNotificationTypes:
-         (UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert)];
-    }
-    
-    
+   
+    //------------register for notifications-----------
+    [self registerForNotification:application];
     
     
     //-------------App prefereces--------------------
@@ -235,6 +219,260 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     theKeoOrangeColor = [UIColor colorWithRed:246/255.0f green:89/255.0f blue:30/255.0f alpha:1.0f];
     
     
+    //--------------initialize amazon-------------
+    [self importAmazonData];
+    
+    
+    //---------------Screen size-------------------
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    screenWidth = screenRect.size.width;
+    screenHeight = screenRect.size.height;
+    tabBarHeight = 49;//global
+    
+    
+    //--------------Initialisatio of boolean variables--------
+    isLoadingLoadBox = false;
+    sendKeo = false;
+    firstGlobalOpening = true;
+    firstContactOpening = true;
+    uploadPhotoOnCloudinary = false;
+    downloadPhotoOnAmazon = false;
+    showDatePicker = false;
+    sendSMS = false;
+    
+    //Clean Keo repository
+    //[self cleanKeoPhotoRepository];
+    
+    
+    
+    
+    if([prefs objectForKey:@"ipAdress"]){
+        NSString *ipAdressCopy;
+        ipAdressCopy = [prefs objectForKey:@"ipAdress"];
+        adresseIp2 = [[NSString alloc] initWithString:ipAdressCopy];
+        APLLog(@"ipAdress: %@",ipAdressCopy);
+        if([[adresseIp2 stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@""]){
+            adresseIp2 = my_default_adresseIp;
+        }
+    }
+    else{
+        adresseIp2 = my_default_adresseIp;
+        APLLog(@"no ipAdress, take default one: %@",adresseIp2);
+    }
+    
+    //--------work in local or not
+    localWork=false;
+    //localWork=true;
+    //adresseIp2=@"http://192.168.0.15:5000/";
+    
+    
+    
+    //------------------import all account data----------------------------
+    [self importAccountData];
+    
+    
+    //------------------import messages data-----------------------------
+    [self importMessagesData];
+    
+    //---------------import facebook data-------------------------------
+    [self importFacebookData];
+    
+    
+    
+    loadBox = [[NSMutableArray alloc] init];
+    localKeoContacts = [[NSMutableArray alloc] init];
+    importContactPhones = [[NSMutableArray alloc] init];
+    importContactMails = [[NSMutableArray alloc] init];
+    importContactIDs = [[NSMutableArray alloc] init];
+    
+    
+    
+    //--------------------importKeoContacts------------
+    importKeoContacts = [[NSMutableDictionary alloc] init];
+    //NSMutableDictionary *importKeoContactsCopy = [[NSMutableDictionary alloc] init];
+    if([prefs dictionaryForKey:@"importKeoContacts"]){
+        NSDictionary *importKeoContactsCopy = [prefs dictionaryForKey:@"importKeoContacts"];
+        APLLog(@"importKeoContactsCopy: %@",[importKeoContactsCopy description]);
+        //importKeoContacts = [self copyKeoContactDictionary:importKeoContactsCopy];
+        importKeoContacts = [importKeoContactsCopy mutableCopy];
+    }
+    else{
+        APLLog(@"no Keo contacts");
+    }
+    
+    //---------------------importKeoOccurences--------------
+    importKeoOccurences = [[NSMutableDictionary alloc] init];
+    if([prefs dictionaryForKey:my_prefs_keo_occurences_key]){
+        NSDictionary *importKeoOccurencesCopy = [prefs dictionaryForKey:my_prefs_keo_occurences_key];
+        APLLog(@"importKeoOccurencesCopy: %@",[importKeoOccurencesCopy description]);
+        importKeoOccurences = [importKeoOccurencesCopy mutableCopy];
+    }
+    else{
+        APLLog(@"no Keo occurences");
+    }
+    
+    
+    
+    
+    selectedLocalDic = [[NSMutableDictionary alloc] init];
+    
+    
+    if([prefs objectForKey:@"allKeoNumbers"]){
+        NSArray *importContactPhonesCopy;
+        importContactPhonesCopy = [prefs objectForKey:@"allKeoNumbers"];
+        importContactPhones = [self copyArray:importContactPhonesCopy];
+    }
+    if([prefs objectForKey:@"allKeoMails"]){
+        NSArray *importContactMailsCopy;
+        importContactMailsCopy = [prefs objectForKey:@"allKeoMails"];
+        importContactMails = [self copyArray:importContactMailsCopy];
+    }
+    if([prefs objectForKey:@"allKeoIDs"]){
+        NSArray *importContactIDsCopy;
+        importContactIDsCopy = [prefs objectForKey:@"allKeoIDs"];
+        importContactIDs = [self copyArray:importContactIDsCopy];
+    }
+    
+    
+    //---------------import timestamp-----------------
+    [self importTimeStamp];
+
+    
+    //---------------import device token-----------------
+    if([prefs objectForKey:@"deviceToken"]){
+        NSString *myDeviceTokenCopy;
+        myDeviceTokenCopy = [prefs objectForKey:@"deviceToken"];
+        myDeviceToken = [[NSString alloc] initWithString:myDeviceTokenCopy];
+    }
+    else{
+        APLLog(@"no device token");
+    }
+    APLLog(@"DeviceToken from memory: %@",myDeviceToken);
+    
+    
+    
+    myKeoReferences = [[NSMutableArray alloc] init];
+    [self getAllPhotoPaths];
+    APLLog(@"Pictever References has length: %d and contains: %@",[myKeoReferences count],[myKeoReferences description]);
+    
+    
+    openingWindow = 0;// global variable to switch directly to the chat window at the first opening
+    storyboardName = @"Main";
+    backgroundImage = @"ShyftBackground.png";
+    uploadProgress = 0.0;
+    lastLabelSelected = @"";
+    sendToTimeStamp = @"";
+    sendToMail = [[NSMutableArray alloc] init];
+    
+    
+    //---------------Contacts loading---------------
+    
+    loadAllcontacts = false;
+    importContactsData = [[NSMutableArray alloc] init];
+    importContactsNames = [[NSMutableArray alloc] init];
+    
+    myUploadContactSession = [[GPSession alloc] init];
+    
+    
+    
+    //-----------import keo_choices--------------
+    
+    importKeoChoices = [[NSMutableArray alloc] init];
+    if([prefs arrayForKey:@"importKeoChoices2"]){
+        NSArray *importKeoChoicesCopy = [prefs arrayForKey:@"importKeoChoices2"];
+        //importKeoChoices = [self copyKeoChoicesArray:importKeoChoicesCopy];
+        importKeoChoices = [importKeoChoicesCopy mutableCopy];
+    }
+    
+    if([importKeoChoices count] > 0){
+        APLLog(@"importKeoChoices: %@", [importKeoChoices description]);
+    }
+    
+    
+
+    //-------------import tips variables-----------------
+    [self importTipsVariables];
+    
+    
+    //----------------if the app was opened on a notification, I can switch directly to the gallery------------------
+    NSDictionary *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    appOpenedOnNotification = false;
+    if (notification) {
+        // do something with notification
+        appOpenedOnNotification = true;
+    }
+    
+    APLLog([NSString stringWithFormat:@"didFinishLaunchingWithOptions username: %@  coutryCode:%@  phoneNumber:%@   hashpass:%@   status:%@",username,myCountryCode,myCurrentPhoneNumber,hashPassword,myStatus]);
+    
+    return YES;
+}
+
+-(NSMutableArray *)copyArray:(NSArray *)importedArr{
+    NSMutableArray *returnArr = [[NSMutableArray alloc] init];
+    for(NSDictionary *message2 in importedArr){
+        [returnArr insertObject:message2 atIndex:[returnArr count]];
+    }
+    return returnArr;
+}
+
+-(void)initializeApplause{
+    [[APLLogger settings] setReportOnShakeEnabled:YES];
+    [[APLLogger settings] setDefaultUser:@"gauthierpetetin@hotmail.com"];
+    [[APLLogger settings] setServerURL:@"https://aph.applause.com"];
+    [APLLogger startNewSessionWithApplicationKey:@"af94f31a47659c5d3f1bd14cb884abdd9949b0c8"];
+}
+
+-(void)registerForNotification:(UIApplication *)application{
+    // Let the device know we want to receive push notifications
+    //-- Set Notification
+    if ([application respondsToSelector:@selector(isRegisteredForRemoteNotifications)])
+    {
+        // iOS 8 Notifications
+        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+        
+        [application registerForRemoteNotifications];
+    }
+    else
+    {
+        // iOS < 8 Notifications
+        [application registerForRemoteNotificationTypes:
+         (UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert)];
+    }
+}
+
+-(void)importFacebookData{
+    if([prefs objectForKey:my_prefs_fb_name_key]){
+        NSString *fbNameCopy;
+        fbNameCopy = [prefs objectForKey:my_prefs_fb_name_key];
+        myFacebookName = [[NSString alloc] initWithString:fbNameCopy];
+    }
+    else{
+        myFacebookName = @"";
+        APLLog(@"no facebook name");
+    }
+    
+    if([prefs objectForKey:my_prefs_fb_id_key]){
+        NSString *fbIDCopy;
+        fbIDCopy = [prefs objectForKey:my_prefs_fb_id_key];
+        myFacebookID = [[NSString alloc] initWithString:fbIDCopy];
+    }
+    else{
+        myFacebookID = @"";
+        APLLog(@"no facebook ID");
+    }
+    
+    if([prefs objectForKey:my_prefs_fb_birthday_key]){
+        NSString *fbBirthdayCopy;
+        fbBirthdayCopy = [prefs objectForKey:my_prefs_fb_birthday_key];
+        myFacebookBirthDay = [[NSString alloc] initWithString:fbBirthdayCopy];
+    }
+    else{
+        myFacebookBirthDay = @"";
+        APLLog(@"no facebook birthday");
+    }
+}
+
+-(void)importAmazonData{
     
     //---------Cloudfront parameters-----------------
     if([prefs objectForKey:@"downloadPhotoRequestName"]){
@@ -323,55 +561,59 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     
     //---------------initialisation of AMAZON ANALYTICS----------
     //if([GPRequests connected]){
-        APLLog(@"connect to analytics");
-        analytics = [AWSMobileAnalytics defaultMobileAnalyticsWithAppNamespace:@"App.PicteverProd"];
+    APLLog(@"connect to analytics");
+    analytics = [AWSMobileAnalytics defaultMobileAnalyticsWithAppNamespace:@"App.PicteverProd"];
     //}
     
+
+}
+
+-(void)importMessagesData{
+    messagesDataFile = [[NSMutableArray alloc] init];
     
-    //---------------Screen size-------------------
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    screenWidth = screenRect.size.width;
-    screenHeight = screenRect.size.height;
-    tabBarHeight = 49;//global
+    if([prefs arrayForKey:@"messagesDataFile"]){
+        NSArray *messagesDataFileCopy;
+        if([prefs objectForKey:@"messagesDataFile"]){
+            messagesDataFileCopy = [prefs arrayForKey:@"messagesDataFile"];
+        }
+        messagesDataFile = [self copyMessagesDataFile:messagesDataFileCopy];
+        [prefs setObject:messagesDataFile forKey:@"messagesDataFile"];
+    }
+    else{
+        APLLog(@"no messages");
+    }
+    if(messagesDataFile){
+        APLLog(@"MessagesDataFile length: %d", [messagesDataFile count]);
+    }
+    else{
+        messagesDataFile = [[NSMutableArray alloc] init];
+    }
+    
+    APLLog(@"%@",[messagesDataFile description]);
     
     
-    //--------------Initialisatio of boolean variables--------
-    isLoadingLoadBox = false;
-    sendKeo = false;
-    firstGlobalOpening = true;
-    firstContactOpening = true;
-    uploadPhotoOnCloudinary = false;
-    downloadPhotoOnAmazon = false;
-    showDatePicker = false;
-    sendSMS = false;
-    
-    //Clean Keo repository
-    //[self cleanKeoPhotoRepository];
-    
-    
-    
-    
-    if([prefs objectForKey:@"ipAdress"]){
-        NSString *ipAdressCopy;
-        ipAdressCopy = [prefs objectForKey:@"ipAdress"];
-        adresseIp2 = [[NSString alloc] initWithString:ipAdressCopy];
-        APLLog(@"ipAdress: %@",ipAdressCopy);
-        if([[adresseIp2 stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@""]){
-            adresseIp2 = my_default_adresseIp;
+    //sendBox (messages to send)
+    sendBox = [[NSMutableArray alloc] init];
+    if([prefs arrayForKey:@"sendBox"]){
+        NSArray *sendBoxCopy;
+        if([prefs objectForKey:@"sendBox"]){
+            sendBoxCopy = [prefs arrayForKey:@"sendBox"];
+        }
+        if(sendBoxCopy){
+            for(int i=0; i<[sendBoxCopy count]; i++){
+                [sendBox insertObject:sendBoxCopy[i] atIndex:[sendBox count]];
+            }
         }
     }
     else{
-        adresseIp2 = my_default_adresseIp;
-        APLLog(@"no ipAdress, take default one: %@",adresseIp2);
+        APLLog(@"no messages in SendBox");
     }
+    APLLog(@"SENDBox: %@", [sendBox description]);
     
-    //--------work in local or not
-    localWork=false;
-    //localWork=true;
-    //adresseIp2=@"http://192.168.0.15:5000/";
-    
-    
-    
+}
+
+-(void)importAccountData{
+
     bool logInCopy = [prefs boolForKey:my_prefs_login_key];
     if(logInCopy){
         logIn = true;
@@ -383,8 +625,6 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     }
     
     
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////// We get all the different parameters in the preferences///////////////////
     bool myVersionForceInstallCopy = [prefs boolForKey:@"myVersionForceInstall"];
     if(myVersionForceInstallCopy){
         myVersionForceInstall = true;
@@ -419,6 +659,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         username = [[NSString alloc] initWithString:usernameCopy];
     }
     else{
+        username = @"";
         APLLog(@"no username");
     }
     
@@ -428,6 +669,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         hashPassword = [[NSString alloc] initWithString:hashPasswordCopy];
     }
     else{
+        hashPassword = @"";
         APLLog(@"no password");
     }
     
@@ -483,106 +725,10 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         numberOfMessagesInTheFuture = @"0";
         APLLog(@"no numberOfMessagesInTheFuture");
     }
-    
-    
-    
-    messagesDataFile = [[NSMutableArray alloc] init];
-    
-    if([prefs arrayForKey:@"messagesDataFile"]){
-        NSArray *messagesDataFileCopy;
-        if([prefs objectForKey:@"messagesDataFile"]){
-            messagesDataFileCopy = [prefs arrayForKey:@"messagesDataFile"];
-        }
-        messagesDataFile = [self copyMessagesDataFile:messagesDataFileCopy];
-        [prefs setObject:messagesDataFile forKey:@"messagesDataFile"];
-    }
-    else{
-        APLLog(@"no messages");
-    }
-    if(messagesDataFile){
-        APLLog(@"MessagesDataFile length: %d", [messagesDataFile count]);
-    }
-    else{
-        messagesDataFile = [[NSMutableArray alloc] init];
-    }
-    
-    APLLog(@"%@",[messagesDataFile description]);
-    
-    
-    //sendBox (messages to send)
-    sendBox = [[NSMutableArray alloc] init];
-    if([prefs arrayForKey:@"sendBox"]){
-        NSArray *sendBoxCopy;
-        if([prefs objectForKey:@"sendBox"]){
-            sendBoxCopy = [prefs arrayForKey:@"sendBox"];
-        }
-        if(sendBoxCopy){
-            for(int i=0; i<[sendBoxCopy count]; i++){
-                [sendBox insertObject:sendBoxCopy[i] atIndex:[sendBox count]];
-            }
-        }
-    }
-    else{
-        APLLog(@"no messages in SendBox");
-    }
-    APLLog(@"SENDBox: %@", [sendBox description]);
-    
-    
-    loadBox = [[NSMutableArray alloc] init];
-    localKeoContacts = [[NSMutableArray alloc] init];
-    importContactPhones = [[NSMutableArray alloc] init];
-    importContactMails = [[NSMutableArray alloc] init];
-    importContactIDs = [[NSMutableArray alloc] init];
-    
-    
-    
-    //--------------------importKeoContacts------------
-    importKeoContacts = [[NSMutableDictionary alloc] init];
-    //NSMutableDictionary *importKeoContactsCopy = [[NSMutableDictionary alloc] init];
-    if([prefs dictionaryForKey:@"importKeoContacts"]){
-        NSDictionary *importKeoContactsCopy = [prefs dictionaryForKey:@"importKeoContacts"];
-        APLLog(@"importKeoContactsCopy: %@",[importKeoContactsCopy description]);
-        //importKeoContacts = [self copyKeoContactDictionary:importKeoContactsCopy];
-        importKeoContacts = [importKeoContactsCopy mutableCopy];
-    }
-    else{
-        APLLog(@"no Keo contacts");
-    }
-    
-    //---------------------importKeoOccurences--------------
-    importKeoOccurences = [[NSMutableDictionary alloc] init];
-    if([prefs dictionaryForKey:my_prefs_keo_occurences_key]){
-        NSDictionary *importKeoOccurencesCopy = [prefs dictionaryForKey:my_prefs_keo_occurences_key];
-        APLLog(@"importKeoOccurencesCopy: %@",[importKeoOccurencesCopy description]);
-        importKeoOccurences = [importKeoOccurencesCopy mutableCopy];
-    }
-    else{
-        APLLog(@"no Keo occurences");
-    }
-    
-    
-    
-    
-    selectedLocalDic = [[NSMutableDictionary alloc] init];
-    
-    
-    if([prefs objectForKey:@"allKeoNumbers"]){
-        NSArray *importContactPhonesCopy;
-        importContactPhonesCopy = [prefs objectForKey:@"allKeoNumbers"];
-        importContactPhones = [self copyArray:importContactPhonesCopy];
-    }
-    if([prefs objectForKey:@"allKeoMails"]){
-        NSArray *importContactMailsCopy;
-        importContactMailsCopy = [prefs objectForKey:@"allKeoMails"];
-        importContactMails = [self copyArray:importContactMailsCopy];
-    }
-    if([prefs objectForKey:@"allKeoIDs"]){
-        NSArray *importContactIDsCopy;
-        importContactIDsCopy = [prefs objectForKey:@"allKeoIDs"];
-        importContactIDs = [self copyArray:importContactIDsCopy];
-    }
-    
-    
+}
+
+
+-(void)importTimeStamp{
     
     NSString *amazonStartTimeStamp = [NSString stringWithFormat:@"%.0f",[[NSDate date] timeIntervalSince1970]-16400];
     mytimeStamp = @"";
@@ -616,64 +762,9 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     }
     APLLog(@"myActualTimeStamp %@", mytimeStamp);
 
-    
-    
-    if([prefs objectForKey:@"deviceToken"]){
-        NSString *myDeviceTokenCopy;
-        myDeviceTokenCopy = [prefs objectForKey:@"deviceToken"];
-        myDeviceToken = [[NSString alloc] initWithString:myDeviceTokenCopy];
-    }
-    else{
-        APLLog(@"no device token");
-    }
-    APLLog(@"DeviceToken from memory: %@",myDeviceToken);
-    
-    
-    
-    APLLog([NSString stringWithFormat:@"didFinishLaunchingWithOptions username: %@  coutryCode:%@  phoneNumber:%@   hashpass:%@   status:%@",username,myCountryCode,myCurrentPhoneNumber,hashPassword,myStatus]);
-    //
-    
-    
-    
-    myKeoReferences = [[NSMutableArray alloc] init];
-    [self getAllPhotoPaths];
-    APLLog(@"Pictever References has length: %d and contains: %@",[myKeoReferences count],[myKeoReferences description]);
-    
-    
-    openingWindow = 0;// global variable to switch directly to the chat window at the first opening
-    storyboardName = @"Main";
-    backgroundImage = @"ShyftBackground.png";
-    uploadProgress = 0.0;
-    lastLabelSelected = @"";
-    sendToTimeStamp = @"";
-    sendToMail = [[NSMutableArray alloc] init];
-    
-    
-    //---------------Contacts loading---------------
-    
-    loadAllcontacts = false;
-    importContactsData = [[NSMutableArray alloc] init];
-    importContactsNames = [[NSMutableArray alloc] init];
-    
-    myUploadContactSession = [[GPSession alloc] init];
-    
-    
-    
-    //-----------import keo_choices--------------
-    
-    importKeoChoices = [[NSMutableArray alloc] init];
-    if([prefs arrayForKey:@"importKeoChoices2"]){
-        NSArray *importKeoChoicesCopy = [prefs arrayForKey:@"importKeoChoices2"];
-        //importKeoChoices = [self copyKeoChoicesArray:importKeoChoicesCopy];
-        importKeoChoices = [importKeoChoicesCopy mutableCopy];
-    }
-    
-    if([importKeoChoices count] > 0){
-        APLLog(@"importKeoChoices: %@", [importKeoChoices description]);
-    }
-    
-    
-    
+}
+
+-(void)importTipsVariables{
     //----------------tips-----------------------
     if([prefs objectForKey:my_prefs_send_tips_key]){
         NSString *sendTipsCopy;
@@ -696,28 +787,6 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         receiveTips = @"0";
         APLLog(@"no receiveTipsCounter");
     }
-    
-    
-    
-    //----------------if the app was opened on a notification, I can switch directly to the gallery------------------
-    NSDictionary *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
-    appOpenedOnNotification = false;
-    if (notification) {
-        // do something with notification
-        appOpenedOnNotification = true;
-    }
-    
-    
-    
-    return YES;
-}
-
--(NSMutableArray *)copyArray:(NSArray *)importedArr{
-    NSMutableArray *returnArr = [[NSMutableArray alloc] init];
-    for(NSDictionary *message2 in importedArr){
-        [returnArr insertObject:message2 atIndex:[returnArr count]];
-    }
-    return returnArr;
 }
 
 -(NSMutableArray *)copyKeoChoicesArray:(NSArray *)importedChoicesArray{

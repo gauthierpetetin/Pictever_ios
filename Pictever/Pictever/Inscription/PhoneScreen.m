@@ -32,6 +32,10 @@ NSArray *sortedArrayOfCodes;
 NSArray *pickerArray;
 UIPickerView *myPickerView;
 
+NSString *myFacebookName;
+NSString *myFacebookID;
+NSString *myFacebookBirthDay;
+
 NSString *adresseIp2;//global
 
 NSString * backgroundImage; //global
@@ -571,6 +575,17 @@ numberOfRowsInComponent:(NSInteger)component{
 //-----------------go back to login screen------------------------------
 
 -(void) backPressed3{
+    username = @"";
+    hashPassword = @"";
+    myFacebookBirthDay = @"";
+    myFacebookID = @"";
+    myFacebookName = @"";
+    [prefs setObject:username forKey:my_prefs_username_key];
+    [prefs setObject:hashPassword forKey:my_prefs_password_key];
+    [prefs setObject:myFacebookBirthDay forKey:my_prefs_fb_birthday_key];
+    [prefs setObject:myFacebookID forKey:my_prefs_fb_id_key];
+    [prefs setObject:myFacebookName forKey:my_prefs_fb_name_key];
+    
 
     [self dismissViewControllerAnimated:YES completion:nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"setUsername" object: nil];
@@ -946,7 +961,7 @@ numberOfRowsInComponent:(NSInteger)component{
     myInformationLabel.textColor = [UIColor darkGrayColor];
     myInformationLabel.numberOfLines = 0;
     myInformationLabel.lineBreakMode = NSLineBreakByCharWrapping;
-    myInformationLabel.text = @"(Since we don't use a facebook login, we need your phone number to find your friends)";
+    myInformationLabel.text = @"We need your phone number to find the friends who have you in their adressbook and enable you to communicate with them on Pictever. We will never misuse it.";
     
     //---------------Creation of country number textField
     CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,0.20*xUsername,yUsername);

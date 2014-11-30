@@ -15,6 +15,7 @@
 #import <AWSiOSSDKv2/AWSCore.h>
 #import "myConstants.h"
 #import "GPSession.h"
+#import "myGeneralMethods.h"
 
 
 @interface LogInScreen ()
@@ -66,6 +67,8 @@ NSString *password1;
 NSString *hashPassword;//global
 NSString *myCurrentPhoneNumber;//global
 
+UIColor *theKeoOrangeColor;
+
 NSString *reponseLogIn;
 NSString *myDeviceToken;
 NSString *mytimeStamp;
@@ -89,7 +92,8 @@ UIActivityIndicatorView *loginSpinnerLogin;
 {
     [super viewDidLoad];
 
-    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FilleBleEmpty@2x.png"]]];
     
     logIn = false;
     
@@ -338,7 +342,7 @@ UIActivityIndicatorView *loginSpinnerLogin;
     xUsername=250;
     yEspace=50;
     //xButton=100;
-    xButton=250;
+    xButton=90;
     yUsername=30;
     
     
@@ -359,7 +363,9 @@ UIActivityIndicatorView *loginSpinnerLogin;
     [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
     //[myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
     [myWelcomeLabel setFont:[UIFont fontWithName:@"Gabriola" size:42]];
-    myWelcomeLabel.text = @"Log In to Pictever!";
+    myWelcomeLabel.text = @"Log In";
+    myWelcomeLabel.textColor = theKeoOrangeColor;
+    
     
     //----------------Creation of textField Username
     CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername); // Définition d'un rectangle
@@ -392,9 +398,10 @@ UIActivityIndicatorView *loginSpinnerLogin;
     logInButton.layer.cornerRadius = 10; // arrondir les
     logInButton.clipsToBounds = YES;     // angles du bouton
     [logInButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [logInButton setTitle:@"Log In" forState:UIControlStateNormal];
+    [logInButton setTitle:@"Let's go!" forState:UIControlStateNormal];
     [logInButton.titleLabel setFont:[UIFont fontWithName:@"System-Bold" size:15]];
     [[logInButton layer] setBorderWidth:1.0f];
+    [[logInButton layer] setBorderColor:[[UIColor grayColor] CGColor]];
     [logInButton addTarget:self
                     action:@selector(myActionLogIn:)
           forControlEvents:UIControlEventTouchUpInside];
@@ -412,7 +419,7 @@ UIActivityIndicatorView *loginSpinnerLogin;
     
     //-----------------Creation of loading spinner---------
     loginSpinnerLogin = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    loginSpinnerLogin.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+50);
+    loginSpinnerLogin.center = CGPointMake(0.5*screenWidth+xButton-25,yInitial+yUsername+0.5*yUsername+50);
     loginSpinnerLogin.color = [UIColor blackColor];
     loginSpinnerLogin.hidesWhenStopped = YES;
     

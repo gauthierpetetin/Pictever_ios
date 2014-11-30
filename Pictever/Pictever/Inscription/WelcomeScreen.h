@@ -15,7 +15,9 @@
 /////APPLAUSE
 #import <Applause/APLLogger.h>
 
-@interface WelcomeScreen : UIViewController <UIAlertViewDelegate>
+#import <FacebookSDK/FacebookSDK.h>
+
+@interface WelcomeScreen : UIViewController <UIAlertViewDelegate, FBLoginViewDelegate>
 
 -(void)signUpPressed;
 

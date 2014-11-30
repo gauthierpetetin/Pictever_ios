@@ -113,6 +113,9 @@ extern NSString *const my_prefs_phoneNumber_key;
 extern NSString *const my_prefs_countryCode_key;
 extern NSString *const my_prefs_send_tips_key;
 extern NSString *const my_prefs_receive_tips_key;
+extern NSString *const my_prefs_fb_name_key;
+extern NSString *const my_prefs_fb_id_key;
+extern NSString *const my_prefs_fb_birthday_key;
 
 //-------------------------sendBoxContent------------------------------------------
 extern NSString *const my_sendbox_date;

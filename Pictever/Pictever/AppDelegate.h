@@ -50,6 +50,10 @@ extern NSUserDefaults *prefs;
 
 extern NSString *myAppVersion;
 
+extern NSString *myFacebookName;
+extern NSString *myFacebookID;
+extern NSString *myFacebookBirthDay;
+
 extern NSString *username;
 extern NSString *hashPassword;
 extern bool logIn;

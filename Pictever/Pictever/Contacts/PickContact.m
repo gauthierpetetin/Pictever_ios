@@ -241,10 +241,12 @@ bool sendSMS;
 
 
 +(void)locSwitchElements: (NSMutableArray *)myArray index1: (int) firstint index2: (int) secondint{
-    id firstObject = [myArray objectAtIndex:firstint];
-    id secondObject = [myArray objectAtIndex:secondint];
-    [myArray replaceObjectAtIndex:firstint withObject:secondObject];
-    [myArray replaceObjectAtIndex:secondint withObject:firstObject];
+    if(([myArray count] > firstint)&&([myArray count]>secondint)){
+        id firstObject = [myArray objectAtIndex:firstint];
+        id secondObject = [myArray objectAtIndex:secondint];
+        [myArray replaceObjectAtIndex:firstint withObject:secondObject];
+        [myArray replaceObjectAtIndex:secondint withObject:firstObject];
+    }
 }
 
 
@@ -256,11 +258,13 @@ bool sendSMS;
     APLLog(@"placeMyselfOnTop");
     int indexM = -1;
     NSMutableDictionary *contMyself = [[NSMutableDictionary alloc] init];
-    for(int k=0; k<[myKeoContacts2 count];k++){
-        if([[myKeoContacts2 objectAtIndex:k] objectForKey:@"firstNames"]){
-            if([[[myKeoContacts2 objectAtIndex:k] objectForKey:@"firstNames"] isEqualToString:@"Myself"]){
-                indexM = k;
-                contMyself = [myKeoContacts2 objectAtIndex:k];
+    if([myKeoContacts2 count]>0){
+        for(int k=0; k<[myKeoContacts2 count];k++){
+            if([[myKeoContacts2 objectAtIndex:k] objectForKey:@"firstNames"]){
+                if([[[myKeoContacts2 objectAtIndex:k] objectForKey:@"firstNames"] isEqualToString:@"Myself"]){
+                    indexM = k;
+                    contMyself = [myKeoContacts2 objectAtIndex:k];
+                }
             }
         }
     }
@@ -337,12 +341,21 @@ bool sendSMS;
         sectionArray = [importContactsNames filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF beginswith[c] %@", [self.sections objectAtIndex:indexPath.section]]];
         if([sectionArray count]>indexPath.row){
             myIndex = [importContactsNames indexOfObject:[sectionArray objectAtIndex:indexPath.row]];
-            
-            contactInfoDict2 = [importContactsData objectAtIndex:myIndex];
+            if([importContactsData count]>myIndex){
+                contactInfoDict2 = [importContactsData objectAtIndex:myIndex];
+            }
+            else{//---------------should never happen-------------------
+                contactInfoDict2 = [[NSMutableDictionary alloc] init];
+                [contactInfoDict2 setObject:@"" forKey:@"firstNames"];
+                [contactInfoDict2 setObject:@"" forKey:@"user_id"];
+                [contactInfoDict2 setObject:@"" forKey:@"phoneNumber1"];
+            }
         }
     }
     
+
     sendToName2 = [NSString stringWithFormat:@"%@ %@", [contactInfoDict2 objectForKey:@"firstNames"], [contactInfoDict2 objectForKey:@"lastNames"]];
+
     
     
     //---------if the user has the app we select his user_id and add "id" in front of it---------------
@@ -643,7 +656,9 @@ bool sendSMS;
     if([sendArr count] > 0){
         sendStr = [sendArr objectAtIndex:0];
         for(int i=1; i < [sendArr count]; i++){
-            sendStr = [NSString stringWithFormat:@"%@, %@",sendStr,[sendArr objectAtIndex:i]];
+            if([sendArr count]>i){
+                sendStr = [NSString stringWithFormat:@"%@, %@",sendStr,[sendArr objectAtIndex:i]];
+            }
         }
     }
     else{

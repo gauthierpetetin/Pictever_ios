@@ -31,6 +31,9 @@ NSString *myCurrentPhotoPath;
 NSString *myCurrentPhoneNumber;
 NSString *storyboardName;
 NSString *adresseIp2;
+NSString *myFacebookName;
+NSString *myFacebookID;
+NSString *myFacebookBirthDay;
 NSString *username;
 NSString *hashPassword;
 NSString *myStatus;
@@ -1007,7 +1010,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         // 3
         
         
-       NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",hashPassword,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion];
+       NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",hashPassword,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion,@"&facebook_id=",myFacebookID,@"&facebook_name=",myFacebookName,@"&facebook_birthday=",myFacebookBirthDay];
 
         APLLog([NSString stringWithFormat:@"asynchronous login session post: %@",postString]);
         NSData* data = [postString dataUsingEncoding:NSUTF8StringEncoding];

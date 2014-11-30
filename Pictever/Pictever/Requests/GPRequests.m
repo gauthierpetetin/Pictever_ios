@@ -34,6 +34,10 @@ NSString *myUserID;
 
 NSString *myStatus;//global
 
+NSString *myFacebookName;
+NSString *myFacebookID;
+NSString *myFacebookBirthDay;
+
 NSString *mytimeStamp;//global
 
 NSString *myDeviceToken;//global
@@ -298,7 +302,7 @@ bool localWork;//global
                                                            timeoutInterval:60.0];
         
         [request setHTTPMethod:@"POST"];
-        NSString *postString2 = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",password2,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion];
+        NSString *postString2 = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",password2,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion,@"&facebook_id=",myFacebookID,@"&facebook_name=",myFacebookName,@"&facebook_birthday=",myFacebookBirthDay];
         APLLog([NSString stringWithFormat:@"postString: %@",postString2]);
         [request setHTTPBody:[postString2 dataUsingEncoding:NSUTF8StringEncoding]];
         
@@ -326,7 +330,7 @@ bool localWork;//global
                                                                cachePolicy:NSURLRequestUseProtocolCachePolicy
                                                            timeoutInterval:60.0];
         [request setHTTPMethod:@"POST"];
-        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",password,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion];
+        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",password,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion,@"&facebook_id=",myFacebookID,@"&facebook_name=",myFacebookName,@"&facebook_birthday=",myFacebookBirthDay];
         APLLog([NSString stringWithFormat:@"postString: %@",postString]);
         [request setHTTPBody:[postString dataUsingEncoding:NSUTF8StringEncoding]];
         
