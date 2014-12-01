@@ -493,11 +493,11 @@
             </objects>
             <point key="canvasLocation" x="3337" y="165"/>
         </scene>
-        <!--Message-->
+        <!--Text-->
         <scene sceneID="fUg-kB-X3G">
             <objects>
                 <navigationController definesPresentationContext="YES" id="41o-sX-5SI" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Message" image="Message-small.png" id="gdH-eb-FiS"/>
+                    <tabBarItem key="tabBarItem" title="Text" image="Message-small.png" id="gdH-eb-FiS"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="eHU-Vz-aK6">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -509,7 +509,7 @@
             </objects>
             <point key="canvasLocation" x="781" y="-759"/>
         </scene>
-        <!--Message-->
+        <!--Text-->
         <scene sceneID="6XM-hh-g5q">
             <objects>
                 <viewController storyboardIdentifier="WriteMessage" id="rgi-Qj-mnO" customClass="WriteMessage2" sceneMemberID="viewController">
@@ -523,7 +523,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <color key="tintColor" red="0.99556231500000003" green="0.53647018020000004" blue="0.058324186700000002" alpha="1" colorSpace="calibratedRGB"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Message" id="ydw-f2-DG7">
+                    <navigationItem key="navigationItem" title="Text" id="ydw-f2-DG7">
                         <barButtonItem key="rightBarButtonItem" id="gnY-QR-y5Y">
                             <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Z9K-G2-18b">
                                 <rect key="frame" x="233" y="5" width="32" height="32"/>

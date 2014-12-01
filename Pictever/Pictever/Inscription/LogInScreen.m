@@ -211,7 +211,8 @@ UIActivityIndicatorView *loginSpinnerLogin;
         username = textFieldUsernameLogin.text;
         password1 = textFieldPassword1Login.text;
         
-        //self.responseData2 = [NSMutableData data];
+        username = [username stringByReplacingOccurrencesOfString:@" " withString:@""];
+        password1 = [password1 stringByReplacingOccurrencesOfString:@" " withString:@""];
         
         hashPassword = [GPRequests sha256HashFor:password1];
         
@@ -409,9 +410,11 @@ UIActivityIndicatorView *loginSpinnerLogin;
     //-----------------Creation of back button
     backButton2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     backButton2.frame = CGRectMake(5,screenHeight-45,70,30);
-    backButton2.backgroundColor = [UIColor clearColor];
+    backButton2.backgroundColor = [UIColor blackColor];
+    backButton2.alpha = 0.61;
+    backButton2.layer.cornerRadius = 8;
     [backButton2 setTitle:@"Back" forState:UIControlStateNormal];
-    [backButton2 setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [backButton2 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [backButton2.titleLabel setFont:[UIFont systemFontOfSize:18]];
     [backButton2 addTarget:self
                     action:@selector(backPressed2)
@@ -425,11 +428,12 @@ UIActivityIndicatorView *loginSpinnerLogin;
     
     
     //-----------------Creation of password_recovery button
+    int xpasswordButton = 200;
     passwordRecoveryButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    passwordRecoveryButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+2*yUsername+yUsername+30,xButton,yUsername);
+    passwordRecoveryButton.frame = CGRectMake(0.5*screenWidth-(0.5*xpasswordButton),yInitial+2*yUsername+yUsername+30,xpasswordButton,yUsername);
     passwordRecoveryButton.backgroundColor = [UIColor clearColor];
     [passwordRecoveryButton setTitle:@"Reset my password" forState:UIControlStateNormal];
-    [passwordRecoveryButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [passwordRecoveryButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [passwordRecoveryButton.titleLabel setFont:[UIFont systemFontOfSize:12]];
     [passwordRecoveryButton addTarget:self
                                action:@selector(recoverPasswordPressed)

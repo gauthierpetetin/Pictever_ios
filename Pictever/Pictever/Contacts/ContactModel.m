@@ -8,6 +8,7 @@
 #import "ContactModel.h"
 #import <Foundation/Foundation.h>
 #import "PickContact.h"
+#import "myGeneralMethods.h"
 
 
 #import <AddressBook/AddressBook.h>
@@ -68,9 +69,15 @@ NSMutableArray *importContactIDs;
         
         //-----------prepare the contacts tableview such that we don't have to wait for it later
         [PickContact initImportContactNames];
+        
+        //-----------save importcontactsdata-----------------
+        [myGeneralMethods saveImportContatcsData];
+        
     }
     return self;
 }
+
+
 
 -(bool)contactsLoaded{
     return loadAllcontacts;

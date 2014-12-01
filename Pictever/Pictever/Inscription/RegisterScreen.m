@@ -48,7 +48,6 @@ CGRect rect;
 
 UITextField *textFieldUsernameSignUp;
 UITextField *textFieldPassword1SignUp;
-UITextField *textFieldPassword2SignUp;
 
 
 UILabel *myWelcomeLabelSignUp;
@@ -113,7 +112,6 @@ UIActivityIndicatorView *registerSpinner;
 
 - (IBAction)respondToTapGesture2:(UITapGestureRecognizer *)recognizer {
     [textFieldPassword1SignUp resignFirstResponder];
-    [textFieldPassword2SignUp resignFirstResponder];
     [textFieldUsernameSignUp resignFirstResponder];
 }
 
@@ -124,12 +122,8 @@ UIActivityIndicatorView *registerSpinner;
     if(textFieldUsernameSignUp.isFirstResponder){
         [textFieldPassword1SignUp becomeFirstResponder];
     }
-    else if (textFieldPassword1SignUp.isFirstResponder){
-        [textFieldPassword2SignUp becomeFirstResponder];
-    }
     else{
         [textFieldPassword1SignUp resignFirstResponder];
-        [textFieldPassword2SignUp resignFirstResponder];
         [textFieldUsernameSignUp resignFirstResponder];
     }
     
@@ -154,7 +148,6 @@ UIActivityIndicatorView *registerSpinner;
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
         textFieldPassword1SignUp.text=@"";
-        textFieldPassword2SignUp.text=@"";
     }
     else if ([textFieldPassword1SignUp.text isEqualToString:@""]){
         UIAlertView *alert = [[UIAlertView alloc]
@@ -163,16 +156,6 @@ UIActivityIndicatorView *registerSpinner;
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
         textFieldPassword1SignUp.text=@"";
-        textFieldPassword2SignUp.text=@"";
-    }
-    else if (![textFieldPassword1SignUp.text isEqualToString:textFieldPassword2SignUp.text]){
-        UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:@"Error"
-                              message:@"The two passwords are different!    " delegate:self
-                              cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [alert show];
-        textFieldPassword1SignUp.text=@"";
-        textFieldPassword2SignUp.text=@"";
     }
     else if ([textFieldPassword1SignUp.text length] < 6){
         UIAlertView *alert = [[UIAlertView alloc]
@@ -181,16 +164,29 @@ UIActivityIndicatorView *registerSpinner;
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
         textFieldPassword1SignUp.text=@"";
-        textFieldPassword2SignUp.text=@"";
+
     }
     else{
         username = textFieldUsernameSignUp.text;
         password1 = textFieldPassword1SignUp.text;
         
+        username = [username stringByReplacingOccurrencesOfString:@" " withString:@""];
+        password1 = [password1 stringByReplacingOccurrencesOfString:@" " withString:@""];
+        
         hashPassword = [GPRequests sha256HashFor:password1];
+        
+        if ([username rangeOfString:@"@"].location == NSNotFound) {
+            UIAlertView *alert = [[UIAlertView alloc]
+                                  initWithTitle:@"Error"
+                                  message:@"Please enter a valid email adress" delegate:self
+                                  cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+        } else {
+            NSLog(@"string contains @: %@", username);
+            //-------------------asynchronous register request---------------
+            //[self localAsynchronousRegisterWithEmail:username withHashPass:hashPassword for:self];
+        }
 
-        //-------------------asynchronous register request---------------
-        [self localAsynchronousRegisterWithEmail:username withHashPass:hashPassword for:self];
     }
 }
 
@@ -369,7 +365,7 @@ UIActivityIndicatorView *registerSpinner;
     textFieldUsernameSignUp.borderStyle = UITextBorderStyleLine;
     textFieldUsernameSignUp.delegate=self;
     textFieldUsernameSignUp.backgroundColor = [UIColor whiteColor];
-    textFieldUsernameSignUp.placeholder = @"Enter your email";
+    textFieldUsernameSignUp.placeholder = @"Your preferred email";
     textFieldUsernameSignUp.autocapitalizationType = UITextAutocapitalizationTypeNone;
     textFieldUsernameSignUp.borderStyle = UITextBorderStyleRoundedRect;
     textFieldUsernameSignUp.keyboardType = UIKeyboardTypeEmailAddress;
@@ -381,25 +377,14 @@ UIActivityIndicatorView *registerSpinner;
     textFieldPassword1SignUp.borderStyle = UITextBorderStyleLine;
     textFieldPassword1SignUp.delegate=self;
     textFieldPassword1SignUp.backgroundColor = [UIColor whiteColor];
-    textFieldPassword1SignUp.placeholder = @"Enter a password";
+    textFieldPassword1SignUp.placeholder = @"Your password (6 min)";
     textFieldPassword1SignUp.borderStyle = UITextBorderStyleRoundedRect;
     textFieldPassword1SignUp.secureTextEntry = YES;
-    
-    //------------Creation of textField Password2
-    CGRect rectTFPassword2 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername+yUsername,xUsername,yUsername);; // Définition d'un rectangle
-    textFieldPassword2SignUp = [[UITextField alloc] initWithFrame:rectTFPassword2];
-    textFieldPassword2SignUp.textAlignment = NSTextAlignmentCenter;
-    textFieldPassword2SignUp.borderStyle = UITextBorderStyleLine;
-    textFieldPassword2SignUp.delegate=self;
-    textFieldPassword2SignUp.backgroundColor = [UIColor whiteColor];
-    textFieldPassword2SignUp.placeholder = @"Re-Enter your password";
-    textFieldPassword2SignUp.borderStyle = UITextBorderStyleRoundedRect;
-    textFieldPassword2SignUp.secureTextEntry = YES;
     
 
     //------------Creation of Sign Up button
     signUpButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    signUpButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+2*yUsername+20,xButton,yUsername);
+    signUpButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+yUsername+20,xButton,yUsername);
     signUpButton.backgroundColor = [UIColor whiteColor];
     [signUpButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
     signUpButton.layer.cornerRadius = 10; // arrondir les
@@ -416,9 +401,11 @@ UIActivityIndicatorView *registerSpinner;
     //---------Creation of back button
     backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     backButton.frame = CGRectMake(5,screenHeight-45,70,30);
-    backButton.backgroundColor = [UIColor clearColor];
+    backButton.backgroundColor = [UIColor blackColor];
+    backButton.alpha = 0.61;
+    backButton.layer.cornerRadius = 8;
     [backButton setTitle:@"Back" forState:UIControlStateNormal];
-    [backButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [backButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [backButton.titleLabel setFont:[UIFont systemFontOfSize:18]];
     [backButton addTarget:self
                    action:@selector(backPressed)
@@ -426,7 +413,7 @@ UIActivityIndicatorView *registerSpinner;
     
     //-----------------Creation of register spinner---------
     registerSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    registerSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+80);
+    registerSpinner.center = CGPointMake(0.5*screenWidth+xButton-25,yInitial+yUsername+0.5*yUsername+50);
     registerSpinner.color = [UIColor blackColor];
     registerSpinner.hidesWhenStopped = YES;
     
@@ -434,7 +421,6 @@ UIActivityIndicatorView *registerSpinner;
     [self.view addSubview: myWelcomeLabelSignUp];
     [self.view addSubview: textFieldUsernameSignUp];
     [self.view addSubview: textFieldPassword1SignUp];
-    [self.view addSubview: textFieldPassword2SignUp];
     [self.view addSubview: signUpButton];
     [textFieldUsernameSignUp becomeFirstResponder];
 }

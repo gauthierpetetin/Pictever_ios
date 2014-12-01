@@ -21,7 +21,7 @@
 
 #import <MessageUI/MessageUI.h>//to send SMS
 
-@interface TakePicture3 : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate, MFMessageComposeViewControllerDelegate, UIActionSheetDelegate, UITextFieldDelegate, UIAlertViewDelegate>
+@interface TakePicture3 : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate, MFMessageComposeViewControllerDelegate, UIActionSheetDelegate, UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate>
 
 -(void)switchScreenToMessages;
 

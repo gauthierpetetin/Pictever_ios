@@ -48,6 +48,8 @@ NSUserDefaults *prefs;
 NSMutableDictionary *importKeoPhotos;//global
 NSMutableArray *importKeoChoices;//global
 
+NSMutableArray *messagesDataFile;
+
 bool logIn;
 
 
@@ -114,7 +116,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"Error get_Status"
-                                      message:@"Server Error" delegate:self
+                                      message:@"Server Error" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -128,7 +130,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
                 dispatch_async(dispatch_get_main_queue(), ^{
                     UIAlertView *alert = [[UIAlertView alloc]
                                           initWithTitle:@"Error"
-                                          message:@"Please login first" delegate:self
+                                          message:@"Please login first" delegate:sender
                                           cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
                 });
@@ -146,11 +148,11 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         }
     }
     else{
-        [self getStatusSucceeded:data];
+        [self getStatusSucceeded:data from:sender];
     }
 }
 
--(void)getStatusSucceeded:(NSData *)data{
+-(void)getStatusSucceeded:(NSData *)data from:(id)sender{
     APLLog(@"Session succeeded! Received %d bytes of data getStatus",[data length]);
     NSString *previousStatus = myStatus;
     APLLog(@"My old mystatus: %@", previousStatus);
@@ -158,13 +160,15 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     if(![myStatus isEqualToString:previousStatus]){
         [PickContact updateMyStatus];
         NSString *prMessage = [NSString stringWithFormat:@"You are now a %@!",myStatus];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            UIAlertView *alert = [[UIAlertView alloc]
-                                  initWithTitle:@"New Status"
-                                  message:prMessage delegate:self
-                                  cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alert show];
-        });
+        if(![previousStatus isEqualToString:@""]){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:@"New Status"
+                                      message:prMessage delegate:sender
+                                      cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            });
+        }
         [GPRequests alertAnalyticsStatus];
     }
     [prefs setObject:myStatus forKey:my_status_saving_Key];
@@ -218,7 +222,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"Error: receive"
-                                      message:@"Server problem" delegate:self
+                                      message:@"Server problem" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -362,7 +366,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
                                                                                dispatch_async(dispatch_get_main_queue(), ^{
                                                                                    UIAlertView *alert3 = [[UIAlertView alloc]
                                                                                                           initWithTitle:@"Message was not sent"
-                                                                                                          message:@"" delegate:self
+                                                                                                          message:@"" delegate:sender
                                                                                                           cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                                                                                    [alert3 show];
                                                                                });
@@ -393,7 +397,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"send: Error"
-                                      message:@"Server problem" delegate:self
+                                      message:@"Server problem" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -441,12 +445,6 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     APLLog(@"Session succeeded! Received %d bytes of data Send",[data length]);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertView *alert3 = [[UIAlertView alloc]
-                               initWithTitle:@"Message sent successfully"
-                               message:@"" delegate:self
-                               cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert3 show];
-        [alert3 dismissWithClickedButtonIndex:0 animated:YES];
         
         if([_sendTextOrPhoto isEqualToString:@"text"]){//---------------message is a text---------
             APLLog(@"initialize text viewcontroller");
@@ -519,7 +517,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
                                                                                dispatch_async(dispatch_get_main_queue(), ^{
                                                                                    UIAlertView *alert3 = [[UIAlertView alloc]
                                                                                                           initWithTitle:@"Message was not resent"
-                                                                                                          message:@"" delegate:self
+                                                                                                          message:@"" delegate:sender
                                                                                                           cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                                                                                    [alert3 show];
                                                                                });
@@ -545,7 +543,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"resend: Error"
-                                      message:@"Server problem" delegate:self
+                                      message:@"Server problem" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -568,17 +566,17 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         }
     }
     else{
-        [self resendSucceeded:data];
+        [self resendSucceeded:data from:sender];
     }
 }
 
--(void)resendSucceeded:(NSData *)data{
+-(void)resendSucceeded:(NSData *)data from:(id)sender{
     APLLog(@"Session succeeded! Received %d bytes of data Resend",[data length]);
     
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertView *alert3 = [[UIAlertView alloc]
                                initWithTitle:@"Message resent successfully"
-                               message:@"" delegate:self
+                               message:@"" delegate:sender
                                cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert3 show];
         [alert3 dismissWithClickedButtonIndex:0 animated:YES];
@@ -620,7 +618,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"Error futur_messages"
-                                      message:@"Server Error" delegate:self
+                                      message:@"Server Error" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -736,7 +734,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"uploadContacts: Error"
-                                      message:@"Server problem" delegate:self
+                                      message:@"Server problem" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -910,7 +908,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"askSendChoices: Error"
-                                      message:@"Server problem" delegate:self
+                                      message:@"Server problem" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -1047,7 +1045,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"login: Error"
-                                      message:@"Server problem" delegate:self
+                                      message:@"Server problem" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -1062,12 +1060,12 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         }
     }
     else{
-        [self loginSucceeded:data];
+        [self loginSucceeded:data from:sender];
     }
     
 }
 
--(void)loginSucceeded:(NSData *)data{
+-(void)loginSucceeded:(NSData *)data from:(id)sender{
     APLLog(@"FIRST LOGIN OK");
     APLLog(@"Succeeded! Received %d bytes of data login",[data length]);
     NSError *myError = nil;
@@ -1196,7 +1194,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
                 dispatch_async(dispatch_get_main_queue(), ^{
                     UIAlertView *versionAlert = [[UIAlertView alloc]
                                                  initWithTitle:versionAlertTitle
-                                                 message:my_actionsheet_install_it_now delegate:self
+                                                 message:my_actionsheet_install_it_now delegate:sender
                                                  cancelButtonTitle:@"Cancel" otherButtonTitles:@"Install",nil];
                     [versionAlert show];
                 });
@@ -1234,7 +1232,10 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             [[[GPSession alloc] init] askSendChoicesfor:self];
             bool contactsOk = [[ContactModel alloc] init];
             if(contactsOk){
-                APLLog(@"Contacts loaded");
+                APLLog(@"Contacts loaded: %d", [messagesDataFile count]);
+            }
+            else{
+                APLLog(@"=contatcs not loaded");
             }
             [myUploadContactSession uploadContacts:[myGeneralMethods createJsonArrayOfContacts] withTableViewReload:YES for:self];
         }
@@ -1280,7 +1281,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"Error: reset"
-                                      message:@"Server problem" delegate:self
+                                      message:@"Server problem" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
@@ -1310,6 +1311,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 
 
 -(void)increaseSendTipCounter:(id)sender{
+
 
     int sendTipCounter = [sendTips intValue];
     sendTipCounter += 1;
@@ -1341,13 +1343,23 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
                 [alert show];
             });
         }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert3 = [[UIAlertView alloc]
+                                       initWithTitle:@"Message sent successfully"
+                                       message:@"" delegate:sender
+                                       cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert3 show];
+                [alert3 dismissWithClickedButtonIndex:0 animated:YES];
+            });
+        }
     }
     sendTips = [NSString stringWithFormat:@"%d", sendTipCounter];
     [prefs setObject:sendTips forKey:my_prefs_send_tips_key];
 }
 
 
--(void)increaseReceiveTipCounter{
+-(void)increaseReceiveTipCounter:(id)sender{
     int receiveTipCounter = [receiveTips intValue];
     receiveTipCounter += 1;
     if(receiveTipCounter < 4){
@@ -1355,7 +1367,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"You just received a message in your timeline!"
-                                      message:@"Little tip: if you like a message you receive, press the orange button to resend it, so you can be surprised again!" delegate:self
+                                      message:@"Little tip: if you like a message you receive, press the orange button to resend it, so you can be surprised again!" delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });

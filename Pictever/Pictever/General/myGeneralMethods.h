@@ -36,6 +36,10 @@
 
 + (NSString *)saveImageReceived: (UIImage*)imageInKeo atKey:(NSString *)myKey;
 
++(void)saveImportContatcsData;
+
++(NSMutableArray *)cleanImportContatcs:(NSMutableArray *)myAdressBook;
+
 +(void)saveMessagesData;
 
 +(void)cleanMessageDataFile;

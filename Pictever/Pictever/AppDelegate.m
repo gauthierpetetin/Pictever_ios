@@ -190,7 +190,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     APLLog(@"didFinishLaunchingWithOptions-------Pictever---------");
     
     firstUseEver = false;
-    
+
     
     //--------------initialize Applause--------------
     [self initializeApplause];
@@ -368,11 +368,23 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     //---------------Contacts loading---------------
     
     loadAllcontacts = false;
-    importContactsData = [[NSMutableArray alloc] init];
     importContactsNames = [[NSMutableArray alloc] init];
     
     myUploadContactSession = [[GPSession alloc] init];
     
+    
+    //-----------import contacts data--------------
+    
+    importContactsData = [[NSMutableArray alloc] init];
+    if([prefs arrayForKey:my_prefs_contacts_data_key]){
+        NSArray *importContactsDataCopy = [prefs arrayForKey:my_prefs_contacts_data_key];
+        //importContactsData = [[[NSMutableArray alloc] initWithArray:importContactsDataCopy] mutableCopy];
+        importContactsData = [importContactsDataCopy mutableCopy];
+    }
+    
+    if([importContactsData count] > 0){
+        APLLog(@"importContactsData count: %d", [importContactsData count]);
+    }
     
     
     //-----------import keo_choices--------------
@@ -425,6 +437,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 -(void)registerForNotification:(UIApplication *)application{
     // Let the device know we want to receive push notifications
     //-- Set Notification
+    
     if ([application respondsToSelector:@selector(isRegisteredForRemoteNotifications)])
     {
         // iOS 8 Notifications

@@ -41,6 +41,6 @@
 
 -(void)sendResetMailRequest:(NSString *)email for:(id)sender;
 
--(void)increaseReceiveTipCounter;
+-(void)increaseReceiveTipCounter:(id)sender;
 
 @end

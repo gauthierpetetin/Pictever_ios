@@ -211,14 +211,18 @@ int myBlinkingCounter;
     //-------------------first login (we receive a lot of info from the server in answer) -------------------------
     
     if(username){
-        if(hashPassword){
-            if(!myVersionForceInstall){
-                APLLog(@"Do first login!");
-                if([GPRequests connected]){
-                    [[[GPSession alloc]init] asynchronousLoginWithEmailfor:self];
-                }
-                else{
-                    [NSThread detachNewThreadSelector:@selector(askThingsInBackground) toTarget:self withObject:nil];
+        if(![username isEqualToString:@""]){
+            if(hashPassword){
+                if(![hashPassword isEqualToString:@""]){
+                    if(!myVersionForceInstall){
+                        APLLog(@"Do first login!");
+                        if([GPRequests connected]){
+                            [[[GPSession alloc]init] asynchronousLoginWithEmailfor:self];
+                        }
+                        else{
+                            [NSThread detachNewThreadSelector:@selector(askThingsInBackground) toTarget:self withObject:nil];
+                        }
+                    }
                 }
             }
         }
@@ -472,6 +476,9 @@ int myBlinkingCounter;
     myFacebookID = [user objectID];
     if([user objectForKey:@"user_birthday"]){
         myFacebookBirthDay = [user objectForKey:@"user_birthday"];
+        if(!myFacebookBirthDay){
+            myFacebookBirthDay = @"";
+        }
     }
     else{
         myFacebookBirthDay = @"";

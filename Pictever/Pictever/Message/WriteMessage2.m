@@ -79,6 +79,8 @@ UITextView *myTextView;
 UILabel *hideRectangle;
 UIButton *sendButton;
 
+UIButton *newMessageButtonM;
+
 NSString *destinataire3;
 
 float uploadProgress;//global
@@ -115,6 +117,8 @@ NSString* lastLabelSelected;//global
 NSString *textViewInitialMessage;
 
 bool sendSMS;
+
+int pandasize;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -199,6 +203,12 @@ bool sendSMS;
     [progressView3 setProgress:uploadProgress animated:YES];
 }
 
+-(void)viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:my_notif_showBilly_name object:nil];
+}
+
 
 -(void)viewDidAppear:(BOOL)animated{
     APLLog(@"WriteMessage2 did appear");
@@ -244,11 +254,7 @@ bool sendSMS;
 
 //-----------switch view, go to the gallery------------------
 -(void)switchScreenToKeo{
-    openingWindow = 2;
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_master_controller];
-    
-    [self presentViewController:vc animated:NO completion:nil];
+    [self.tabBarController setSelectedIndex:2];
 }
 
 - (void)didReceiveMemoryWarning
@@ -435,6 +441,8 @@ bool sendSMS;
     }
     showDatePicker = false;
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showAnimateForNewMessageM) name:my_notif_showBilly_name object:nil];
+    
 }
 
 //---------------------------if the recipient and the send send_choice (in 3 days, in 3 weeks) are chosen, send the message!------------
@@ -587,15 +595,17 @@ bool sendSMS;
     //[sendButton setFont:[UIFont systemFontOfSize:20]];
     [sendButton addTarget:self action:@selector(sendPressed) forControlEvents:UIControlEventTouchUpInside];
     
-    ////////Create tap gesture recognizer
-    //UITapGestureRecognizer *tapRecognizer2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture2:)];
-    //tapRecognizer2.numberOfTapsRequired = 1;
-    //[self.view addGestureRecognizer:tapRecognizer2];
-    //////////
+    
+    pandasize = 75;
+    newMessageButtonM = [[UIButton alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*pandasize, 25-100, pandasize, pandasize)];
+    newMessageButtonM.contentMode = UIViewContentModeScaleAspectFit;
+    [newMessageButtonM setImage:[UIImage imageNamed:@"bouton_panda.png"] forState:UIControlStateNormal];
+    [newMessageButtonM addTarget:self action:@selector(switchScreenToKeo) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.parentViewController.view addSubview:newMessageButtonM];
     
     
 }
-
 
 //--------------the screen is taped to show/hide the keyboard------------------------------
 
@@ -615,6 +625,34 @@ bool sendSMS;
         [myTextView becomeFirstResponder];
     }
 }
+
+
+-(void)showAnimateForNewMessageM{
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         newMessageButtonM.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25, pandasize, pandasize);
+                     }
+                     completion:^(BOOL completed){
+                         [NSTimer scheduledTimerWithTimeInterval:3.0
+                                                          target:self
+                                                        selector:@selector(hideAnimateForNewMessageM)
+                                                        userInfo:nil
+                                                         repeats:NO];
+                     }];
+}
+
+-(void)hideAnimateForNewMessageM{
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         newMessageButtonM.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25-100, pandasize, pandasize);
+                     }
+                     completion:nil];
+}
+
+
+
+
 
 -(void)cancelPressed2{
     //[sendButton removeFromSuperview];

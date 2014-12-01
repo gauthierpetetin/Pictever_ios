@@ -122,11 +122,13 @@ UIImageView *myImageViewPh; //important to capture the photo!
 UITextField *keoTextFieldPh;
 UILabel *labelChatPh;
 UILabel *labelKeoPh;
-UILabel *labelCancelPh;
+//UILabel *labelCancelPh;
 UIImage *theKeoImage;
 UIImage *imageSaved;
 
-
+UILabel *tapScreenLabel;
+UILabel *seeMenuLabel;
+UIButton *newMessageButtonPh;
 
 NSMutableArray *sendToMail;//global
 NSString *sendToName;//global
@@ -159,6 +161,8 @@ int yButton15;
 CGPoint originalPickerposition;
 
 int colorCounter;
+
+int pandasize;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -241,16 +245,6 @@ int colorCounter;
         [progressView setUserInteractionEnabled:NO];
         [progressView setProgressViewStyle:UIProgressViewStyleBar];
         [progressView setTrackTintColor:[UIColor clearColor]];
-        
-        if(firstUseEver){
-            UIAlertView *myAlertView = [[UIAlertView alloc] initWithTitle:@"Tap screen see the menu bar!"
-                                                                  message:@""
-                                                                 delegate:nil
-                                                        cancelButtonTitle:@"OK"
-                                                        otherButtonTitles: nil];
-            
-            [myAlertView show];
-        }
         
     }
     
@@ -453,6 +447,9 @@ int colorCounter;
 
 //------------------tap gesture recognizer to show or hide the textfield on the photo---------------
 - (IBAction)respondToTapGesture:(UITapGestureRecognizer *)recognizer {
+    [tapScreenLabel removeFromSuperview];
+    [seeMenuLabel removeFromSuperview];
+    
     if(myImageViewPh.image == nil){
         if (![self tabBarIsVisible]){
             NSLog(@"tabBar IS HIDDEN");
@@ -543,7 +540,7 @@ int colorCounter;
     [colorButton removeFromSuperview];
     
     [cancelButtonPh removeFromSuperview];
-    [labelCancelPh removeFromSuperview];
+    //[labelCancelPh removeFromSuperview];
     
     [self initializeView];
     if(frontCameraActivated){
@@ -552,6 +549,8 @@ int colorCounter;
     else{
         [self startCameraWithFrontCamera:NO];
     }
+    
+    [self indicateMenuBarAtFirstUse];
 }
 
 
@@ -673,14 +672,13 @@ int colorCounter;
     
     ///////SceenShot
     [sendButtonPh removeFromSuperview];
-    //[messagesButtonPh removeFromSuperview];
-    //[keoButtonPh removeFromSuperview];
-    //[labelChatPh removeFromSuperview];
-    //[labelKeoPh removeFromSuperview];
-    
     [cancelButtonPh removeFromSuperview];
-    [labelCancelPh removeFromSuperview];
     [colorButton removeFromSuperview];
+    
+    [tapScreenLabel removeFromSuperview];
+    [seeMenuLabel removeFromSuperview];
+    
+    [newMessageButtonPh removeFromSuperview];
     
     //myKeoImage = [self captureScreenInRectHighQuality:self.view.frame];
     //myImageViewPh.image = myKeoImage;
@@ -699,10 +697,12 @@ int colorCounter;
     
     
     [self.view addSubview:cancelButtonPh];
-    [self.view addSubview:labelCancelPh];
+    //[self.view addSubview:labelCancelPh];
     
     [self.view bringSubviewToFront:keoTextFieldPh];
     [self.view bringSubviewToFront:colorButton];
+    
+    [self.view addSubview:newMessageButtonPh];
     ////////
     
     APLLog(@"SEND");
@@ -765,7 +765,7 @@ int colorCounter;
                 [colorButton removeFromSuperview];
                 
                 [cancelButtonPh removeFromSuperview];
-                [labelCancelPh removeFromSuperview];
+                //[labelCancelPh removeFromSuperview];
                 
                 [self initializeView];
                 if(frontCameraActivated){
@@ -775,6 +775,8 @@ int colorCounter;
                     [self startCameraWithFrontCamera:NO];
                 }
                 
+                
+                [self indicateMenuBarAtFirstUse];
             }
             else{
                 UIAlertView *alert5 = [[UIAlertView alloc]
@@ -1013,7 +1015,7 @@ int colorCounter;
                 
                 sendButtonPh.hidden = YES;
                 cancelButtonPh.hidden = YES;
-                labelCancelPh.hidden = YES;
+                //labelCancelPh.hidden = YES;
                 mySendTimer = [NSTimer scheduledTimerWithTimeInterval: 0.2 target: self selector: @selector(send) userInfo: nil repeats: NO];
                 //[self send];
                 
@@ -1077,6 +1079,9 @@ int colorCounter;
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     APLLog(@"TakePicture3 will appear");
+    
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(showAnimateForNewMessage) name:my_notif_showBilly_name object:nil];
+    
     shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y-localTabbarheight);
     imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y-localTabbarheight);
     
@@ -1125,6 +1130,7 @@ int colorCounter;
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(insertNewRow:) name:@"insertNewRow" object: nil];
     
+    
     if(firstGlobalOpening){
         firstGlobalOpening = false;
     }
@@ -1140,6 +1146,12 @@ int colorCounter;
         
     }
     showDatePicker = false;
+}
+
+-(void)viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:my_notif_showBilly_name object:nil];
 }
 
 
@@ -1306,19 +1318,13 @@ int colorCounter;
     [self.view addSubview:myImageViewPh];
     [self.view addSubview:sendButtonPh];
     [self.view addSubview:cancelButtonPh];
-    [self.view addSubview:labelCancelPh];
+    //[self.view addSubview:labelCancelPh];
     
     sendToDateAsText = @"";
     sendToName = @"";
     
     if(firstUseEver){
-        UIAlertView *myAlertView = [[UIAlertView alloc] initWithTitle:@"Tap the screen to add some text!"
-                                                              message:@""
-                                                             delegate:nil
-                                                    cancelButtonTitle:@"OK"
-                                                    otherButtonTitles: nil];
-        
-        [myAlertView show];
+        [self.view addSubview:tapScreenLabel];
     }
     
     APLLog(@"takepictureworkedOver");
@@ -1381,8 +1387,8 @@ int colorCounter;
     keoTextFieldPh.textAlignment = NSTextAlignmentCenter;
     keoTextFieldPh.textColor = [UIColor whiteColor];
     keoTextFieldPh.backgroundColor = [myGeneralMethods getColorFromHexString:self.colorArray[colorCounter]];
-    [keoTextFieldPh.layer setBorderColor:[UIColor whiteColor].CGColor];
-    [keoTextFieldPh.layer setBorderWidth:1.0];
+    //[keoTextFieldPh.layer setBorderColor:[UIColor whiteColor].CGColor];
+    //[keoTextFieldPh.layer setBorderWidth:1.0];
     [keoTextFieldPh setFont:[UIFont systemFontOfSize:16]];
     //keoTextFieldPh.lineBreakMode = NSLineBreakByWordWrapping;
     //keoTextFieldPh.numberOfLines = 0;
@@ -1503,6 +1509,7 @@ int colorCounter;
     cancelButtonPh.hidden = NO;
     [cancelButtonPh addTarget:self action:@selector(cancelPressed) forControlEvents:UIControlEventTouchUpInside];
     
+    /*
     int xButton14 = 100;
     int yButton14 = 25;
     //creation of label Cancel
@@ -1517,7 +1524,7 @@ int colorCounter;
     //labelCancel.shadowOffset = CGSizeMake(0, 0);
     //[labelCancel setHighlighted:YES];
     //labelCancel.highlightedTextColor = [UIColor blackColor];
-    
+    */
     
     //Creation of ImagePicker button
     imagePickerButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -1536,8 +1543,8 @@ int colorCounter;
     colorButton.clipsToBounds = YES;
     colorButton.backgroundColor = [myGeneralMethods getColorFromHexString:self.colorArray[colorCounter]];
     colorButton.layer.cornerRadius = colorButtonSize/2.0f;
-    colorButton.layer.borderColor=[UIColor whiteColor].CGColor;
-    colorButton.layer.borderWidth=2.0f;
+    //colorButton.layer.borderColor=[UIColor whiteColor].CGColor;
+    //colorButton.layer.borderWidth=2.0f;
     
     [self.view addSubview:imagePickerButton];
     [self.view addSubview:shootButtonPh];
@@ -1552,6 +1559,70 @@ int colorCounter;
     [self.view bringSubviewToFront:keoTextFieldPh];
     [self.view bringSubviewToFront:colorButton];
     
+    [self initPopupViews];
+}
+
+-(void)initPopupViews{
+    int xPopLabel = 200;
+    int yPopLabel = 50;
+    tapScreenLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*xPopLabel, 0.5*screenHeight-0.5*yPopLabel, xPopLabel, yPopLabel)];
+    tapScreenLabel.clipsToBounds=YES;
+    tapScreenLabel.layer.cornerRadius = 8;
+    tapScreenLabel.backgroundColor = [UIColor blackColor];
+    tapScreenLabel.textColor = [UIColor whiteColor];
+    tapScreenLabel.textAlignment = NSTextAlignmentCenter;
+    tapScreenLabel.alpha = 0.75;
+    tapScreenLabel.text = @"Tap to add some text";
+    
+    seeMenuLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*xPopLabel, 0.5*screenHeight-0.5*yPopLabel, xPopLabel, yPopLabel)];
+    seeMenuLabel.clipsToBounds=YES;
+    seeMenuLabel.layer.cornerRadius = 8;
+    seeMenuLabel.backgroundColor = [UIColor blackColor];
+    seeMenuLabel.textColor = [UIColor whiteColor];
+    seeMenuLabel.textAlignment = NSTextAlignmentCenter;
+    seeMenuLabel.alpha = 0.75;
+    seeMenuLabel.text = @"Tap to see menu bar";
+    
+    pandasize = 75;
+    newMessageButtonPh = [[UIButton alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*pandasize, 25-100, pandasize, pandasize)];
+    newMessageButtonPh.contentMode = UIViewContentModeScaleAspectFit;
+    [newMessageButtonPh setImage:[UIImage imageNamed:@"bouton_panda.png"] forState:UIControlStateNormal];
+    [newMessageButtonPh addTarget:self action:@selector(gotoTimeline) forControlEvents:UIControlEventTouchUpInside];
+
+    [self.view addSubview:newMessageButtonPh];
+
+}
+
+-(void)showAnimateForNewMessage{
+    [self.view bringSubviewToFront:newMessageButtonPh];
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         newMessageButtonPh.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25, pandasize, pandasize);
+                     }
+                     completion:^(BOOL completed){
+                         [NSTimer scheduledTimerWithTimeInterval:3.0
+                                                          target:self
+                                                        selector:@selector(hideAnimateForNewMessage)
+                                                        userInfo:nil
+                                                         repeats:NO];
+                     }];
+}
+
+-(void)hideAnimateForNewMessage{
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         newMessageButtonPh.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25-100, pandasize, pandasize);
+                     }
+                     completion:nil];
+}
+
+-(void)gotoTimeline{
+    NSLog(@"gototimeline");
+    if(myImageViewPh.image == nil){
+        NSLog(@"switchscreen");
+        [self switchScreenToKeo];
+    }
 }
 
 //--------------------change color of textfield---------------------
@@ -1664,6 +1735,7 @@ int colorCounter;
 //------------------alertView delegate (first tips for the user)-----------------------------------
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    APLLog(@"Takepicture3 alertView clickedButtonAtIndex: %@", alertView.title);
     if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
@@ -1673,6 +1745,13 @@ int colorCounter;
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
         }
+    }
+}
+
+
+-(void)indicateMenuBarAtFirstUse{
+    if(firstUseEver){
+        [self.view addSubview:seeMenuLabel];
     }
 }
 

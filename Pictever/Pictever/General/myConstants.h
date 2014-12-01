@@ -116,6 +116,7 @@ extern NSString *const my_prefs_receive_tips_key;
 extern NSString *const my_prefs_fb_name_key;
 extern NSString *const my_prefs_fb_id_key;
 extern NSString *const my_prefs_fb_birthday_key;
+extern NSString *const my_prefs_contacts_data_key;
 
 //-------------------------sendBoxContent------------------------------------------
 extern NSString *const my_sendbox_date;
@@ -131,6 +132,8 @@ extern NSString *const my_actionsheet_you_are_great;
 extern NSString *const my_actionsheet_want_to_remember;
 extern NSString *const my_actionsheet_install_it_now;
 
+//---------------------------notification names------------------------
+extern NSString *const my_notif_showBilly_name;
 
 @interface myConstants: NSObject
 

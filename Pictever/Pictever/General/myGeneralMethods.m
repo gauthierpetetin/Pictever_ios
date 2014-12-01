@@ -311,6 +311,37 @@ NSString *mytimeStamp;//global
 
 
 //---------------save messagesDataFiles-------------------------
++(void)saveImportContatcsData{
+    if(importContactsData){
+        APLLog(@"Save contacts data with length: %d",[importContactsData count]);
+        //NSLog(@"aaaaaaaaaaaa: %@", [importContactsData description]);
+        NSMutableArray *importContactsDataSavingCopy = [myGeneralMethods cleanImportContatcs:[importContactsData mutableCopy]];
+        //NSLog(@"bbbbbbbbbb: %@", [importContactsData description]);
+        [prefs setObject:importContactsDataSavingCopy forKey:my_prefs_contacts_data_key];
+        
+        //NSLog(@"iiiiiiiiiiii: %@", [importContactsData description]);
+    }
+}
+
++(NSMutableArray *)cleanImportContatcs:(NSMutableArray *)myAdressBook{//-----problems occur when saving without this
+    NSLog(@"cleanImportContatcs");
+    NSMutableArray *answerArrayContact = [[NSMutableArray alloc] init];
+    for(NSMutableDictionary *locDic in myAdressBook){
+        //NSLog(@"ccccc: %@", [locDic description]);
+        [answerArrayContact insertObject:[locDic mutableCopy] atIndex:[answerArrayContact count]];
+    }
+    
+    for(NSMutableDictionary *locDic in answerArrayContact){
+        //NSLog(@"ddddd: %@", [locDic description]);
+        if([locDic objectForKey:@"image"]){
+            [locDic removeObjectForKey:@"image"];
+        }
+    }
+    return answerArrayContact;
+}
+
+
+//---------------save messagesDataFiles-------------------------
 +(void)saveMessagesData{
     if(messagesDataFile){
         [myGeneralMethods cleanMessageDataFile];

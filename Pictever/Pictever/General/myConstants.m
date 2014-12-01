@@ -134,6 +134,7 @@ NSString *const my_prefs_receive_tips_key = @"receiveTips";
 NSString *const my_prefs_fb_name_key = @"fb_name";
 NSString *const my_prefs_fb_id_key = @"fb_id";
 NSString *const my_prefs_fb_birthday_key = @"fb_birthday";
+NSString *const my_prefs_contacts_data_key = @"importcontactsdata";
 
 
 
@@ -151,6 +152,10 @@ NSString *const my_actionsheet_wanna_help_us = @"Wanna help us?";
 NSString *const my_actionsheet_you_are_great = @"You're great!";
 NSString *const my_actionsheet_want_to_remember = @"Want to remember this message?";
 NSString *const my_actionsheet_install_it_now = @"Do you want to install it now?";
+
+
+//---------------------------notification names------------------------
+NSString *const my_notif_showBilly_name = @"showBilly";
 
 @end
 

@@ -202,7 +202,8 @@ myTabBarController *myController;
     //----------if the gallery is empty----------------------------
     else{
         APLLog(@"No messages in the gallery");
-        self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"background_nomessages.png"]];
+        self.view.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
+        //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"background_nomessages.png"]];
     }
     
     //keoTableView.frame = CGRectMake(0, 65, screenWidth, screenHeight-65-tabBarHeight);
@@ -568,8 +569,9 @@ myTabBarController *myController;
     
     APLLog(@"vibrate for new shyft: %@", [newPhotoMessage description]);
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    [[NSNotificationCenter defaultCenter] postNotificationName:my_notif_showBilly_name object:nil];
     
-    [[[GPSession alloc] init] increaseReceiveTipCounter];
+    [[[GPSession alloc] init] increaseReceiveTipCounter:self];
     
 }
 

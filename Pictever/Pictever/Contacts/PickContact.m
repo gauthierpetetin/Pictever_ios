@@ -108,6 +108,9 @@ bool sendSMS;
     //we initialize the array containing the contacts who already have the app in order to place them at the top of the tableview
     [PickContact initLocalKeoContacts];
     
+    if([importContactsNames count] == 0){
+        [PickContact initImportContactNames];
+    }
     
     self.tableView.backgroundColor = [UIColor clearColor];
     self.parentViewController.view.backgroundColor = theBackgroundColor;
@@ -609,6 +612,7 @@ bool sendSMS;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    NSLog(@"importcontactsdata: %d", [importContactsData count]);
     NSInteger rowCount;
     if (importContactsData) {
         if([[self.sections objectAtIndex:section] isEqualToString:@"Pictever"]){

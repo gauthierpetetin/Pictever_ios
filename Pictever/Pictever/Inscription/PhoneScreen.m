@@ -14,6 +14,10 @@
 #import <AWSiOSSDKv2/AWSMobileAnalytics.h>
 #import <AWSiOSSDKv2/AWSCore.h>
 #import "myConstants.h"
+
+#import <AddressBook/AddressBook.h>
+#import <AddressBookUI/AddressBookUI.h>
+
 @interface PhoneScreen ()
 
 @property (nonatomic, strong) NSMutableData *responseDataDefinePhNumber;
@@ -23,6 +27,8 @@
 
 @implementation PhoneScreen
 
+
+bool firstUseEver;
 
 NSMutableArray *allMyCountries;
 //NSDictionary *codeForCountryDictionary;
@@ -99,6 +105,11 @@ int yEspace;
 int elevation;
 
 NSInteger definePhoneErrorCode;
+
+//-------------ask contacts-----------
+UILabel *blackLabel;
+UILabel *whiteTextLabel;
+UILabel *whiteTextLabel2;
 
 - (void)viewDidLoad
 {
@@ -384,6 +395,82 @@ NSInteger definePhoneErrorCode;
     }
 }
 
+-(void)hideContactInformation{
+    APLLog(@"hideContactInformation");
+    [blackLabel removeFromSuperview];
+    [whiteTextLabel removeFromSuperview];
+    [whiteTextLabel2 removeFromSuperview];
+    
+    [textFieldCountry becomeFirstResponder];
+}
+
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(hideContactInformation) name:@"hideInformation" object: nil];
+    
+    //-----------in case of first use, inform user that we will access his contacts--------------
+    
+    blackLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, screenWidth, screenHeight)];
+    blackLabel.backgroundColor = [UIColor blackColor];
+    blackLabel.alpha = 0.75;
+    
+    whiteTextLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 30, screenWidth-30, 180)];
+    whiteTextLabel.textColor = [UIColor whiteColor];
+    whiteTextLabel.numberOfLines = 0;
+    whiteTextLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    whiteTextLabel.backgroundColor = [UIColor clearColor];
+    whiteTextLabel.textAlignment = NSTextAlignmentCenter;
+    whiteTextLabel.text = @"Pictever uses the phone numbers in your adress book to help you find your friends :)";
+    
+    whiteTextLabel2 = [[UILabel alloc] initWithFrame:CGRectMake(15, screenHeight-150, screenWidth-30, 100)];
+    whiteTextLabel2.textColor = [UIColor whiteColor];
+    whiteTextLabel2.numberOfLines = 0;
+    whiteTextLabel2.lineBreakMode = NSLineBreakByWordWrapping;
+    whiteTextLabel2.backgroundColor = [UIColor clearColor];
+    whiteTextLabel2.textAlignment = NSTextAlignmentCenter;
+    whiteTextLabel2.text = @"We won't spam or auto-add your friends.";
+    
+    
+    
+    ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(NULL, NULL);
+    
+    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined) {
+        [self.view addSubview:blackLabel];
+        [self.view addSubview:whiteTextLabel];
+        [self.view addSubview:whiteTextLabel2];
+        
+        ABAddressBookRequestAccessWithCompletion(addressBookRef, ^(bool granted, CFErrorRef error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"hideInformation" object:nil];
+            });
+            if (granted) {
+                APLLog(@"access to contacts authorized for the first time");
+                // First time access has been granted, add the contact
+            } else {
+                APLLog(@"accessToContactsDenied for the first time");
+                // User denied access
+                // Display an alert telling user the contact could not be added
+            }
+        });
+    }
+    else if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+        // The user has previously given access, add the contact
+        APLLog(@"access to contacts authorized");
+        [textFieldCountry becomeFirstResponder];
+
+    }
+    else {
+        APLLog(@"accessToContactsDenied");
+        [textFieldCountry becomeFirstResponder];
+        // The user has previously denied access
+        // Send an alert telling user to change privacy setting in settings app
+    }
+    
+    
+}
+
 -(void)addPickerView{
     pickerArray = sortedArrayOfCountries;
 
@@ -391,21 +478,9 @@ NSInteger definePhoneErrorCode;
     myPickerView.dataSource = self;
     myPickerView.delegate = self;
     myPickerView.showsSelectionIndicator = YES;
-    //UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
-    //                               initWithTitle:@"Done" style:UIBarButtonItemStyleDone
-    //                               target:self action:@selector(countrySelected)];
-    //UIToolbar *toolBar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, screenHeight-myPickerView.frame.size.height-50, 320, 50)];
-    //[toolBar setBarStyle:UIBarStyleBlackOpaque];
-    //NSArray *toolbarItems = [NSArray arrayWithObjects:
-    //                         doneButton, nil];
-    //[toolBar setItems:toolbarItems];
-    
-    
-    //textFieldPhoneNumber.inputView = myPickerView;
+
     textFieldCountry.inputView = myPickerView;
-    
-    //textFieldCountry.inputAccessoryView = toolBar;
-    
+
 }
 
 
@@ -595,6 +670,13 @@ numberOfRowsInComponent:(NSInteger)component{
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
 }
+
+-(void)viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"hideInfromation" object:nil];
+}
+
 
 
 //---------------hide keyboard when screen is touched---------------
@@ -867,7 +949,7 @@ numberOfRowsInComponent:(NSInteger)component{
             }
             if(definePhoneErrorCode == 406){
                 UIAlertView *alert = [[UIAlertView alloc]
-                                      initWithTitle:@"Error"
+                                      initWithTitle:@"Sorry"
                                       message:@"This phone number is already taken by another account" delegate:self
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
@@ -1038,7 +1120,6 @@ numberOfRowsInComponent:(NSInteger)component{
     [self.view addSubview:phoneSpinner];
     [self.view addSubview:flagImageView];
     [self.view addSubview:myInformationLabel];
-    [textFieldCountry becomeFirstResponder];
 }
 
 @end
