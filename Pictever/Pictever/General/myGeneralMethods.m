@@ -485,6 +485,8 @@ NSString *mytimeStamp;//global
         id receivedLabel = [sms objectForKey:my_receive_label_Key];
         id receiveColor = [sms objectForKey:my_receive_color_Key];
         id received_at = [sms objectForKey:my_received_at_Key];
+        id facebook_id = [sms objectForKey:my_from_facebook_id_key];
+        id facebook_name = [sms objectForKey:my_from_facebook_name_key];
         
         NSString *shyft_idAsString;
         NSString *fromAsString;
@@ -496,6 +498,8 @@ NSString *mytimeStamp;//global
         NSString *receivedLabelAsString;
         NSString *receiveColorAsString;
         NSString *received_atAsString;
+        NSString *facebook_idAsString;
+        NSString *facebook_nameAsString;
         
         if(![shyft_id isKindOfClass:[NSNull class]]){
             shyft_idAsString = (NSString *)shyft_id;
@@ -543,6 +547,18 @@ NSString *mytimeStamp;//global
             [newMessage setObject:receiveColorAsString forKey:my_receive_color_Key];}
         else{
             [newMessage setObject:@"" forKey:my_receive_color_Key];}
+        
+        if(![facebook_id isKindOfClass:[NSNull class]]){
+            facebook_idAsString = (NSString *)facebook_id;
+            [newMessage setObject:facebook_idAsString forKey:my_from_facebook_id_key];}
+        else{
+            [newMessage setObject:@"" forKey:my_from_facebook_id_key];}
+        
+        if(![facebook_name isKindOfClass:[NSNull class]]){
+            facebook_nameAsString = (NSString *)facebook_name;
+            [newMessage setObject:facebook_nameAsString forKey:my_from_facebook_name_key];}
+        else{
+            [newMessage setObject:@"" forKey:my_from_facebook_name_key];}
         
         if([photoStringAsString isEqualToString:@""]){//------------text message-----
             [newMessage setObject:photoStringAsString forKey:my_photo_Key];

@@ -770,24 +770,19 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     id res = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&myError];
     
     
-    NSMutableArray *importContactPhonesLoc = [[NSMutableArray alloc] init];
-    NSMutableArray *importContactMailsLoc = [[NSMutableArray alloc] init];
-    NSMutableArray *importContactIDsLoc = [[NSMutableArray alloc] init];
-    NSMutableArray *importContactStatusLoc = [[NSMutableArray alloc] init];
-    
     NSArray *resArray = (NSArray *)res;
     APLLog(@"Number of Shyft contacts: %d",[resArray count]);
     
+    APLLog(@"Shyft contacts: %@", [res description]);
     for(id keoContactJson in res){
         id emailOfContact = [keoContactJson objectForKey:my_uploadContact_email];
         NSString * emailOfContactAsString;
         if(![emailOfContact isKindOfClass:[NSNull class]]){
             emailOfContactAsString = (NSString *)emailOfContact;
-            [importContactMailsLoc addObject:emailOfContactAsString];
         }
         else{
             APLLog(@"EMPTY email");
-            [importContactMailsLoc addObject:@""];
+            emailOfContactAsString = @"";
         }
         
         
@@ -796,11 +791,10 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         NSString * phoneOfContactAsString;
         if(![phoneOfContact isKindOfClass:[NSNull class]]){
             phoneOfContactAsString = (NSString *)phoneOfContact;
-            [importContactPhonesLoc addObject:phoneOfContactAsString];
         }
         else{
             APLLog(@"EMPTY phone");
-            [importContactPhonesLoc addObject:@""];
+            phoneOfContactAsString = @"";
         }
         
         
@@ -809,22 +803,40 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         NSString * user_idOfContactAsString;
         if(![user_idOfContact isKindOfClass:[NSNull class]]){
             user_idOfContactAsString = (NSString *)user_idOfContact;
-            [importContactIDsLoc addObject:user_idOfContactAsString];
         }
         else{
             APLLog(@"EMPTY user_id");
-            [importContactIDsLoc addObject:@""];
+            user_idOfContactAsString = @"";
         }
         
         id statusOfContact = [keoContactJson objectForKey:my_uploadContact_status];
         NSString * statusOfContactAsString;
         if(![statusOfContact isKindOfClass:[NSNull class]]){
             statusOfContactAsString = (NSString *)statusOfContact;
-            [importContactStatusLoc addObject:statusOfContactAsString];
         }
         else{
             APLLog(@"EMPTY status");
-            [importContactStatusLoc addObject:@""];
+            statusOfContactAsString = @"";
+        }
+        
+        id facebookIDOfContact = [keoContactJson objectForKey:my_uploadContact_facebook_id];
+        NSString * facebookIDOfContactAsString;
+        if(![facebookIDOfContact isKindOfClass:[NSNull class]]){
+            facebookIDOfContactAsString = (NSString *)facebookIDOfContact;
+        }
+        else{
+            APLLog(@"EMPTY facebook ID");
+            facebookIDOfContactAsString = @"";
+        }
+        
+        id facebookNameOfContact = [keoContactJson objectForKey:my_uploadContact_facebook_name];
+        NSString * facebookNameOfContactAsString;
+        if(![facebookNameOfContact isKindOfClass:[NSNull class]]){
+            facebookNameOfContactAsString = (NSString *)facebookNameOfContact;
+        }
+        else{
+            APLLog(@"EMPTY facebook name");
+            facebookNameOfContactAsString = @"";
         }
         
         NSMutableDictionary *contactToUpadte = [[NSMutableDictionary alloc] init];
@@ -832,6 +844,8 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         [contactToUpadte setObject:phoneOfContactAsString forKey:my_uploadContact_phoneNumber];
         [contactToUpadte setObject:user_idOfContactAsString forKey:my_uploadContact_user_id];
         [contactToUpadte setObject:statusOfContactAsString forKey:my_uploadContact_status];
+        [contactToUpadte setObject:facebookIDOfContactAsString forKey:my_uploadContact_facebook_id];
+        [contactToUpadte setObject:facebookNameOfContactAsString forKey:my_uploadContact_facebook_name];
         
         //APLLog(@"contact to upadate %@",[contactToUpadte description]);
         [localUpdateContactData addObject:contactToUpadte];
@@ -1311,7 +1325,8 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 
 
 -(void)increaseSendTipCounter:(id)sender{
-
+    
+    APLLog(@"increaseSendTipCounter");
 
     int sendTipCounter = [sendTips intValue];
     sendTipCounter += 1;
@@ -1338,7 +1353,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:my_actionsheet_you_are_great
-                                      message:@"Please join our community on facebook!" delegate:sender
+                                      message:@"Please like Pictever on facebook!" delegate:sender
                                       cancelButtonTitle:@"No, thanks" otherButtonTitles:@"Yes I want to join the community!",nil];
                 [alert show];
             });
@@ -1354,6 +1369,16 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             });
         }
     }
+    else{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAlertView *alert3 = [[UIAlertView alloc]
+                                   initWithTitle:@"Message sent successfully"
+                                   message:@"" delegate:sender
+                                   cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert3 show];
+            [alert3 dismissWithClickedButtonIndex:0 animated:YES];
+        });
+    }
     sendTips = [NSString stringWithFormat:@"%d", sendTipCounter];
     [prefs setObject:sendTips forKey:my_prefs_send_tips_key];
 }
@@ -1362,8 +1387,9 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 -(void)increaseReceiveTipCounter:(id)sender{
     int receiveTipCounter = [receiveTips intValue];
     receiveTipCounter += 1;
-    if(receiveTipCounter < 4){
+    if(receiveTipCounter < 5){
         if (receiveTipCounter == 1 || receiveTipCounter == 4) {
+            APLLog(@"RESEND TIP");
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
                                       initWithTitle:@"You just received a message in your timeline!"

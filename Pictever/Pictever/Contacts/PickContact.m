@@ -11,6 +11,8 @@
 
 #import "PickContact.h"
 
+#import "myConstants.h"
+
 //Amazon analytics
 #import <AWSiOSSDKv2/AWSMobileAnalytics.h>
 #import <AWSiOSSDKv2/AWSCore.h>
@@ -153,7 +155,6 @@ bool sendSMS;
 +(void)initLocalKeoContacts{
     localKeoContacts = [[NSMutableArray alloc] init];
     for(NSMutableDictionary *ccc in [importKeoContacts allKeys]){
-        //NSMutableDictionary *addContact = [PickContact copyKeoContact4:[importKeoContacts objectForKey:ccc]];
         NSMutableDictionary *addContact = [[importKeoContacts objectForKey:ccc] mutableCopy];
         [localKeoContacts addObject:addContact];
     }
@@ -256,68 +257,40 @@ bool sendSMS;
 
 
 //-----------the contact "Myself" has to be at the top of the tableview----------------------
-+(NSMutableArray *)placeMyselfOnTop:(NSMutableArray *)myKeoContacts2{
++(NSMutableArray *)placeMyselfOnTop:(NSMutableArray *)myKeoContacts3{
 //@" Myself" forKey:@"firstNames"
     APLLog(@"placeMyselfOnTop");
-    int indexM = -1;
+    int indexT = [PickContact indexOfContactMyselfInMutableArray:myKeoContacts3];
     NSMutableDictionary *contMyself = [[NSMutableDictionary alloc] init];
+    
+    if(indexT != -1){
+        if([myKeoContacts3 count]>indexT){
+            contMyself = [myKeoContacts3 objectAtIndex:indexT];
+        }
+        
+        [myKeoContacts3 removeObjectAtIndex:indexT];
+        [myKeoContacts3 insertObject:contMyself atIndex:0];
+
+    }
+    return myKeoContacts3;
+}
+
++(NSInteger)indexOfContactMyselfInMutableArray:(NSMutableArray *)myKeoContacts2{
+    int indexM = -1;
     if([myKeoContacts2 count]>0){
         for(int k=0; k<[myKeoContacts2 count];k++){
             if([[myKeoContacts2 objectAtIndex:k] objectForKey:@"firstNames"]){
                 if([[[myKeoContacts2 objectAtIndex:k] objectForKey:@"firstNames"] isEqualToString:@"Myself"]){
                     indexM = k;
-                    contMyself = [myKeoContacts2 objectAtIndex:k];
                 }
             }
         }
     }
-    if(indexM != -1){
-        [myKeoContacts2 removeObjectAtIndex:indexM];
-        [myKeoContacts2 insertObject:contMyself atIndex:0];
-        //APLLog(@"placecontactOnTop: %@",myKeoContacts2);
-    }
-    return myKeoContacts2;
+    return indexM;
 }
 
 
-+(NSMutableDictionary *)copyKeoContact4:(NSDictionary *)contactImported{
-    NSMutableDictionary *newContact2 = [[NSMutableDictionary alloc] init];
-    
-    if([contactImported objectForKey:@"email"]){
-        [newContact2 setObject:[contactImported objectForKey:@"email"] forKey:@"email"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"email"];}
-    if([contactImported objectForKey:@"user_id"]){
-        [newContact2 setObject:[contactImported objectForKey:@"user_id"] forKey:@"user_id"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"user_id"];}
-    if([contactImported objectForKey:@"status"]){
-        [newContact2 setObject:[contactImported objectForKey:@"status"] forKey:@"status"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"status"];}
-    if([contactImported objectForKey:@"firstNames"]){
-        [newContact2 setObject:[contactImported objectForKey:@"firstNames"] forKey:@"firstNames"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"firstNames"];}
-    if([contactImported objectForKey:@"lastNames"]){
-        [newContact2 setObject:[contactImported objectForKey:@"lastNames"] forKey:@"lastNames"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"lastNames"];}
-    if([contactImported objectForKey:@"fullName"]){
-        [newContact2 setObject:[contactImported objectForKey:@"fullName"] forKey:@"fullName"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"fullName"];}
-    if([contactImported objectForKey:@"phoneNumber1"]){
-        [newContact2 setObject:[contactImported objectForKey:@"phoneNumber1"] forKey:@"phoneNumber1"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"phoneNumber1"];}
-    if([contactImported objectForKey:@"image"]){
-        [newContact2 setObject:[contactImported objectForKey:@"image"] forKey:@"image"];}
-    else{
-        [newContact2 setObject:[UIImage imageNamed:@"NoPhoto.png"] forKey:@"image"];}
-    
-    return newContact2 ;
-}
+
 
 
 //---------------recipient selected by the user----------------------------------
@@ -408,7 +381,15 @@ bool sendSMS;
     APLLog(@"update all contacts");
     importKeoContactsCopy = [[NSMutableDictionary alloc] init];
     for(NSDictionary *oneContact in updateArray){
-        [PickContact addKeoAccount:[oneContact objectForKey:@"email"] addUserId:[oneContact objectForKey:@"user_id"] ToContact:[oneContact objectForKey:@"phoneNumber1"] andAddStatus:[oneContact objectForKey:@"status"]];
+        NSString *lFbID = @"";
+        NSString *lFbName = @"";
+        if([oneContact objectForKey:my_uploadContact_facebook_id]){
+            lFbID = [oneContact objectForKey:my_uploadContact_facebook_id];
+        }
+        if([oneContact objectForKey:my_uploadContact_facebook_name]){
+            lFbName = [oneContact objectForKey:my_uploadContact_facebook_name];
+        }
+        [PickContact addKeoAccount:[oneContact objectForKey:my_uploadContact_email] addUserId:[oneContact objectForKey:my_uploadContact_user_id] ToContact:[oneContact objectForKey:my_uploadContact_phoneNumber] andAddStatus:[oneContact objectForKey:my_uploadContact_status] andAddFbID:lFbID andAddFbName:lFbName];
     }
     importKeoContacts = [importKeoContactsCopy mutableCopy];
     [prefs setObject:importKeoContacts forKey:@"importKeoContacts"];
@@ -416,7 +397,7 @@ bool sendSMS;
 
 
 //---------------------thanks to the info received (user_id, email, phonenumber), we update the particular user)------------------
-+(void)addKeoAccount:(NSString *)keoAccountAdress addUserId:(NSString *)userId ToContact:(NSString *)contactPhoneNumber andAddStatus:(NSString *)contStatus{
++(void)addKeoAccount:(NSString *)keoAccountAdress addUserId:(NSString *)userId ToContact:(NSString *)contactPhoneNumber andAddStatus:(NSString *)contStatus andAddFbID:(NSString*)contactFbId andAddFbName:(NSString *)contactFbName{
     //------------we search in importcontacts data which contact has the same phone number---------
     NSMutableArray *copyImportContactsData = [importContactsData mutableCopy];
     NSMutableArray *indexArray = [[NSMutableArray alloc] init];
@@ -436,10 +417,12 @@ bool sendSMS;
         for(NSString *myString in indexArray){
             NSMutableDictionary *previousContact = [importContactsData objectAtIndex:[myString intValue]];
             NSMutableDictionary *replacementContact = [[NSMutableDictionary alloc] init];
-            [replacementContact setObject:keoAccountAdress forKey:@"email"];
-            [replacementContact setObject:contactPhoneNumber forKey:@"phoneNumber1"];
-            [replacementContact setObject:userId forKey:@"user_id"];
-            [replacementContact setObject:contStatus forKey:@"status"];
+            [replacementContact setObject:keoAccountAdress forKey:my_uploadContact_email];
+            [replacementContact setObject:contactPhoneNumber forKey:my_uploadContact_phoneNumber];
+            [replacementContact setObject:userId forKey:my_uploadContact_user_id];
+            [replacementContact setObject:contStatus forKey:my_uploadContact_status];
+            [replacementContact setObject:contactFbId forKey:my_uploadContact_facebook_id];
+            [replacementContact setObject:contactFbName forKey:my_uploadContact_facebook_name];
             if([previousContact objectForKey:@"firstNames"]){
                 [replacementContact setObject:[previousContact objectForKey:@"firstNames"] forKey:@"firstNames"];
             }
@@ -455,7 +438,6 @@ bool sendSMS;
             [importKeoContactsCopy setObject:replacementContact forKey:contactPhoneNumber];
             /////
             
-            //NSMutableDictionary *replacementContact2 = [PickContact copyKeoContact4:replacementContact];
             NSMutableDictionary *replacementContact2 = [replacementContact mutableCopy];
             
             NSMutableDictionary *photoContact = [PickContact addPhotosToContact2:replacementContact2];
@@ -612,7 +594,7 @@ bool sendSMS;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSLog(@"importcontactsdata: %d", [importContactsData count]);
+    //NSLog(@"importcontactsdata: %d", [importContactsData count]);
     NSInteger rowCount;
     if (importContactsData) {
         if([[self.sections objectAtIndex:section] isEqualToString:@"Pictever"]){

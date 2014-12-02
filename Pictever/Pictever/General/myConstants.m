@@ -33,6 +33,8 @@ NSString *const my_uicontrol_Key = @"UIControl";
 NSString *const my_first_name_Key = @"firstNames";
 NSString *const my_last_name_Key = @"lastNames";
 NSString *const my_full_name_Key = @"fullName";
+NSString *const my_from_facebook_id_key = @"from_facebook_id";
+NSString *const my_from_facebook_name_key = @"from_facebook_name";
 
 NSString *const my_inprogress_string = @"in_progress";
 
@@ -100,6 +102,8 @@ NSString *const my_uploadContact_email = @"email";
 NSString *const my_uploadContact_phoneNumber = @"phoneNumber1";
 NSString *const my_uploadContact_user_id = @"user_id";
 NSString *const my_uploadContact_status = @"status";
+NSString *const my_uploadContact_facebook_id = @"facebook_id";
+NSString *const my_uploadContact_facebook_name = @"facebook_name";
 
 //--------------------send choices labels-----------------------------------------
 NSString *const my_sendChoice_order_id = @"order_id";

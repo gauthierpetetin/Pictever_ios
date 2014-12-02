@@ -263,7 +263,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     //--------work in local or not
     localWork=false;
     //localWork=true;
-    //adresseIp2=@"http://192.168.0.15:5000/";
+    //adresseIp2=@"http://192.168.42.65:5000/";
     
     
     
@@ -293,7 +293,6 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     if([prefs dictionaryForKey:@"importKeoContacts"]){
         NSDictionary *importKeoContactsCopy = [prefs dictionaryForKey:@"importKeoContacts"];
         APLLog(@"importKeoContactsCopy: %@",[importKeoContactsCopy description]);
-        //importKeoContacts = [self copyKeoContactDictionary:importKeoContactsCopy];
         importKeoContacts = [importKeoContactsCopy mutableCopy];
     }
     else{
@@ -800,6 +799,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         receiveTips = @"0";
         APLLog(@"no receiveTipsCounter");
     }
+
 }
 
 -(NSMutableArray *)copyKeoChoicesArray:(NSArray *)importedChoicesArray{
@@ -890,10 +890,22 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             [newMessage2 setObject:[message objectForKey:my_receive_label_Key] forKey:my_receive_label_Key];}
         else{
             [newMessage2 setObject:@"" forKey:my_receive_label_Key];}
+        
         if([message objectForKey:my_receive_color_Key]){
             [newMessage2 setObject:[message objectForKey:my_receive_color_Key] forKey:my_receive_color_Key];}
         else{
             [newMessage2 setObject:@"" forKey:my_receive_color_Key];}
+        
+        if([message objectForKey:my_from_facebook_id_key]){
+            [newMessage2 setObject:[message objectForKey:my_from_facebook_id_key] forKey:my_from_facebook_id_key];}
+        else{
+            [newMessage2 setObject:@"" forKey:my_from_facebook_id_key];}
+        
+        if([message objectForKey:my_from_facebook_name_key]){
+            [newMessage2 setObject:[message objectForKey:my_from_facebook_name_key] forKey:my_from_facebook_name_key];}
+        else{
+            [newMessage2 setObject:@"" forKey:my_from_facebook_name_key];}
+        
         if([message objectForKey:my_loaded_Key]){
             [newMessage2 setObject:[message objectForKey:my_loaded_Key] forKey:my_loaded_Key];}
         else{
@@ -957,48 +969,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 
 
 
--(NSMutableDictionary *)copyKeoContactDictionary:(NSDictionary *)importedDic{
-    NSMutableDictionary *returnDic = [[NSMutableDictionary alloc] init];
-    for(NSString *key in [importedDic allKeys]){
-        NSMutableDictionary *contactImported3 = [importedDic objectForKey:key];
-        NSMutableDictionary *newContact3 = [contactImported3 mutableCopy]; //[self copyKeoContact:contactImported3];
-        
-        [returnDic setObject:newContact3 forKey:[newContact3 objectForKey:@"phoneNumber1"]];
-    }
-    return returnDic;
-}
 
-
--(NSMutableDictionary *)copyKeoContact:(NSDictionary *)contactImported{
-    NSMutableDictionary *newContact2 = [[NSMutableDictionary alloc] init];
-    
-    if([contactImported objectForKey:@"email"]){
-        [newContact2 setObject:[contactImported objectForKey:@"email"] forKey:@"email"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"email"];}
-    if([contactImported objectForKey:@"user_id"]){
-        [newContact2 setObject:[contactImported objectForKey:@"user_id"] forKey:@"user_id"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"user_id"];}
-    if([contactImported objectForKey:@"status"]){
-        [newContact2 setObject:[contactImported objectForKey:@"status"] forKey:@"status"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"status"];}
-    if([contactImported objectForKey:@"firstNames"]){
-        [newContact2 setObject:[contactImported objectForKey:@"firstNames"] forKey:@"firstNames"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"firstNames"];}
-    if([contactImported objectForKey:@"lastNames"]){
-        [newContact2 setObject:[contactImported objectForKey:@"lastNames"] forKey:@"lastNames"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"lastNames"];}
-    if([contactImported objectForKey:@"phoneNumber1"]){
-        [newContact2 setObject:[contactImported objectForKey:@"phoneNumber1"] forKey:@"phoneNumber1"];}
-    else{
-        [newContact2 setObject:@"" forKey:@"phoneNumber1"];}
-    
-    return newContact2 ;
-}
 
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {

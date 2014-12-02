@@ -89,6 +89,7 @@ UIActivityIndicatorView *registerSpinner;
 
     //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
     self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FilleBleEmpty@2x.png"]]];
+    //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"GarconMontagneEmpty@2x.png"]]];
     
     logIn = false;
     
@@ -184,7 +185,7 @@ UIActivityIndicatorView *registerSpinner;
         } else {
             NSLog(@"string contains @: %@", username);
             //-------------------asynchronous register request---------------
-            //[self localAsynchronousRegisterWithEmail:username withHashPass:hashPassword for:self];
+            [self localAsynchronousRegisterWithEmail:username withHashPass:hashPassword for:self];
         }
 
     }
@@ -425,7 +426,9 @@ UIActivityIndicatorView *registerSpinner;
     [textFieldUsernameSignUp becomeFirstResponder];
 }
 
-
+- (BOOL)prefersStatusBarHidden {
+    return YES;
+}
 
 @end
 

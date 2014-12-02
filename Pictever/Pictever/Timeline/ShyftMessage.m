@@ -50,6 +50,8 @@ NSMutableDictionary *importKeoPhotos;//global
         //_receive_label = [NSString stringWithFormat:@" %@ ",[myShyftMessage objectForKey:my_receive_label_Key]];
         _receive_label = [myShyftMessage objectForKey:my_receive_label_Key];
         _receive_color = [myShyftMessage objectForKey:my_receive_color_Key];
+        _from_facebook_id = [myShyftMessage objectForKey:my_from_facebook_id_key];
+        _from_facebook_name = [myShyftMessage objectForKey:my_from_facebook_name_key];
         _loaded = [myShyftMessage objectForKey:my_loaded_Key];
         _color = [self getShyftUIColor];
         
@@ -90,6 +92,9 @@ NSMutableDictionary *importKeoPhotos;//global
         if(![[fullNameLoc stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@""]){
             _fullName = fullNameLoc;
         }
+        else if (![_from_facebook_name isEqualToString:@""]){
+            _fullName = _from_facebook_name;
+        }
         
     }
     return self;
@@ -107,7 +112,7 @@ NSMutableDictionary *importKeoPhotos;//global
 
 
 -(NSString *)getDescription{
-    NSString *description = [NSString stringWithFormat:@" _shyft_id: %@ \n _from_email: %@ \n _from_id: %@ \n_from_numero:%@ \n _message: %@ \n _created_at: %@ \n _received_at: %@ \n _photo: %@ \n _receive_label: %@ \n _receive_color: %@ \n _loaded: %@ \n _fullName: %@ \n", _shyft_id,_from_email, _from_id, _from_numero, _message, _created_at, _received_at, _photo, _receive_label, _receive_color, _loaded, _fullName];
+    NSString *description = [NSString stringWithFormat:@" _shyft_id: %@ \n _from_email: %@ \n _from_id: %@ \n_from_numero:%@ \n _message: %@ \n _created_at: %@ \n _received_at: %@ \n _photo: %@ \n _receive_label: %@ \n _receive_color: %@ \n _loaded: %@ \n _fullName: %@ \n _facebook_id: %@ \n _facebook_name: %@", _shyft_id,_from_email, _from_id, _from_numero, _message, _created_at, _received_at, _photo, _receive_label, _receive_color, _loaded, _fullName, _from_facebook_id, _from_facebook_name];
     return description;
 }
 

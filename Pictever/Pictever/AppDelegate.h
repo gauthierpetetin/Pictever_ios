@@ -164,8 +164,6 @@ extern NSString* receiveTips;
 
 -(NSMutableArray *)copyMessagesDataFile:(NSArray *)importedArray;
 -(NSMutableArray *)copyArray:(NSArray *)importedArr;
--(NSMutableDictionary *)copyKeoContactDictionary:(NSDictionary *)importedDic;
 -(NSMutableArray *)copyKeoChoicesArray:(NSArray *)importedChoicesArray;
--(NSMutableDictionary *)copyKeoContact:(NSDictionary *)contactImported;
 
 @end

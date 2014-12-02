@@ -67,6 +67,7 @@ UITextField *textFieldPhoneNumber;
 UITextField *textFieldCode;
 
 NSMutableArray *importContactsData; //global
+NSMutableDictionary *importKeoContacts;
 
 UILabel *myWelcomeLabel;
 UILabel *myInformationLabel;
@@ -820,32 +821,6 @@ numberOfRowsInComponent:(NSInteger)component{
     
 }
 
-//-----------------------create the contact myself and include it to the contact list importcontactsdata----------------
-
--(void)createContactMyself{
-    NSMutableDictionary * contactMe = [[NSMutableDictionary alloc] init];
-    [contactMe setObject:@"Myself" forKey:@"firstNames"];
-    [contactMe setObject:@"" forKey:@"lastNames"];
-    [contactMe setObject:@"Myself" forKey:@"fullName"];
-    [contactMe setObject:[UIImage imageNamed:@"my_keo_image.png"] forKey:@"image"];
-    if(myCurrentPhoneNumber){
-        [contactMe setObject:myCurrentPhoneNumber forKey:@"phoneNumber1"];
-    }
-    else{
-        [contactMe setObject:@"" forKey:@"phoneNumber1"];
-    }
-    [contactMe setObject:@"" forKey:@"phoneNumber2"];
-    if(username){
-        [contactMe setObject:username forKey:@"email"];
-    }
-    else{
-        [contactMe setObject:@"" forKey:@"email"];
-    }
-    [contactMe setObject:@"" forKey:@"user_id"];
-    [importContactsData addObject:contactMe];
-    APLLog(@"contact Myself created");
-    
-}
 
 //------------------------------------------------------------------------------------------------
 //------------------------------------Requests answers--------------------------------------------
@@ -982,9 +957,8 @@ numberOfRowsInComponent:(NSInteger)component{
             //--------------save regional code
             myCountryCode = localCountryCode;
             [prefs setObject:localCountryCode forKey:my_prefs_countryCode_key];
-            //
             
-            [self createContactMyself];
+            
             
             APLLog(@"Phone number is saved: %@",[prefs objectForKey:my_prefs_phoneNumber_key]);
             dispatch_async(dispatch_get_main_queue(), ^{

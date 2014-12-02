@@ -23,13 +23,13 @@
 
 +(void)initImportContactNames;
 +(NSMutableDictionary *)addPhotosToContact2:(NSMutableDictionary *)kContact;
-+(NSMutableDictionary *)copyKeoContact4:(NSDictionary *)contactImported;
 +(void)initLocalKeoContacts;
 +(void)updateAllContacts:(NSArray *)updateArray;
-+(void)addKeoAccount:(NSString *)keoAccountAdress addUserId:(NSString *)userId ToContact:(NSString *)contactPhoneNumber andAddStatus:(NSString *)contStatus;
++(void)addKeoAccount:(NSString *)keoAccountAdress addUserId:(NSString *)userId ToContact:(NSString *)contactPhoneNumber andAddStatus:(NSString *)contStatus andAddFbID:(NSString*)contactFbId andAddFbName:(NSString *)contactFbName;
 +(NSMutableDictionary *)addPhotosToAllContacts;
 +(NSMutableDictionary *)addPhotosToContact:(NSMutableDictionary *)kContact atKey:(NSString *)tKey;
-+(NSMutableArray *)placeMyselfOnTop:(NSMutableArray *)myKeoContacts2;
++(NSMutableArray *)placeMyselfOnTop:(NSMutableArray *)myKeoContacts3;
++(NSInteger)indexOfContactMyselfInMutableArray:(NSMutableArray *)myKeoContacts2;
 +(void)updateMyStatus;
 @end
 

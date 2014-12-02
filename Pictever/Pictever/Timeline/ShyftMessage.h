@@ -32,6 +32,8 @@
 @property (strong, nonatomic) UIImage *croppedImage;
 @property (strong, nonatomic) UIImage *userProfileImage;
 @property (strong, nonatomic) NSString *fullName;
+@property (strong, nonatomic) NSString *from_facebook_id;
+@property (strong, nonatomic) NSString *from_facebook_name;
 
 
 - (instancetype)initWithShyft:(NSMutableDictionary *)shyftMessage;

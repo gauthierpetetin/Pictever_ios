@@ -94,6 +94,7 @@ UIActivityIndicatorView *loginSpinnerLogin;
 
     //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
     self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FilleBleEmpty@2x.png"]]];
+    //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"GarconMontagneEmpty@2x.png"]]];
     
     logIn = false;
     
@@ -104,6 +105,10 @@ UIActivityIndicatorView *loginSpinnerLogin;
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(setUsernameByNotif) name:@"setUsername" object: nil];
 
+}
+
+- (BOOL)prefersStatusBarHidden {
+    return YES;
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -286,8 +291,7 @@ UIActivityIndicatorView *loginSpinnerLogin;
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
                 textFieldPassword1Login.text = @"";
-                
-                [prefs setObject:username forKey:my_prefs_username_key];
+
                 [self.view addSubview:passwordRecoveryButton];
             });
         }

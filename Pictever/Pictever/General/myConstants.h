@@ -24,6 +24,8 @@ extern NSString *const my_uicontrol_Key;
 extern NSString *const my_first_name_Key;
 extern NSString *const my_last_name_Key;
 extern NSString *const my_full_name_Key;
+extern NSString *const my_from_facebook_id_key;
+extern NSString *const my_from_facebook_name_key;
 
 extern NSString *const my_inprogress_string;
 
@@ -82,6 +84,8 @@ extern NSString *const my_uploadContact_email;
 extern NSString *const my_uploadContact_phoneNumber;
 extern NSString *const my_uploadContact_user_id;
 extern NSString *const my_uploadContact_status;
+extern NSString *const my_uploadContact_facebook_id;
+extern NSString *const my_uploadContact_facebook_name;
 
 //--------------------send choices labels-------------------------------------------
 extern NSString *const my_sendChoice_order_id;

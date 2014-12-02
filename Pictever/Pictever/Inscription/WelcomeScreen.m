@@ -197,8 +197,9 @@ int myBlinkingCounter;
             APLLog(@"not login - show controls");
             //self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"Ecran_acceuil_orange_empty.png"]]];
             self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FilleBle@2x.png"]]];
+            //self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"GarconMontagneOrange@2x.png"]]];
             [self initControls];
-            //[self.view addSubview:myWelcomeLabel2];
+
             [self.view addSubview:signUpButton2];
             [self.view addSubview:logInButton2];
             [self.view addSubview:fbLoginView];
@@ -212,16 +213,14 @@ int myBlinkingCounter;
     
     if(username){
         if(![username isEqualToString:@""]){
-            if(hashPassword){
-                if(![hashPassword isEqualToString:@""]){
-                    if(!myVersionForceInstall){
-                        APLLog(@"Do first login!");
-                        if([GPRequests connected]){
-                            [[[GPSession alloc]init] asynchronousLoginWithEmailfor:self];
-                        }
-                        else{
-                            [NSThread detachNewThreadSelector:@selector(askThingsInBackground) toTarget:self withObject:nil];
-                        }
+            if(logIn){
+                if(!myVersionForceInstall){
+                    APLLog(@"Do first login!");
+                    if([GPRequests connected]){
+                        [[[GPSession alloc]init] asynchronousLoginWithEmailfor:self];
+                    }
+                    else{
+                        [NSThread detachNewThreadSelector:@selector(askThingsInBackground) toTarget:self withObject:nil];
                     }
                 }
             }
