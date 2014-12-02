@@ -88,7 +88,7 @@ UIActivityIndicatorView *registerSpinner;
     [super viewDidLoad];
 
     //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
-    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FilleBleEmpty@2x.png"]]];
+    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FillesTrekEmpty@2x.png"]]];
     //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"GarconMontagneEmpty@2x.png"]]];
     
     logIn = false;

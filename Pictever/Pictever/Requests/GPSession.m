@@ -780,6 +780,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         if(![emailOfContact isKindOfClass:[NSNull class]]){
             emailOfContactAsString = (NSString *)emailOfContact;
         }
+        
         else{
             APLLog(@"EMPTY email");
             emailOfContactAsString = @"";

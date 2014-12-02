@@ -15,6 +15,8 @@
 #import <AWSiOSSDKv2/AWSCore.h>
 #import "myConstants.h"
 
+#import "myGeneralMethods.h"
+
 #import <AddressBook/AddressBook.h>
 #import <AddressBookUI/AddressBookUI.h>
 
@@ -112,11 +114,15 @@ UILabel *blackLabel;
 UILabel *whiteTextLabel;
 UILabel *whiteTextLabel2;
 
+UIColor *theKeoOrangeColor;
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    
+    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FillesTrekEmpty@2x.png"]]];
     
     numberForCountryDictionary = @{
                                        @"Canada"                                       : @"+1",
@@ -406,6 +412,7 @@ UILabel *whiteTextLabel2;
 }
 
 
+
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
@@ -674,6 +681,17 @@ numberOfRowsInComponent:(NSInteger)component{
 
 -(void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
+    
+    
+    [backButton3 removeFromSuperview];
+    [myWelcomeLabel removeFromSuperview];
+    [textFieldCountry removeFromSuperview];
+    [textFieldPhoneNumber removeFromSuperview];
+    [logInButton removeFromSuperview];
+    [phoneSpinner removeFromSuperview];
+    [flagImageView removeFromSuperview];
+    [myInformationLabel removeFromSuperview];
+    
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"hideInfromation" object:nil];
 }
@@ -1006,6 +1024,7 @@ numberOfRowsInComponent:(NSInteger)component{
     myWelcomeLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
     [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
     //[myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
+    myWelcomeLabel.textColor = theKeoOrangeColor;
     [myWelcomeLabel setFont:[UIFont fontWithName:@"Gabriola" size:42]];
     myWelcomeLabel.text = @"Phone Number";
     
@@ -1078,8 +1097,12 @@ numberOfRowsInComponent:(NSInteger)component{
     backButton3.frame = CGRectMake(5,screenHeight-45,70,30);
     backButton3.backgroundColor = [UIColor clearColor];
     [backButton3 setTitle:@"Back" forState:UIControlStateNormal];
-    [backButton3 setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [backButton3 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [backButton3.titleLabel setFont:[UIFont systemFontOfSize:18]];
+    backButton3.backgroundColor = [UIColor blackColor];
+    backButton3.layer.cornerRadius = 8;
+    backButton3.clipsToBounds = YES;
+    backButton3.alpha = 0.61;
     [backButton3 addTarget:self
                     action:@selector(backPressed3)
           forControlEvents:UIControlEventTouchUpInside];

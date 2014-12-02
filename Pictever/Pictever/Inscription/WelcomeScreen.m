@@ -196,7 +196,7 @@ int myBlinkingCounter;
         else{
             APLLog(@"not login - show controls");
             //self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"Ecran_acceuil_orange_empty.png"]]];
-            self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FilleBle@2x.png"]]];
+            self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FillesTrek@2x.png"]]];
             //self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"GarconMontagneOrange@2x.png"]]];
             [self initControls];
 
