@@ -138,6 +138,8 @@ extern NSString *const my_actionsheet_install_it_now;
 
 //---------------------------notification names------------------------
 extern NSString *const my_notif_showBilly_name;
+extern NSString *const my_notif_messageSentSuccessfully_name;
+extern NSString *const my_notif_messageResentSuccessfully_name;
 
 @interface myConstants: NSObject
 

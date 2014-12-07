@@ -129,6 +129,7 @@ UIImage *imageSaved;
 UILabel *tapScreenLabel;
 UILabel *seeMenuLabel;
 UIButton *newMessageButtonPh;
+UILabel *sentSuccessfullyLabelPh;
 
 NSMutableArray *sendToMail;//global
 NSString *sendToName;//global
@@ -301,6 +302,16 @@ int pandasize;
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture:)];
     tapRecognizer.numberOfTapsRequired = 1;
     [self.view addGestureRecognizer:tapRecognizer];
+    
+    
+    //------------Create two swipe recognizers (one for left/right direction and one for top/down direction)----------------
+    UISwipeGestureRecognizer *swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture:)];
+    [swipeRecognizer setDirection:(UISwipeGestureRecognizerDirectionRight | UISwipeGestureRecognizerDirectionLeft)];
+    [self.view addGestureRecognizer:swipeRecognizer];
+    
+    UISwipeGestureRecognizer *swipeRecognizer2 = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture:)];
+    [swipeRecognizer2 setDirection:(UISwipeGestureRecognizerDirectionDown | UISwipeGestureRecognizerDirectionUp)];
+    [self.view addGestureRecognizer:swipeRecognizer2];
     
     
     self.view.backgroundColor = [[UIColor alloc] initWithCGColor:[UIColor blackColor].CGColor];
@@ -486,6 +497,7 @@ int pandasize;
         }
     }
 }
+
 
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -1081,6 +1093,7 @@ int pandasize;
     APLLog(@"TakePicture3 will appear");
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(showAnimateForNewMessage) name:my_notif_showBilly_name object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(showAnimateMessageSentSuccessfully) name:my_notif_messageSentSuccessfully_name object:nil];
     
     shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y-localTabbarheight);
     imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y-localTabbarheight);
@@ -1152,6 +1165,7 @@ int pandasize;
     [super viewDidDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:my_notif_showBilly_name object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:my_notif_messageSentSuccessfully_name object:nil];
 }
 
 
@@ -1590,8 +1604,22 @@ int pandasize;
     [newMessageButtonPh addTarget:self action:@selector(gotoTimeline) forControlEvents:UIControlEventTouchUpInside];
 
     [self.view addSubview:newMessageButtonPh];
+    
+    
+    sentSuccessfullyLabelPh = [[UILabel alloc] initWithFrame:CGRectMake(0, -30, screenWidth, 30)];
+    sentSuccessfullyLabelPh.backgroundColor = theKeoOrangeColor;
+    sentSuccessfullyLabelPh.textColor = [UIColor whiteColor];
+    sentSuccessfullyLabelPh.font = [UIFont fontWithName:@"Gabriola" size:22];
+    sentSuccessfullyLabelPh.textAlignment = NSTextAlignmentCenter;
+    sentSuccessfullyLabelPh.alpha = 0.75;
+    sentSuccessfullyLabelPh.text = @"Message sent successfully!";
+
+    [self.view addSubview:sentSuccessfullyLabelPh];
 
 }
+
+
+//------------------------animation when user receives a new message------------------------------
 
 -(void)showAnimateForNewMessage{
     [self.view bringSubviewToFront:newMessageButtonPh];
@@ -1623,6 +1651,24 @@ int pandasize;
         NSLog(@"switchscreen");
         [self switchScreenToKeo];
     }
+}
+
+//-----------------------------animation when message is sent succesfully--------------------------------
+
+-(void)showAnimateMessageSentSuccessfully{
+    [self.view bringSubviewToFront:sentSuccessfullyLabelPh];
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         sentSuccessfullyLabelPh.frame = CGRectMake(0, 0, screenWidth, 30);
+                     }
+                     completion:^(BOOL completed){
+                         [UIView animateWithDuration:0.5 delay:1.0 options:UIViewAnimationOptionCurveLinear
+                                          animations:^{
+                                              sentSuccessfullyLabelPh.frame = CGRectMake(0, -30, screenWidth, 30);
+                                          }
+                                          completion:nil];
+                     }];
 }
 
 //--------------------change color of textfield---------------------
@@ -1754,6 +1800,8 @@ int pandasize;
         [self.view addSubview:seeMenuLabel];
     }
 }
+
+
 
 
 

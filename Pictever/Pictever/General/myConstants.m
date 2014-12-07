@@ -160,6 +160,8 @@ NSString *const my_actionsheet_install_it_now = @"Do you want to install it now?
 
 //---------------------------notification names------------------------
 NSString *const my_notif_showBilly_name = @"showBilly";
+NSString *const my_notif_messageSentSuccessfully_name = @"messageSentSuccessfully";
+NSString *const my_notif_messageResentSuccessfully_name = @"messageResentSuccessfully";
 
 @end
 

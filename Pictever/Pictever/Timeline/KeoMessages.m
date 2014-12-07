@@ -42,6 +42,11 @@
 
 @interface KeoMessages () <UITableViewDataSource, UITableViewDelegate>
 
+@property (assign, nonatomic) CGFloat previousScrollViewYOffset;
+@property (assign, nonatomic) CGFloat initialLoadingLabelYOffset;
+@property (assign, nonatomic) CGFloat initialSpinnerTopYOffset;
+@property (assign, nonatomic) CGFloat initialNavigationBarYOffset;
+
 @end
 
 @implementation KeoMessages
@@ -135,7 +140,12 @@ NSTimer *waitTimer;
 NSTimer *messagesLoadedTimer;
 UILabel *waitLabel;
 UILabel *refreshLabel;
-//UILabel *loadingLabel;
+
+UILabel *resentSuccessfullyLabelK;
+UILabel *resentSuccessfullyLabelK2;
+UILabel *sentSuccessfullyLabelK;
+UILabel *sentSuccessfullyLabelK2;
+
 
 bool isReloadingTableView;
 
@@ -250,14 +260,18 @@ myTabBarController *myController;
     _loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.14*screenWidth, 20, 100, 40)];
     _loadingLabel.backgroundColor = [UIColor clearColor];
     [_loadingLabel setFont:[UIFont systemFontOfSize:12]];
+    self.initialLoadingLabelYOffset = _loadingLabel.frame.origin.y;
     [self.parentViewController.view addSubview:_loadingLabel];
     
     _spinnerTop = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     _spinnerTop.center = CGPointMake(0.075*screenWidth, 40);
     _spinnerTop.color = [UIColor blackColor];
     _spinnerTop.hidesWhenStopped = YES;
+    self.initialSpinnerTopYOffset = _spinnerTop.frame.origin.y;
     [self.parentViewController.view addSubview:_spinnerTop];
     
+    
+    self.initialNavigationBarYOffset = self.navigationController.navigationBar.frame.origin.y;
     
     //------------------show the user he is currently refreshing the tableview--------------------
     /*refreshLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.56*screenWidth, 5, 100, 40)];
@@ -288,6 +302,7 @@ myTabBarController *myController;
     
     [self initHeaderView];
     
+    [self initPopupViews];
     
     if([self.tableView numberOfRowsInSection:0]>0){
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
@@ -296,6 +311,38 @@ myTabBarController *myController;
     [self.tableView reloadData];
     
     APLLog(@"KeoMessages didload");
+}
+
+-(void)initPopupViews{
+    resentSuccessfullyLabelK = [[UILabel alloc] initWithFrame:CGRectMake(0, -30, screenWidth, 30)];
+    resentSuccessfullyLabelK.backgroundColor = theKeoOrangeColor;
+    resentSuccessfullyLabelK.textColor = [UIColor whiteColor];
+    resentSuccessfullyLabelK.font = [UIFont fontWithName:@"Gabriola" size:22];
+    resentSuccessfullyLabelK.textAlignment = NSTextAlignmentCenter;
+    resentSuccessfullyLabelK.alpha = 0.95;
+    resentSuccessfullyLabelK.text = @"Message resent successfully!";
+    
+    resentSuccessfullyLabelK2 = [[UILabel alloc] initWithFrame:CGRectMake(0, -48, screenWidth, 18)];
+    resentSuccessfullyLabelK2.backgroundColor = theKeoOrangeColor;
+    resentSuccessfullyLabelK2.alpha = 0.95;
+    
+    [self.parentViewController.view addSubview:resentSuccessfullyLabelK2];
+    [self.parentViewController.view addSubview:resentSuccessfullyLabelK];
+    
+    sentSuccessfullyLabelK = [[UILabel alloc] initWithFrame:CGRectMake(0, -30, screenWidth, 30)];
+    sentSuccessfullyLabelK.backgroundColor = theKeoOrangeColor;
+    sentSuccessfullyLabelK.textColor = [UIColor whiteColor];
+    sentSuccessfullyLabelK.font = [UIFont fontWithName:@"Gabriola" size:22];
+    sentSuccessfullyLabelK.textAlignment = NSTextAlignmentCenter;
+    sentSuccessfullyLabelK.alpha = 0.95;
+    sentSuccessfullyLabelK.text = @"Message sent successfully!";
+    
+    sentSuccessfullyLabelK2 = [[UILabel alloc] initWithFrame:CGRectMake(0, -48, screenWidth, 18)];
+    sentSuccessfullyLabelK2.backgroundColor = theKeoOrangeColor;
+    sentSuccessfullyLabelK2.alpha = 0.95;
+    
+    [self.parentViewController.view addSubview:sentSuccessfullyLabelK2];
+    [self.parentViewController.view addSubview:sentSuccessfullyLabelK];
 }
 
 -(void)initHeaderView{
@@ -337,6 +384,50 @@ myTabBarController *myController;
     self.tableView.tableHeaderView = hdView;
 }
 
+//-----------------------------animation when message is sent succesfully--------------------------------
+
+-(void)showAnimateMessageSentSuccessfullyK{
+    [self.view bringSubviewToFront:sentSuccessfullyLabelK];
+    [self.view bringSubviewToFront:sentSuccessfullyLabelK2];
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         sentSuccessfullyLabelK.frame = CGRectMake(0, 18, screenWidth, 30);
+                         sentSuccessfullyLabelK2.frame = CGRectMake(0, 0, screenWidth, 18);
+                     }
+                     completion:^(BOOL completed){
+                         [UIView animateWithDuration:0.5 delay:1.0 options:UIViewAnimationOptionCurveLinear
+                                          animations:^{
+                                              sentSuccessfullyLabelK.frame = CGRectMake(0, -30, screenWidth, 30);
+                                              sentSuccessfullyLabelK2.frame = CGRectMake(0, -48, screenWidth, 18);
+                                          }
+                                          completion:nil];
+                     }];
+}
+
+//-----------------------------animation when message is resent succesfully--------------------------------
+
+-(void)showAnimateMessageResentSuccessfullyK{
+    [self.view bringSubviewToFront:resentSuccessfullyLabelK];
+    [self.view bringSubviewToFront:resentSuccessfullyLabelK2];
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         resentSuccessfullyLabelK.frame = CGRectMake(0, 18, screenWidth, 30);
+                         resentSuccessfullyLabelK2.frame = CGRectMake(0, 0, screenWidth, 18);
+                     }
+                     completion:^(BOOL completed){
+                         [UIView animateWithDuration:0.5 delay:1.0 options:UIViewAnimationOptionCurveLinear
+                                          animations:^{
+                                              resentSuccessfullyLabelK.frame = CGRectMake(0, -30, screenWidth, 30);
+                                              resentSuccessfullyLabelK2.frame = CGRectMake(0, -48, screenWidth, 18);
+                                          }
+                                          completion:nil];
+                     }];
+}
+
+
+//----------------tap billy to ask number of future messges-------------------------------
 -(void)billyTapped{
     APLLog(@"Billy tapped: %@",numberOfMessagesInTheFuture);
     
@@ -408,6 +499,16 @@ myTabBarController *myController;
      }*/
 }
 
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    
+    //------------show all the navigationbar barbutton items-------------------
+    [self updateBarButtonItems:1.0];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showAnimateMessageSentSuccessfullyK) name:my_notif_messageSentSuccessfully_name object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showAnimateMessageResentSuccessfullyK) name:my_notif_messageResentSuccessfully_name object:nil];
+}
+
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     
@@ -465,6 +566,10 @@ myTabBarController *myController;
         [self showLoadTbvLabel];
     }
     
+    
+    //------------show all the navigationbar barbutton items-------------------
+    [self updateOtherViewsToFrame:self.navigationController.navigationBar.frame withAlpha:1.0];
+    
 }
 
 
@@ -478,6 +583,8 @@ myTabBarController *myController;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"reloadData" object:nil];
     //[[NSNotificationCenter defaultCenter] removeObserver:self name:@"vibrateForNewShyft" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"showFutureMessages" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:my_notif_messageSentSuccessfully_name object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:my_notif_messageResentSuccessfully_name object:nil];
 }
 
 -(void)reloadDataT{
@@ -1417,7 +1524,13 @@ myTabBarController *myController;
 //------------------user scrolls to load new messages or to refresh tableview-----------------------------------
 
 - (void)scrollViewDidScroll:(UIScrollView *)aScrollView {
+    
     CGPoint offset = aScrollView.contentOffset;
+    
+    if(offset.y > hdView.frame.size.height){
+        [self updateNavigationBar:aScrollView];
+    }
+    
     
     if(offset.y <= (-100.0)){
         //APLLog(@"TOP");
@@ -1518,6 +1631,108 @@ myTabBarController *myController;
     [self startLoadingAnimation];
     downloadPhotoOnAmazon = true;
     [[[NewBucketRequest alloc] init] sessionNewBucket:newMessage];
+}
+
+
+
+
+
+//--------------------hide the navigation controller bar----------------------------------------
+
+- (void)updateNavigationBar:(UIScrollView *)scrollView
+{
+    CGRect frame = self.navigationController.navigationBar.frame;
+    CGFloat size = frame.size.height - 21;
+    CGFloat framePercentageHidden = ((20 - frame.origin.y) / (frame.size.height - 1));
+    CGFloat scrollOffset = scrollView.contentOffset.y;
+    CGFloat scrollDiff = scrollOffset - self.previousScrollViewYOffset;
+    CGFloat scrollHeight = scrollView.frame.size.height;
+    CGFloat scrollContentSizeHeight = scrollView.contentSize.height + scrollView.contentInset.bottom;
+    
+    if (scrollOffset <= -scrollView.contentInset.top) {
+        frame.origin.y = 20;
+    } else if ((scrollOffset + scrollHeight) >= scrollContentSizeHeight) {
+        frame.origin.y = -size;
+    } else {
+        frame.origin.y = MIN(20, MAX(-size, frame.origin.y - scrollDiff));
+    }
+    
+    [self updateOtherViewsToFrame:frame withAlpha:(1 - framePercentageHidden)];
+    
+    [self.navigationController.navigationBar setFrame:frame];
+    [self updateBarButtonItems:(1 - framePercentageHidden)];
+    self.previousScrollViewYOffset = scrollOffset;
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    [self stoppedScrolling];
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView
+                  willDecelerate:(BOOL)decelerate
+{
+    if (!decelerate) {
+        [self stoppedScrolling];
+    }
+}
+
+- (void)stoppedScrolling
+{
+    CGRect frame = self.navigationController.navigationBar.frame;
+    if (frame.origin.y < 20) {
+        [self animateNavBarTo:-(frame.size.height - 21)];
+    }
+}
+
+- (void)updateBarButtonItems:(CGFloat)alpha
+{
+    [self.navigationItem.leftBarButtonItems enumerateObjectsUsingBlock:^(UIBarButtonItem* item, NSUInteger i, BOOL *stop) {
+        item.customView.alpha = alpha;
+    }];
+    [self.navigationItem.rightBarButtonItems enumerateObjectsUsingBlock:^(UIBarButtonItem* item, NSUInteger i, BOOL *stop) {
+        item.customView.alpha = alpha;
+    }];
+    self.navigationItem.titleView.alpha = alpha;
+    self.navigationController.navigationBar.tintColor = [self.navigationController.navigationBar.tintColor colorWithAlphaComponent:alpha];
+
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                     [[UIColor blackColor] colorWithAlphaComponent:alpha],
+                                                                     NSForegroundColorAttributeName,
+                                                                     [UIFont fontWithName:@"Helvetica-Bold" size:16.0],
+                                                                     NSFontAttributeName,
+                                                                     nil]];
+    
+}
+
+- (void)animateNavBarTo:(CGFloat)y
+{
+    [UIView animateWithDuration:0.2 animations:^{
+        CGRect frame = self.navigationController.navigationBar.frame;
+        CGFloat alpha = (frame.origin.y >= y ? 0 : 1);
+        frame.origin.y = y;
+        
+        [self updateOtherViewsToFrame:frame withAlpha:alpha];
+        
+        [self.navigationController.navigationBar setFrame:frame];
+        [self updateBarButtonItems:alpha];
+    }];
+}
+
+-(void)updateOtherViewsToFrame:(CGRect)barFrame withAlpha:(CGFloat)alpha{
+    CGRect progressViewFrame = progressView2.frame;
+    progressViewFrame.origin.y = barFrame.origin.y+barFrame.size.height;
+    [progressView2 setFrame:progressViewFrame];
+    
+    CGRect spinnerTopFrame = _spinnerTop.frame;
+    spinnerTopFrame.origin.y = self.initialSpinnerTopYOffset+barFrame.origin.y-self.initialNavigationBarYOffset;
+    [_spinnerTop setFrame:spinnerTopFrame];
+    _spinnerTop.alpha = alpha;
+    
+    CGRect loadingLabelFrame = _loadingLabel.frame;
+    loadingLabelFrame.origin.y = self.initialLoadingLabelYOffset+barFrame.origin.y-self.initialNavigationBarYOffset;
+    [_loadingLabel setFrame:loadingLabelFrame];
+    _loadingLabel.alpha = alpha;
 }
 
 

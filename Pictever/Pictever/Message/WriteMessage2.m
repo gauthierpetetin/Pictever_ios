@@ -80,6 +80,9 @@ UILabel *hideRectangle;
 UIButton *sendButton;
 
 UIButton *newMessageButtonM;
+UILabel *sentSuccessfullyLabelM;
+UILabel *sentSuccessfullyLabelM2;
+
 
 NSString *destinataire3;
 
@@ -190,6 +193,7 @@ int pandasize;
     
     //------------------ask the server if new messages have been received------------
     [self askNewMessages2];
+    
 }
 
 -(void)hideProgressBar3{
@@ -207,6 +211,7 @@ int pandasize;
     [super viewDidDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:my_notif_showBilly_name object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:my_notif_messageSentSuccessfully_name object:nil];
 }
 
 
@@ -442,6 +447,7 @@ int pandasize;
     showDatePicker = false;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showAnimateForNewMessageM) name:my_notif_showBilly_name object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showAnimateMessageSentSuccessfullyM) name:my_notif_messageSentSuccessfully_name object:nil];
     
 }
 
@@ -605,6 +611,24 @@ int pandasize;
     [self.parentViewController.view addSubview:newMessageButtonM];
     
     
+    
+    
+    sentSuccessfullyLabelM = [[UILabel alloc] initWithFrame:CGRectMake(0, -30, screenWidth, 30)];
+    sentSuccessfullyLabelM.backgroundColor = theKeoOrangeColor;
+    sentSuccessfullyLabelM.textColor = [UIColor whiteColor];
+    sentSuccessfullyLabelM.font = [UIFont fontWithName:@"Gabriola" size:22];
+    sentSuccessfullyLabelM.textAlignment = NSTextAlignmentCenter;
+    sentSuccessfullyLabelM.alpha = 0.95;
+    sentSuccessfullyLabelM.text = @"Message sent successfully!";
+    
+    sentSuccessfullyLabelM2 = [[UILabel alloc] initWithFrame:CGRectMake(0, -48, screenWidth, 18)];
+    sentSuccessfullyLabelM2.backgroundColor = theKeoOrangeColor;
+    sentSuccessfullyLabelM2.alpha = 0.95;
+
+    [self.parentViewController.view addSubview:sentSuccessfullyLabelM2];
+    [self.parentViewController.view addSubview:sentSuccessfullyLabelM];
+    
+    
 }
 
 //--------------the screen is taped to show/hide the keyboard------------------------------
@@ -626,6 +650,8 @@ int pandasize;
     }
 }
 
+
+//-------------------------animation when user receives a new message---------------------------------
 
 -(void)showAnimateForNewMessageM{
     
@@ -651,6 +677,26 @@ int pandasize;
 }
 
 
+//-----------------------------animation when message is sent succesfully--------------------------------
+
+-(void)showAnimateMessageSentSuccessfullyM{
+    [self.view bringSubviewToFront:sentSuccessfullyLabelM];
+    [self.view bringSubviewToFront:sentSuccessfullyLabelM2];
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         sentSuccessfullyLabelM.frame = CGRectMake(0, 18, screenWidth, 30);
+                         sentSuccessfullyLabelM2.frame = CGRectMake(0, 0, screenWidth, 18);
+                     }
+                     completion:^(BOOL completed){
+                         [UIView animateWithDuration:0.5 delay:1.0 options:UIViewAnimationOptionCurveLinear
+                                          animations:^{
+                                              sentSuccessfullyLabelM.frame = CGRectMake(0, -30, screenWidth, 30);
+                                              sentSuccessfullyLabelM2.frame = CGRectMake(0, -48, screenWidth, 18);
+                                          }
+                                          completion:nil];
+                     }];
+}
 
 
 

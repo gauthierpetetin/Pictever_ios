@@ -574,12 +574,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     APLLog(@"Session succeeded! Received %d bytes of data Resend",[data length]);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertView *alert3 = [[UIAlertView alloc]
-                               initWithTitle:@"Message resent successfully"
-                               message:@"" delegate:sender
-                               cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert3 show];
-        [alert3 dismissWithClickedButtonIndex:0 animated:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:my_notif_messageResentSuccessfully_name object:nil];
     });
     [[[GPSession alloc] init] getStatusRequest:self];
 }
@@ -1361,23 +1356,13 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         }
         else{
             dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertView *alert3 = [[UIAlertView alloc]
-                                       initWithTitle:@"Message sent successfully"
-                                       message:@"" delegate:sender
-                                       cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                [alert3 show];
-                [alert3 dismissWithClickedButtonIndex:0 animated:YES];
+                [[NSNotificationCenter defaultCenter] postNotificationName:my_notif_messageSentSuccessfully_name object:nil];
             });
         }
     }
     else{
         dispatch_async(dispatch_get_main_queue(), ^{
-            UIAlertView *alert3 = [[UIAlertView alloc]
-                                   initWithTitle:@"Message sent successfully"
-                                   message:@"" delegate:sender
-                                   cancelButtonTitle:@"OK" otherButtonTitles:nil];
-            [alert3 show];
-            [alert3 dismissWithClickedButtonIndex:0 animated:YES];
+            [[NSNotificationCenter defaultCenter] postNotificationName:my_notif_messageSentSuccessfully_name object:nil];
         });
     }
     sendTips = [NSString stringWithFormat:@"%d", sendTipCounter];

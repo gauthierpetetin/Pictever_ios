@@ -291,7 +291,7 @@ NSString *mytimeStamp;//global
     APLLog(@"saveImage");
     if (imageInKeo != nil)
     {
-        UIImageWriteToSavedPhotosAlbum(imageInKeo, nil, nil, nil);
+        //UIImageWriteToSavedPhotosAlbum(imageInKeo, nil, nil, nil);
         NSError *error;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
