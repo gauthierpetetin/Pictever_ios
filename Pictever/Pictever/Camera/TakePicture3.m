@@ -305,11 +305,11 @@ int pandasize;
     
     
     //------------Create two swipe recognizers (one for left/right direction and one for top/down direction)----------------
-    UISwipeGestureRecognizer *swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture:)];
+    UISwipeGestureRecognizer *swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToSwipeGesture:)];
     [swipeRecognizer setDirection:(UISwipeGestureRecognizerDirectionRight | UISwipeGestureRecognizerDirectionLeft)];
     [self.view addGestureRecognizer:swipeRecognizer];
     
-    UISwipeGestureRecognizer *swipeRecognizer2 = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture:)];
+    UISwipeGestureRecognizer *swipeRecognizer2 = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToSwipeGesture:)];
     [swipeRecognizer2 setDirection:(UISwipeGestureRecognizerDirectionDown | UISwipeGestureRecognizerDirectionUp)];
     [self.view addGestureRecognizer:swipeRecognizer2];
     
@@ -458,6 +458,30 @@ int pandasize;
 
 //------------------tap gesture recognizer to show or hide the textfield on the photo---------------
 - (IBAction)respondToTapGesture:(UITapGestureRecognizer *)recognizer {
+
+    [self respondToSwipeGesture:recognizer];
+    
+    if(keoTextFieldPh.isFirstResponder){
+        [keoTextFieldPh resignFirstResponder];
+    }
+    else{
+        if([[self.view subviews] containsObject:keoTextFieldPh]){
+            [keoTextFieldPh removeFromSuperview];
+            [colorButton removeFromSuperview];
+        }
+        else{
+            if(pictureIsTaken){
+                [self.view addSubview:keoTextFieldPh];
+                [self.view addSubview:colorButton];
+                [keoTextFieldPh becomeFirstResponder];
+            }
+        }
+    }
+}
+
+
+//------------------swipe gesture recognizer to show or hide the textfield on the photo---------------
+- (IBAction)respondToSwipeGesture:(UITapGestureRecognizer *)recognizer {
     [tapScreenLabel removeFromSuperview];
     [seeMenuLabel removeFromSuperview];
     
@@ -480,22 +504,7 @@ int pandasize;
             }];
         }
     }
-    if(keoTextFieldPh.isFirstResponder){
-        [keoTextFieldPh resignFirstResponder];
-    }
-    else{
-        if([[self.view subviews] containsObject:keoTextFieldPh]){
-            [keoTextFieldPh removeFromSuperview];
-            [colorButton removeFromSuperview];
-        }
-        else{
-            if(pictureIsTaken){
-                [self.view addSubview:keoTextFieldPh];
-                [self.view addSubview:colorButton];
-                [keoTextFieldPh becomeFirstResponder];
-            }
-        }
-    }
+
 }
 
 

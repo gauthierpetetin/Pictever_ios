@@ -171,8 +171,8 @@ UIActivityIndicatorView *registerSpinner;
         username = textFieldUsernameSignUp.text;
         password1 = textFieldPassword1SignUp.text;
         
-        username = [username stringByReplacingOccurrencesOfString:@" " withString:@""];
-        password1 = [password1 stringByReplacingOccurrencesOfString:@" " withString:@""];
+        username = [username stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        password1 = [password1 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         
         hashPassword = [GPRequests sha256HashFor:password1];
         
@@ -182,7 +182,22 @@ UIActivityIndicatorView *registerSpinner;
                                   message:@"Please enter a valid email adress" delegate:self
                                   cancelButtonTitle:@"Ok" otherButtonTitles:nil];
             [alert show];
-        } else {
+        }
+        else if ([username rangeOfString:@" "].location != NSNotFound){
+            UIAlertView *alert = [[UIAlertView alloc]
+                                  initWithTitle:@"Error"
+                                  message:@"Please enter a valid email adress" delegate:self
+                                  cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+        }
+        else if([password1 rangeOfString:@" "].location != NSNotFound){
+            UIAlertView *alert = [[UIAlertView alloc]
+                                  initWithTitle:@"Error"
+                                  message:@"Please enter a valid password" delegate:self
+                                  cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+        }
+        else {
             NSLog(@"string contains @: %@", username);
             //-------------------asynchronous register request---------------
             [self localAsynchronousRegisterWithEmail:username withHashPass:hashPassword for:self];

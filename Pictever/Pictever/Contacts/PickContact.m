@@ -260,7 +260,7 @@ bool sendSMS;
 +(NSMutableArray *)placeMyselfOnTop:(NSMutableArray *)myKeoContacts3{
 //@" Myself" forKey:@"firstNames"
     APLLog(@"placeMyselfOnTop");
-    int indexT = [PickContact indexOfContactMyselfInMutableArray:myKeoContacts3];
+    NSInteger indexT = [PickContact indexOfContactMyselfInMutableArray:myKeoContacts3];
     NSMutableDictionary *contMyself = [[NSMutableDictionary alloc] init];
     
     if(indexT != -1){
