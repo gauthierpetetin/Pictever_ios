@@ -178,4 +178,8 @@ bool zoomOn;//global
     return image;
 }
 
+-(BOOL)prefersStatusBarHidden{
+    return YES;
+}
+
 @end

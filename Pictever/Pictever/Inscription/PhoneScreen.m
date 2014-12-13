@@ -475,8 +475,6 @@ UIColor *theKeoOrangeColor;
         // The user has previously denied access
         // Send an alert telling user to change privacy setting in settings app
     }
-    
-    
 }
 
 -(void)addPickerView{

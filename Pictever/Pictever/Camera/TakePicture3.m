@@ -166,6 +166,10 @@ int colorCounter;
 int pandasize;
 
 
+UITapGestureRecognizer *tapRecognizer;
+UISwipeGestureRecognizer *swipeRecognizer;
+UISwipeGestureRecognizer *swipeRecognizer2;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -299,19 +303,18 @@ int pandasize;
     
     
     //-----------Create tap gesture recognizer (to add textfield on the photo)----------------
-    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture:)];
+    tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture:)];
     tapRecognizer.numberOfTapsRequired = 1;
-    [self.view addGestureRecognizer:tapRecognizer];
     
     
     //------------Create two swipe recognizers (one for left/right direction and one for top/down direction)----------------
-    UISwipeGestureRecognizer *swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToSwipeGesture:)];
+    swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToSwipeGesture:)];
     [swipeRecognizer setDirection:(UISwipeGestureRecognizerDirectionRight | UISwipeGestureRecognizerDirectionLeft)];
-    [self.view addGestureRecognizer:swipeRecognizer];
+
     
-    UISwipeGestureRecognizer *swipeRecognizer2 = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToSwipeGesture:)];
+    swipeRecognizer2 = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToSwipeGesture:)];
     [swipeRecognizer2 setDirection:(UISwipeGestureRecognizerDirectionDown | UISwipeGestureRecognizerDirectionUp)];
-    [self.view addGestureRecognizer:swipeRecognizer2];
+    
     
     
     self.view.backgroundColor = [[UIColor alloc] initWithCGColor:[UIColor blackColor].CGColor];
@@ -434,7 +437,7 @@ int pandasize;
 //--------------move the text on the photo---------------------------
 - (void)wasDragged:(UITextField *)button withEvent:(UIEvent *)event
 {
-    APLLog(@"was dragged");
+    //APLLog(@"was dragged");
     // get the touch
     UITouch *touch = [[event touchesForView:button] anyObject];
     
@@ -458,7 +461,10 @@ int pandasize;
 
 //------------------tap gesture recognizer to show or hide the textfield on the photo---------------
 - (IBAction)respondToTapGesture:(UITapGestureRecognizer *)recognizer {
-
+    
+    [tapScreenLabel removeFromSuperview];
+    [seeMenuLabel removeFromSuperview];
+    
     [self respondToSwipeGesture:recognizer];
     
     if(keoTextFieldPh.isFirstResponder){
@@ -482,10 +488,10 @@ int pandasize;
 
 //------------------swipe gesture recognizer to show or hide the textfield on the photo---------------
 - (IBAction)respondToSwipeGesture:(UITapGestureRecognizer *)recognizer {
-    [tapScreenLabel removeFromSuperview];
-    [seeMenuLabel removeFromSuperview];
+    NSLog(@"respond to swipe gesture");
     
     if(myImageViewPh.image == nil){
+        NSLog(@"respond to swipe gesture2");
         if (![self tabBarIsVisible]){
             NSLog(@"tabBar IS HIDDEN");
             [self setTabBarVisible:YES animated:YES];
@@ -562,6 +568,7 @@ int pandasize;
     
     [cancelButtonPh removeFromSuperview];
     //[labelCancelPh removeFromSuperview];
+    [tapScreenLabel removeFromSuperview];
     
     [self initializeView];
     if(frontCameraActivated){
@@ -1329,6 +1336,9 @@ int pandasize;
     
     pictureIsTaken = true;
     
+    [self.view removeGestureRecognizer:swipeRecognizer];
+    [self.view removeGestureRecognizer:swipeRecognizer2];
+    
     [imagePickerButton removeFromSuperview];
     [flashButtonPh removeFromSuperview];
     [frontButtonPh removeFromSuperview];
@@ -1581,6 +1591,10 @@ int pandasize;
     
     [self.view bringSubviewToFront:keoTextFieldPh];
     [self.view bringSubviewToFront:colorButton];
+    
+    [self.view addGestureRecognizer:tapRecognizer];
+    [self.view addGestureRecognizer:swipeRecognizer];
+    [self.view addGestureRecognizer:swipeRecognizer2];
     
     [self initPopupViews];
 }
