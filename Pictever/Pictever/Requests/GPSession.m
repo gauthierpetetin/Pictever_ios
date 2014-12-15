@@ -1070,6 +1070,9 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         }
     }
     else{
+        logIn = true;
+        [prefs setBool:logIn forKey:my_prefs_login_key];
+        
         [self loginSucceeded:data from:sender];
     }
     

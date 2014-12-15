@@ -408,22 +408,30 @@ myTabBarController *myController;
 //-----------------------------animation when message is resent succesfully--------------------------------
 
 -(void)showAnimateMessageResentSuccessfullyK{
+    APLLog(@"showAnimateMessageResentSuccessfullyK");
+    [self initPopupViews];
+    
     [self.view bringSubviewToFront:resentSuccessfullyLabelK];
     [self.view bringSubviewToFront:resentSuccessfullyLabelK2];
     
-    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
-                     animations:^{
-                         resentSuccessfullyLabelK.frame = CGRectMake(0, 18, screenWidth, 30);
-                         resentSuccessfullyLabelK2.frame = CGRectMake(0, 0, screenWidth, 18);
-                     }
-                     completion:^(BOOL completed){
-                         [UIView animateWithDuration:0.5 delay:1.0 options:UIViewAnimationOptionCurveLinear
-                                          animations:^{
-                                              resentSuccessfullyLabelK.frame = CGRectMake(0, -30, screenWidth, 30);
-                                              resentSuccessfullyLabelK2.frame = CGRectMake(0, -48, screenWidth, 18);
-                                          }
-                                          completion:nil];
-                     }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+    
+        [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
+                         animations:^{
+                             resentSuccessfullyLabelK.frame = CGRectMake(0, 18, screenWidth, 30);
+                             resentSuccessfullyLabelK2.frame = CGRectMake(0, 0, screenWidth, 18);
+                         }
+                         completion:^(BOOL completed){
+                             [UIView animateWithDuration:0.5 delay:1.0 options:UIViewAnimationOptionCurveLinear
+                                              animations:^{
+                                                  resentSuccessfullyLabelK.frame = CGRectMake(0, -30, screenWidth, 30);
+                                                  resentSuccessfullyLabelK2.frame = CGRectMake(0, -48, screenWidth, 18);
+                                              }
+                                              completion:nil];
+                         }];
+        
+    });
+    
 }
 
 

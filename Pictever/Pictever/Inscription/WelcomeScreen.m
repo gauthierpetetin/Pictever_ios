@@ -225,6 +225,23 @@ int myBlinkingCounter;
                 }
             }
         }
+        else{//-------------------case where the user refused to give his email with facebook connect-------
+            if(myFacebookID){
+                if(![myFacebookID isEqualToString:@""]){
+                    if(logIn){
+                        if(!myVersionForceInstall){
+                            APLLog(@"Do first login!");
+                            if([GPRequests connected]){
+                                [[[GPSession alloc]init] asynchronousLoginWithEmailfor:self];
+                            }
+                            else{
+                                [NSThread detachNewThreadSelector:@selector(askThingsInBackground) toTarget:self withObject:nil];
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
