@@ -631,7 +631,7 @@ int myBlinkingCounter;
 }
 
 -(void)localFacebookLoginSucceeded:(NSData *)data withErrorCode:(NSInteger)sessionErrorCode from:(id)sender{
-    APLLog(@"local login session did receive response with error code: %i",sessionErrorCode);
+    APLLog(@"local facebook login session did receive response with error code: %i",sessionErrorCode);
     if(sessionErrorCode != 200){
         dispatch_async(dispatch_get_main_queue(), ^{
             UIAlertView *alert = [[UIAlertView alloc]

@@ -583,37 +583,43 @@ NSString *mytimeStamp;//global
         //APLLog(numberAsString);
         //APLLog(dateRecueAsString);
         
-        APLLog(@"insert: %@ in messagesdatafile",[newMessage description]);
-        [messagesDataFile insertObject:[newMessage mutableCopy] atIndex:0];
+        if(![myGeneralMethods alreadyContainsMessage:newMessage]){
+            
+            APLLog(@"insert: %@ in messagesdatafile",[newMessage description]);
+            [messagesDataFile insertObject:[newMessage mutableCopy] atIndex:0];
+            
+            
+            if(messagesDataFile){
+                [myGeneralMethods saveMessagesData];
+            }
+            
+            //------------get the name of the contact associated to this phonenumber--------------
+            [myGeneralMethods checkAccountName:numberAsString];
+            
+            
+            [prefs setObject:importKeoContacts forKey:@"importKeoContacts"];
+            
+            
+            
+            if(![[photoStringAsString stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@""]){//-----------photo message
+                APLLog(@"-----new photo message");
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    APLLog(@"send notif startLoadingAnimation");
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"startLoadingAnimation" object: nil];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"downloadPhotoOnNewBucket" object:self userInfo:[newMessage mutableCopy]];
+                });
+            }
+            else{
+                APLLog(@"-----new text message");
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"vibrateForNewShyft" object:self userInfo:[newMessage mutableCopy]];
+                });
+            }
         
-        
-        if(messagesDataFile){
-            [myGeneralMethods saveMessagesData];
-        }
-        
-        //------------get the name of the contact associated to this phonenumber--------------
-        [myGeneralMethods checkAccountName:numberAsString];
-        
-        
-        [prefs setObject:importKeoContacts forKey:@"importKeoContacts"];
-        
-        
-        
-        if(![[photoStringAsString stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@""]){//-----------photo message
-            APLLog(@"-----new photo message");
-            dispatch_async(dispatch_get_main_queue(), ^{
-                APLLog(@"send notif startLoadingAnimation");
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"startLoadingAnimation" object: nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"downloadPhotoOnNewBucket" object:self userInfo:[newMessage mutableCopy]];
-            });
         }
         else{
-            APLLog(@"-----new text message");
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"vibrateForNewShyft" object:self userInfo:[newMessage mutableCopy]];
-            });
+            APLLog(@"MESSAGESDATAFILE ALREADY CONTAINS THIS MESSAGE");
         }
-        
         
         
     }
@@ -628,6 +634,32 @@ NSString *mytimeStamp;//global
         APLLog(@"wrong timeStamp");
     }
     
+}
+
+
+//-------------know if messagesdatafile already contains message---------------------
++(bool)alreadyContainsMessage:(NSMutableDictionary *)messageToCheck{
+    NSString *message_id_to_check = @"";
+    NSString *message_received_at_to_check = @"";
+    if([messageToCheck objectForKey:my_shyft_id_Key]){
+        message_id_to_check = [messageToCheck objectForKey:my_shyft_id_Key];
+    }
+    if([messageToCheck objectForKey:my_received_at_Key]){
+        message_received_at_to_check = [messageToCheck objectForKey:my_received_at_Key];
+    }
+    
+    for(NSMutableDictionary* dataFileMessage in messagesDataFile){
+        if([dataFileMessage objectForKey:my_shyft_id_Key]){
+            if([[dataFileMessage objectForKey:my_shyft_id_Key] isEqualToString:message_id_to_check]){
+                if([dataFileMessage objectForKey:my_received_at_Key]){
+                    if([[dataFileMessage objectForKey:my_received_at_Key] isEqualToString:message_received_at_to_check]){
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
 
 

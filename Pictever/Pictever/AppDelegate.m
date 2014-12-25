@@ -828,7 +828,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 -(NSMutableArray *)copyMessagesDataFile:(NSArray *)importedArray{
     NSMutableArray *returnArray = [[NSMutableArray alloc] init];
     int counter = 0;
-    
+
     if(!myCurrentPhotoPath){
         myCurrentPhotoPath = [self getCurrentAppPath];
     }
@@ -907,7 +907,11 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             [newMessage2 setObject:@"" forKey:my_from_facebook_name_key];}
         
         if([message objectForKey:my_loaded_Key]){
-            [newMessage2 setObject:[message objectForKey:my_loaded_Key] forKey:my_loaded_Key];}
+            [newMessage2 setObject:[message objectForKey:my_loaded_Key] forKey:my_loaded_Key];
+            if([[message objectForKey:my_loaded_Key] isEqualToString:my_inprogress_string]){
+                [newMessage2 setObject:@"no" forKey:my_loaded_Key];
+            }
+        }
         else{
             [newMessage2 setObject:@"yes" forKey:my_loaded_Key];}
         if([message objectForKey:my_received_at_Key]){
@@ -946,8 +950,8 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         }
         
         
-        //Delete the old messages to make space in the memory (just the last 80 messages are kept)
-        if(counter > 80){
+        //Delete the old messages to make space in the memory (just the last 50 messages are kept)
+        if(counter > 50){
             if([[newMessage2 objectForKey:my_message_Key] isEqualToString:@""]){
                 NSString *dPhotoId = @"default";
                 if([newMessage2 objectForKey:my_photo_Key]){

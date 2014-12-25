@@ -56,6 +56,8 @@
 
 +(void)receiveAllMessagesTogether:(NSArray *)res withTimeStamp:(NSString *)timeStampToSave;
 
++(bool)alreadyContainsMessage:(NSMutableDictionary *)messageToCheck;
+
 +(void)checkAccountName:(NSString *)phNumber1;
 
 +(NSString *) getStringToPrint: (NSDate *)dateToPrint;

@@ -319,7 +319,7 @@ bool localWork;//global
     
 }
 
-//------------------synchronous login request (not used anymore)-----------------------
+//------------------synchronous login request (used when 401)-----------------------
 
 + (NSInteger) loginWithEmail:(NSString *)mail withPassWord:(NSString *)password for:(id)sender{//500 ou 404 on retourne sur l'adresse par défaut
     APLLog(@"loginwithemail");
