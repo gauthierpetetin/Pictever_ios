@@ -772,6 +772,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             APLLog(@"mytimestamp (null)");
         }
     }
+    
     APLLog(@"myActualTimeStamp %@", mytimeStamp);
 
 }

@@ -647,7 +647,7 @@ myTabBarController *myController;
 
 //------------alert the user he received a new message AND the photo has been downloaded----------------
 -(void)vibrateForNewShyft:(NSNotification *)notification{
-    APLLog(@"vibrateForNewShyft: %@",[notification.userInfo description]);
+    APLLog(@"vibrateForNewShyft1: %@",[notification.userInfo description]);
     NSMutableDictionary *newPhotoMessage2 = [notification.userInfo mutableCopy];
 
     if([myShyftSet isLoaded]){
@@ -682,7 +682,7 @@ myTabBarController *myController;
         });
     }
     
-    APLLog(@"vibrate for new shyft: %@", [newPhotoMessage description]);
+    APLLog(@"vibrate for new shyft 2 (now): %@", [newPhotoMessage description]);
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
     [[NSNotificationCenter defaultCenter] postNotificationName:my_notif_showBilly_name object:nil];
     
@@ -733,7 +733,7 @@ myTabBarController *myController;
 -(void)loadUnloadImages{
     if(!isLoadingLoadBox){
         loadBox = [[NSMutableArray alloc] init];
-        for(NSMutableDictionary *loadDic in messagesDataFile){
+        for(NSMutableDictionary *loadDic in [messagesDataFile mutableCopy]){
             if([loadDic objectForKey:my_photo_Key]){
                 if([[loadDic objectForKey:my_photo_Key] isEqualToString:image_not_downloaded_string]||[[loadDic objectForKey:my_loaded_Key] isEqualToString:@"no"]){
                     if(![[loadDic objectForKey:my_loaded_Key] isEqualToString:my_inprogress_string]){
@@ -750,7 +750,7 @@ myTabBarController *myController;
         if([loadBox count] > 0){
             APLLog(@"loadBox not empty: %@", [loadBox description]);
             APLLog(@"loadbox start loading %d messages.",[loadBox count]);
-            for(NSMutableDictionary *unloadedMessage in loadBox){
+            for(NSMutableDictionary *unloadedMessage in [loadBox mutableCopy]){
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     APLLog(@"send notif startLoadingAnimation: %@", [unloadedMessage description]);
@@ -1373,7 +1373,7 @@ myTabBarController *myController;
 
 //---------------------get indexpath of shyft in messages data file-------------------------
 + (NSUInteger)getIndexPathOfShyft:(ShyftMessage *)myShyftToDelete{
-    for(NSMutableDictionary* currentMessage in messagesDataFile){
+    for(NSMutableDictionary* currentMessage in [messagesDataFile mutableCopy]){
         if([currentMessage objectForKey:my_from_id_Key]){
             if([[currentMessage objectForKey:my_from_id_Key] isEqualToString:myShyftToDelete.from_id]){
                 if([currentMessage objectForKey:my_created_at_Key]){

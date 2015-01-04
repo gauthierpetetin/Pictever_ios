@@ -124,7 +124,7 @@ NSString *mytimeStamp;//global
 //--------returns the index of the message in the loadbox---------
 +(NSUInteger)indexOfPhotoID:(NSString *) localPhotoID{
     APLLog(@"search index in loadbox..");
-    for(NSMutableDictionary * mms in loadBox){
+    for(NSMutableDictionary * mms in [loadBox mutableCopy]){
         NSString *photoPublicId3 = [mms objectForKey:my_shyft_id_Key];
         if([localPhotoID isEqualToString:photoPublicId3]){
             APLLog(@"PublicID FOUND: %@",photoPublicId3);
@@ -157,7 +157,7 @@ NSString *mytimeStamp;//global
         lcccReceiverIds = [messageSent objectForKey:my_receiver_ids_send_request_field];
     }
 
-    for(NSMutableDictionary *sendBoxMessage in sendBox){
+    for(NSMutableDictionary *sendBoxMessage in [sendBox mutableCopy]){
         if([sendBoxMessage objectForKey:my_sendbox_key]){
             if([[sendBoxMessage objectForKey:my_sendbox_key] isEqualToString:lcccMessage]){
                 if([sendBoxMessage objectForKey:my_sendbox_recipient]){
@@ -258,8 +258,9 @@ NSString *mytimeStamp;//global
 
 
 +(void)replaceMessage:(NSMutableDictionary *)replacingMessage{
+    APLLog(@"replaceMessage: %@", [replacingMessage description]);//04/01/2015
     NSMutableArray *changeIndexes = [[NSMutableArray alloc] init];
-    for(NSMutableDictionary *loadDic in messagesDataFile){
+    for(NSMutableDictionary *loadDic in [messagesDataFile mutableCopy]){
         if([loadDic objectForKey:my_received_at_Key]){
             if([[loadDic objectForKey:my_received_at_Key] isEqualToString:[replacingMessage objectForKey:my_received_at_Key]]){
                 if([loadDic objectForKey:my_shyft_id_Key]){
@@ -351,7 +352,7 @@ NSString *mytimeStamp;//global
 }
 
 +(void)cleanMessageDataFile{//-----problems occur when saving without this
-    for(NSMutableDictionary *locDic in messagesDataFile){
+    for(NSMutableDictionary *locDic in [messagesDataFile mutableCopy]){
         [locDic removeObjectForKey:@"UIControl"];
         [locDic removeObjectForKey:@"color"];
     }
@@ -442,7 +443,7 @@ NSString *mytimeStamp;//global
     
     NSMutableArray *jsonContactArray = [[NSMutableArray alloc] init];
     
-    for(NSDictionary *contact in importContactsData){
+    for(NSDictionary *contact in [importContactsData mutableCopy]){
         
         if([contact objectForKey:@"phoneNumber1"]){
             if(![[contact objectForKey:@"phoneNumber1"] isEqualToString:@""]){
@@ -648,7 +649,7 @@ NSString *mytimeStamp;//global
         message_received_at_to_check = [messageToCheck objectForKey:my_received_at_Key];
     }
     
-    for(NSMutableDictionary* dataFileMessage in messagesDataFile){
+    for(NSMutableDictionary* dataFileMessage in [messagesDataFile mutableCopy]){
         if([dataFileMessage objectForKey:my_shyft_id_Key]){
             if([[dataFileMessage objectForKey:my_shyft_id_Key] isEqualToString:message_id_to_check]){
                 if([dataFileMessage objectForKey:my_received_at_Key]){

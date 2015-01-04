@@ -139,7 +139,7 @@ bool sendSMS;
 +(void)initImportContactNames{
     importContactsNames = [[NSMutableArray alloc] init];
     if(importContactsData){
-        for(NSMutableDictionary *dicForFullName in importContactsData){
+        for(NSMutableDictionary *dicForFullName in [importContactsData mutableCopy]){
             if([dicForFullName objectForKey:@"fullName"]){
                 [importContactsNames insertObject:[dicForFullName objectForKey:@"fullName"] atIndex:[importContactsNames count]];
             }
@@ -664,7 +664,7 @@ bool sendSMS;
 //----------add photo to one contact------------------------
 +(NSMutableDictionary *)addPhotosToContact2:(NSMutableDictionary *)kContact{
 
-    for(NSMutableDictionary *contact2 in importContactsData){
+    for(NSMutableDictionary *contact2 in [importContactsData mutableCopy]){
         if([[contact2 objectForKey:@"phoneNumber1"] isEqualToString:[kContact objectForKey:@"phoneNumber1"]]){
             if([contact2 objectForKey:@"image"]){
                 return contact2;
@@ -694,7 +694,7 @@ bool sendSMS;
 //----------add photo to one contact------------------------
 +(NSMutableDictionary *)addPhotosToContact:(NSMutableDictionary *)kContact atKey:(NSString *)tKey{
 
-    for(NSMutableDictionary *contact2 in importContactsData){
+    for(NSMutableDictionary *contact2 in [importContactsData mutableCopy]){
 
         if([[contact2 objectForKey:@"phoneNumber1"] isEqualToString:[kContact objectForKey:@"phoneNumber1"]]){
             if([contact2 objectForKey:@"image"]){
