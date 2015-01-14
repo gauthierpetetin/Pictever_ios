@@ -55,7 +55,7 @@ bool zoomOn;//global
     int textViewHeight = screenHeight;
     bigKeoTextView = [[UITextView alloc] initWithFrame:CGRectMake(10, 0.5*screenHeight - 0.5*textViewHeight, screenWidth-20, textViewHeight)];
     bigKeoTextView.textAlignment = NSTextAlignmentCenter;
-    [bigKeoTextView setFont:[UIFont systemFontOfSize:22]];
+    [bigKeoTextView setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:20]];
     bigKeoTextView.textColor = [UIColor whiteColor];
     bigKeoTextView.backgroundColor = [UIColor clearColor];
     bigKeoTextView.editable = NO;
@@ -65,7 +65,6 @@ bool zoomOn;//global
     
     if(_shyftToDetail){
         if(_shyftToDetail.message){
-            
             //------------------if message is a photo---------------------------------
             if([_shyftToDetail.message isEqualToString:@""]){
                 if(_shyftToDetail.uiControl){

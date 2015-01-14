@@ -72,6 +72,9 @@ NSString *const default_image_name = @"image_not_available.png";
 //--------------cropped image height-----------------------------------------------
 const int default_cropped_image_heigth = 300;
 
+//----------------timeline dimensions---------------------------------------------
+const int timeline_marge_width = 10;
+
 
 //----------------saving constants------------------------------------------------
 NSString *const my_status_saving_Key = @"myStatus";
@@ -139,7 +142,9 @@ NSString *const my_prefs_fb_name_key = @"fb_name";
 NSString *const my_prefs_fb_id_key = @"fb_id";
 NSString *const my_prefs_fb_birthday_key = @"fb_birthday";
 NSString *const my_prefs_contacts_data_key = @"importcontactsdata";
-
+NSString *const my_prefs_userid_key = @"myUserID";
+NSString *const my_prefs_numberoffuturemessages_key = @"numberOfMessagesInTheFuture";
+NSString *const my_prefs_mystatus_key = @"myStatus";
 
 
 //-------------------------sendBoxContent------------------------------------------
@@ -152,9 +157,12 @@ NSString *const my_sendbox_path = @"path";
 
 //---------------------------actionsheet titles----------------------------------
 NSString *const my_actionsheet_pick_a_date = @"Pick a date!";
-NSString *const my_actionsheet_wanna_help_us = @"Wanna help us?";
-NSString *const my_actionsheet_you_are_great = @"You're great!";
+NSString *const my_actionsheet_wanna_help_us = @"You like us?";
+NSString *const my_actionsheet_wanna_help_us_french = @"Tu nous aimes bien?";
+NSString *const my_actionsheet_you_are_great = @"You like us a lot?";
+NSString *const my_actionsheet_you_are_great_french = @"Tu nous aimes beaucoup?";
 NSString *const my_actionsheet_want_to_remember = @"Want to remember this message?";
+NSString *const my_actionsheet_want_to_remember_french = @"Envie de te souvenir de ce message?";
 NSString *const my_actionsheet_install_it_now = @"Do you want to install it now?";
 
 

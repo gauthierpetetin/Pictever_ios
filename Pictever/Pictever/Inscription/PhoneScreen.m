@@ -46,8 +46,6 @@ NSString *myFacebookBirthDay;
 
 NSString *adresseIp2;//global
 
-NSString * backgroundImage; //global
-
 bool openingWindow;
 NSString *storyboardName;
 
@@ -64,6 +62,7 @@ CGRect rect;
 UIActivityIndicatorView *phoneSpinner;
 
 UIImageView *flagImageView;
+UIImageView *triangleView;
 UITextField *textFieldCountry;
 UITextField *textFieldPhoneNumber;
 UITextField *textFieldCode;
@@ -71,8 +70,9 @@ UITextField *textFieldCode;
 NSMutableArray *importContactsData; //global
 NSMutableDictionary *importKeoContacts;
 
-UILabel *myWelcomeLabel;
+//UILabel *myWelcomeLabel;
 UILabel *myInformationLabel;
+UILabel *myInformationLabel2;
 UILabel *monLabelPassword1;
 
 
@@ -84,6 +84,7 @@ UIButton *confirmCodeButton;//to confirm phonenumber with sms code (not used now
 
 NSString *phoneNumberToCheck;
 
+NSString *myLocaleString;
 NSString *username;//global
 NSString *hashPassword;//global
 NSString *myCurrentPhoneNumber;//global
@@ -114,15 +115,18 @@ UILabel *blackLabel;
 UILabel *whiteTextLabel;
 UILabel *whiteTextLabel2;
 
-UIColor *theKeoOrangeColor;
+UIColor *theKeoOrangeColor;//global
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
     
-    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FillesTrekEmpty@2x.png"]]];
+    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"RegisterBackground@2x.png"]]];
     
     numberForCountryDictionary = @{
                                        @"Canada"                                       : @"+1",
@@ -408,7 +412,7 @@ UIColor *theKeoOrangeColor;
     [whiteTextLabel removeFromSuperview];
     [whiteTextLabel2 removeFromSuperview];
     
-    [textFieldCountry becomeFirstResponder];
+    [textFieldPhoneNumber becomeFirstResponder];
 }
 
 
@@ -426,6 +430,7 @@ UIColor *theKeoOrangeColor;
     
     whiteTextLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 30, screenWidth-30, 180)];
     whiteTextLabel.textColor = [UIColor whiteColor];
+    whiteTextLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
     whiteTextLabel.numberOfLines = 0;
     whiteTextLabel.lineBreakMode = NSLineBreakByWordWrapping;
     whiteTextLabel.backgroundColor = [UIColor clearColor];
@@ -434,13 +439,12 @@ UIColor *theKeoOrangeColor;
     
     whiteTextLabel2 = [[UILabel alloc] initWithFrame:CGRectMake(15, screenHeight-150, screenWidth-30, 100)];
     whiteTextLabel2.textColor = [UIColor whiteColor];
+    whiteTextLabel2.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
     whiteTextLabel2.numberOfLines = 0;
     whiteTextLabel2.lineBreakMode = NSLineBreakByWordWrapping;
     whiteTextLabel2.backgroundColor = [UIColor clearColor];
     whiteTextLabel2.textAlignment = NSTextAlignmentCenter;
     whiteTextLabel2.text = @"We won't spam or auto-add your friends.";
-    
-    
     
     ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(NULL, NULL);
     
@@ -466,12 +470,12 @@ UIColor *theKeoOrangeColor;
     else if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
         // The user has previously given access, add the contact
         APLLog(@"access to contacts authorized");
-        [textFieldCountry becomeFirstResponder];
+        [textFieldPhoneNumber becomeFirstResponder];
 
     }
     else {
         APLLog(@"accessToContactsDenied");
-        [textFieldCountry becomeFirstResponder];
+        [textFieldPhoneNumber becomeFirstResponder];
         // The user has previously denied access
         // Send an alert telling user to change privacy setting in settings app
     }
@@ -481,6 +485,7 @@ UIColor *theKeoOrangeColor;
     pickerArray = sortedArrayOfCountries;
 
     myPickerView = [[UIPickerView alloc]init];
+    myPickerView.backgroundColor = thePicteverGrayColor;
     myPickerView.dataSource = self;
     myPickerView.delegate = self;
     myPickerView.showsSelectionIndicator = YES;
@@ -528,16 +533,23 @@ numberOfRowsInComponent:(NSInteger)component{
 {
     UILabel *firstLabel = [[UILabel alloc] initWithFrame:CGRectMake(130, 0, screenWidth-130, 32)];
     firstLabel.text = [[allMyCountries objectAtIndex:row] objectForKey:@"country"];
+    firstLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
     firstLabel.textAlignment = NSTextAlignmentLeft;
+    firstLabel.textColor = [UIColor whiteColor];
     firstLabel.backgroundColor = [UIColor clearColor];
     
     UILabel *secondLabel = [[UILabel alloc] initWithFrame:CGRectMake(60, 0, 60, 32)];
     secondLabel.text = [[allMyCountries objectAtIndex:row] objectForKey:@"number"];
+    secondLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
     secondLabel.textAlignment = NSTextAlignmentLeft;
+    secondLabel.textColor = [UIColor whiteColor];
     secondLabel.backgroundColor = [UIColor clearColor];
     
     UIImage *img = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png",[[allMyCountries objectAtIndex:row] objectForKey:@"code"]]];
     UIImageView *icon = [[UIImageView alloc] initWithImage:img];
+    icon.contentMode = UIViewContentModeScaleAspectFit;
+    icon.layer.cornerRadius = 2;
+    icon.layer.masksToBounds = YES;
     //temp.frame = CGRectMake(170, 0, 30, 30);
     icon.frame = CGRectMake(20, 6, 28, 19);
     
@@ -656,18 +668,7 @@ numberOfRowsInComponent:(NSInteger)component{
 //-----------------go back to login screen------------------------------
 
 -(void) backPressed3{
-    username = @"";
-    hashPassword = @"";
-    myFacebookBirthDay = @"";
-    myFacebookID = @"";
-    myFacebookName = @"";
-    [prefs setObject:username forKey:my_prefs_username_key];
-    [prefs setObject:hashPassword forKey:my_prefs_password_key];
-    [prefs setObject:myFacebookBirthDay forKey:my_prefs_fb_birthday_key];
-    [prefs setObject:myFacebookID forKey:my_prefs_fb_id_key];
-    [prefs setObject:myFacebookName forKey:my_prefs_fb_name_key];
-    
-
+    [myGeneralMethods initializeAllAccountVariables];
     [self dismissViewControllerAnimated:YES completion:nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"setUsername" object: nil];
 }
@@ -682,13 +683,15 @@ numberOfRowsInComponent:(NSInteger)component{
     
     
     [backButton3 removeFromSuperview];
-    [myWelcomeLabel removeFromSuperview];
+    //[myWelcomeLabel removeFromSuperview];
     [textFieldCountry removeFromSuperview];
     [textFieldPhoneNumber removeFromSuperview];
     [logInButton removeFromSuperview];
     [phoneSpinner removeFromSuperview];
     [flagImageView removeFromSuperview];
+    [triangleView removeFromSuperview];
     [myInformationLabel removeFromSuperview];
+    [myInformationLabel2 removeFromSuperview];
     
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"hideInfromation" object:nil];
@@ -995,11 +998,11 @@ numberOfRowsInComponent:(NSInteger)component{
 
 
 -(void)initializeControls{
-    yInitial=130;
+    yInitial=160;
     xPassword=190;
-    xUsername=250;
+    xUsername=screenWidth-50;
     yEspace=50;
-    xButton=250;
+    xButton=160;
     yUsername=40;
     
     
@@ -1018,89 +1021,108 @@ numberOfRowsInComponent:(NSInteger)component{
     //----------------------------CREATION OF CONTROLS------------------------------------------------
     
     //--------------creation of label PHONE NUMBER
-    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),50-15,xUsername,60);
+    /*CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),50-15,xUsername,60);
     myWelcomeLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
     [myWelcomeLabel setTextAlignment:NSTextAlignmentCenter];
     //[myWelcomeLabel setFont:[UIFont systemFontOfSize:30]];
     myWelcomeLabel.textColor = theKeoOrangeColor;
     [myWelcomeLabel setFont:[UIFont fontWithName:@"Gabriola" size:42]];
-    myWelcomeLabel.text = @"Phone Number";
+    myWelcomeLabel.text = @"Phone Number";*/
     
     //--------------creation of label information
-    CGRect rectLabInformation = CGRectMake(0.5*screenWidth-(0.5*xUsername),70,xUsername,60);
+    CGRect rectLabInformation = CGRectMake(0.5*screenWidth-(0.5*(xUsername+20)),100,(xUsername+20),60);
     myInformationLabel = [[UILabel alloc] initWithFrame: rectLabInformation];
     [myInformationLabel setTextAlignment:NSTextAlignmentCenter];
-    [myInformationLabel setFont:[UIFont systemFontOfSize:10]];
-    myInformationLabel.textColor = [UIColor darkGrayColor];
+    [myInformationLabel setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
+    myInformationLabel.textColor = [UIColor whiteColor];
     myInformationLabel.numberOfLines = 0;
-    myInformationLabel.lineBreakMode = NSLineBreakByCharWrapping;
-    myInformationLabel.text = @"We need your phone number to find the friends who have you in their adressbook and enable you to communicate with them on Pictever. We will never misuse it.";
+    myInformationLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    myInformationLabel.text = @"Enter your phone number to make it easy for your friends to find you.";
     
     //---------------Creation of country number textField
-    CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,0.20*xUsername,yUsername);
+    CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername);
     textFieldCountry = [[UITextField alloc] initWithFrame:rectTFUsername];
     textFieldCountry.textAlignment = NSTextAlignmentLeft;
-    textFieldCountry.borderStyle = UITextBorderStyleLine;
+    //textFieldCountry.borderStyle = UITextBorderStyleLine;
     textFieldCountry.delegate=self;
-    textFieldCountry.backgroundColor = [UIColor whiteColor];
+    textFieldCountry.backgroundColor = [UIColor clearColor];
     //textFieldCountry.placeholder = @"Ex: 0033";
     [textFieldCountry setFont:[UIFont systemFontOfSize:18]];
     textFieldCountry.keyboardType = UIKeyboardTypeNumberPad;
-    textFieldCountry.borderStyle = UITextBorderStyleRoundedRect;
+    //textFieldCountry.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldCountry.layer.cornerRadius = 4.0f;
+    textFieldCountry.layer.borderWidth = 2.0f;
+    textFieldCountry.layer.borderColor = [UIColor whiteColor].CGColor;
     
-    int xflag = 39;
-    int yflag = 26;
-    flagImageView =[[UIImageView alloc] initWithFrame:CGRectMake(0.5*screenWidth-(0.5*xUsername)+(0.1*xUsername-0.5*xflag),yInitial+0.5*(yUsername-yflag),xflag,yflag)];//55,37
+    int xflag = 31;
+    int yflag = 21;
+    flagImageView =[[UIImageView alloc] initWithFrame:CGRectMake(0.5*screenWidth-(0.5*xUsername)+(0.09*xUsername-0.5*xflag),yInitial+0.5*(yUsername-yflag),xflag,yflag)];//55,37
     flagImageView.clipsToBounds = YES;
     flagImageView.layer.cornerRadius = 4;
+    flagImageView.contentMode = UIViewContentModeScaleAspectFit;
     flagImageView.image = [UIImage imageNamed:@"us.png"];
     
+    int xtriangle = 17;
+    int ytriangle = 17;
+    triangleView =[[UIImageView alloc] initWithFrame:CGRectMake(flagImageView.frame.origin.x+flagImageView.frame.size.width+5,flagImageView.frame.origin.y+0.5*(flagImageView.frame.size.height-ytriangle),xtriangle,ytriangle)];//55,37
+    triangleView.contentMode=UIViewContentModeScaleAspectFit;
+    triangleView.image = [UIImage imageNamed:@"triangle.png"];
+    
     //-----------------Creation of phone number textField
-    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername)+0.20*xUsername,yInitial,0.8*xUsername,yUsername);
+    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername)+0.28*xUsername,yInitial,0.72*xUsername,yUsername);
     textFieldPhoneNumber = [[UITextField alloc] initWithFrame:rectTFPassword1];
     textFieldPhoneNumber.textAlignment = NSTextAlignmentLeft;
-    textFieldPhoneNumber.borderStyle = UITextBorderStyleLine;
+    //textFieldPhoneNumber.borderStyle = UITextBorderStyleLine;
     textFieldPhoneNumber.delegate=self;
-    textFieldPhoneNumber.backgroundColor = [UIColor whiteColor];
-    textFieldPhoneNumber.placeholder = @"please enter your phone";
-    [textFieldCountry setFont:[UIFont systemFontOfSize:18]];
-    textFieldPhoneNumber.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldPhoneNumber.backgroundColor = [UIColor clearColor];
+    textFieldPhoneNumber.placeholder = @"enter your phone num";
+    //textFieldPhoneNumber.borderStyle = UITextBorderStyleRoundedRect;
     textFieldPhoneNumber.keyboardType = UIKeyboardTypeNumberPad;
+    textFieldPhoneNumber.layer.cornerRadius = 4;
+    textFieldPhoneNumber.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
+    textFieldPhoneNumber.textColor = [UIColor whiteColor];
     
     
     //-----------------Creation of "Confirm number" button
     logInButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    logInButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+20,xButton,yUsername);
-    logInButton.backgroundColor = [UIColor whiteColor];
-    logInButton.layer.cornerRadius = 10;
+    logInButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+10,xButton,yUsername-10);
+    logInButton.backgroundColor = thePicteverYellowColor;
+    logInButton.layer.cornerRadius = 4;
     logInButton.clipsToBounds = YES;
-    [logInButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [logInButton setTitle:@"Start Pictever!" forState:UIControlStateNormal];
-    [logInButton.titleLabel setFont:[UIFont fontWithName:@"System-Bold" size:15]];
-    [[logInButton layer] setBorderWidth:1.0f];
+    [logInButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [logInButton setTitle:@"Start" forState:UIControlStateNormal];
+    [logInButton.titleLabel setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
     [logInButton addTarget:self
                     action:@selector(myActionLogIn:)
           forControlEvents:UIControlEventTouchUpInside];
     
     
-    
     phoneSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    phoneSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+20);
-    phoneSpinner.color = [UIColor blackColor];
+    phoneSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton+15,yInitial+yUsername+10+0.5*(yUsername-10));
+    phoneSpinner.color = [UIColor whiteColor];
     phoneSpinner.hidesWhenStopped = YES;
+    
+    //--------------creation of label information 2
+    CGRect rectLabInformation2 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+2*yUsername-15,xUsername,60);
+    myInformationLabel2 = [[UILabel alloc] initWithFrame: rectLabInformation2];
+    [myInformationLabel2 setTextAlignment:NSTextAlignmentCenter];
+    [myInformationLabel2 setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:12]];
+    myInformationLabel2.textColor = [UIColor whiteColor];
+    myInformationLabel2.numberOfLines = 0;
+    myInformationLabel2.lineBreakMode = NSLineBreakByCharWrapping;
+    myInformationLabel2.text = @"(We will never misuse it)";
     
     
     //-------------------Creation of back button
     backButton3 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     backButton3.frame = CGRectMake(5,screenHeight-45,70,30);
-    backButton3.backgroundColor = [UIColor clearColor];
     [backButton3 setTitle:@"Back" forState:UIControlStateNormal];
     [backButton3 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [backButton3.titleLabel setFont:[UIFont systemFontOfSize:18]];
-    backButton3.backgroundColor = [UIColor blackColor];
-    backButton3.layer.cornerRadius = 8;
+    [backButton3.titleLabel setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
+    backButton3.backgroundColor = thePicteverGreenColor;
+    backButton3.layer.cornerRadius = 4;
     backButton3.clipsToBounds = YES;
-    backButton3.alpha = 0.61;
+    backButton3.alpha = 1;
     [backButton3 addTarget:self
                     action:@selector(backPressed3)
           forControlEvents:UIControlEventTouchUpInside];
@@ -1108,13 +1130,19 @@ numberOfRowsInComponent:(NSInteger)component{
     
     //----------------show subviews
     [self.view addSubview: backButton3];
-    [self.view addSubview: myWelcomeLabel];
+    //[self.view addSubview: myWelcomeLabel];
     [self.view addSubview: textFieldCountry];
     [self.view addSubview: textFieldPhoneNumber];
     [self.view addSubview: logInButton];
     [self.view addSubview:phoneSpinner];
     [self.view addSubview:flagImageView];
+    [self.view addSubview:triangleView];
     [self.view addSubview:myInformationLabel];
+    [self.view addSubview:myInformationLabel2];
+}
+
+- (BOOL)prefersStatusBarHidden {
+    return YES;
 }
 
 @end

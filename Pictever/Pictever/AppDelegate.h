@@ -48,6 +48,7 @@ extern ShyftSet *myShyftSet;
 
 extern NSUserDefaults *prefs;
 
+extern NSString *myLocaleString;
 extern NSString *myAppVersion;
 
 extern NSString *myFacebookName;
@@ -126,6 +127,10 @@ extern bool showDatePicker;//global
 
 extern UIColor *theBackgroundColor;//global
 extern UIColor *theKeoOrangeColor;//global
+extern UIColor *thePicteverGreenColor;//global
+extern UIColor *thePicteverYellowColor;//global
+extern UIColor *thePicteverRedColor;//global
+extern UIColor *thePicteverGrayColor;//global
 
 extern NSMutableArray *localKeoContacts;//global
 

@@ -36,15 +36,22 @@
 
 @interface KeoMessages : UITableViewController <UIAlertViewDelegate>
 
+@property (strong, nonatomic) IBOutlet UILabel *backgroundLoadingLabel;
 @property (strong, nonatomic) IBOutlet UILabel *loadingLabel;
 @property (nonatomic, retain) UIActivityIndicatorView *spinnerTop;
 
 @property (strong, nonatomic) IBOutlet UILabel * loadTbvLabel;
 @property (nonatomic, retain) UIActivityIndicatorView *loadTbvSpinner;
 
+- (IBAction)detailPressed:(id)sender;
+
+- (IBAction)imagePressed:(id)sender;
+
 -(void)loadUnloadImages;
 
 - (IBAction)settingsPressed:(id)sender;
+- (IBAction)cameraPressed:(id)sender;
+
 
 -(void)reloadTheWholeTableViewFirstTime;
 
@@ -56,14 +63,15 @@
 
 +(void)switchElements: (NSMutableArray *)myArray index1: (int) firstint index2: (int) secondint;//new
 
-
 + (UIImage*) addImage:(UIImage*)smallImage atPoint:(CGPoint)originPoint onImage:(UIImage*)backgroundImg;
 
 + (UIImage*) fillImgOfSize:(CGSize)img_size withColor:(UIColor*)img_color;
 
 +(UIImage*) drawText2:(NSString*) text inImage:(UIImage*)image inRect:(CGRect)rect withFont:(UIFont *)font withColor:(UIColor*)textColor;
 
-+ (UIImage*) prepareImageForExport:(UIImage *)imageForExport withLabel:(NSString*)labelForExport;
++(UIImage*)prepareImageForExport:(ShyftMessage *)thePictToShare;
+
++ (UIImage*) addPicteverBrandOnImage:(UIImage *)imageForExport;
 
 -(void)vibrateForNewShyft:(NSMutableDictionary *)newPhotoMessage;
 

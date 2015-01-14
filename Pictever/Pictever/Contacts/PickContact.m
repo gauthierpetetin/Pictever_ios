@@ -38,12 +38,12 @@ NSInteger uploadLocalErrorCode;//error code response to the request
 bool firstContactOpening;//global
 bool showDatePicker;//global
 
+NSString *myLocaleString;
 NSString *username;//global
 NSString *hashPassword;//global
 NSString *myStatus;//global
 
 int openingWindow; // glogal
-NSString * backgroundImage; //global
 NSString *adresseIp2;//global
 
 //size if the screen
@@ -80,8 +80,29 @@ UIColor *theBackgroundColor;//global
 UIColor *theKeoOrangeColor;//global
 UIColor *lightGrayColor;
 
+NSString *sendToTimeStamp;//timestamp selected by the user in case the send choice is "calendar"
+
+
+//////////////Request names ////////////////////
+NSString *downloadPhotoRequestName;//global
+////////////////////////////////////////////////
+
+
+///load contacts//
+bool loadAllcontacts;//to be sure all the contacts are loaded before to continue
+
+/////////colors used/////////////
+UIColor *theBackgroundColor;//global
+UIColor *theBackgroundColorDarker;//global
+UIColor *theKeoOrangeColor;//global
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
 
 bool sendSMS;
+
+bool contactAlreadyInformed;
 
 
 - (void)awakeFromNib
@@ -94,6 +115,39 @@ bool sendSMS;
     
     [super viewDidLoad];
     // If the app just opened, we switch directly to the chat view
+    
+    //--------------navigation bar color (code couleur transformé du orangekeo sur
+    //http://htmlpreview.github.io/?https://github.com/tparry/Miscellaneous/blob/master/UINavigationBar_UIColor_calculator.html)
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:244/255.0f green:58/255.0f blue:0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barStyle=UIStatusBarStyleLightContent;
+    [self setNeedsStatusBarAppearanceUpdate];//status bar text color
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                     [[UIColor whiteColor] colorWithAlphaComponent:1.0],
+                                                                     NSForegroundColorAttributeName,
+                                                                     [UIFont fontWithName:@"GothamRounded-Bold" size:18.0],
+                                                                     NSFontAttributeName,
+                                                                     nil]
+     ];
+    
+    
+    
+    //----------------confirm and cancel buttons---------------------------------- 
+    UIBarButtonItem *confirmItem = [[UIBarButtonItem alloc] initWithTitle:@"Confirm" style:UIBarButtonItemStylePlain target:self action:@selector(confirmPressed:)];
+    UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:self action:@selector(cancelPressed:)];
+    
+    self.navigationItem.rightBarButtonItem = confirmItem;
+    self.navigationItem.leftBarButtonItem = cancelItem;
+    
+    NSDictionary *barButtonAppearanceDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [[UIColor whiteColor] colorWithAlphaComponent:1.0],
+                                             NSForegroundColorAttributeName,
+                                             [UIFont fontWithName:@"GothamRounded-Light" size:16.0],
+                                             NSFontAttributeName,
+                                             nil];
+    
+    [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
+     setTitleTextAttributes:barButtonAppearanceDict forState:UIControlStateNormal];
+    
 
     
     //create sections with alphabetical order
@@ -116,6 +170,8 @@ bool sendSMS;
     
     self.tableView.backgroundColor = [UIColor clearColor];
     self.parentViewController.view.backgroundColor = theBackgroundColor;
+    
+    contactAlreadyInformed = false;
     
     APLLog(@"myContacts-viewdidload-end");
 }
@@ -355,6 +411,22 @@ bool sendSMS;
         if([contactInfoDict2 objectForKey:@"phoneNumber1"]){
             NSString *pCont = [NSString stringWithFormat:@"num%@",[contactInfoDict2 objectForKey:@"phoneNumber1"]];
             if(![selectedContactArray containsObject:sendToName2]){
+                
+                if(!contactAlreadyInformed){
+                    NSString *title3 = @"This contact is not on Pictever";
+                    NSString *message3 = @"You can send him a message but he will have to download Pictever to receive your message!";
+                    if([myLocaleString isEqualToString:@"FR"]){
+                        title3 = @"Ce contact n'a pas Pictever";
+                        message3 = @"Tu peux lui envoyer un message mais il devra télécharger Pictever pour recevoir ton message!";
+                    }
+                    UIAlertView *alert3 = [[UIAlertView alloc]
+                                           initWithTitle:title3
+                                           message:message3 delegate:self
+                                           cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert3 show];
+                    contactAlreadyInformed = true;
+                }
+                
                 [sendToMailCopy addObject:pCont];
                 [selectedContactArray addObject:sendToName2];
             }
@@ -445,7 +517,7 @@ bool sendSMS;
                 [replacementContact2 setObject:[photoContact objectForKey:@"image"] forKey:@"image"];
             }
             else{
-                [replacementContact2 setObject:[UIImage imageNamed:@"NoPhoto.png"] forKey:@"image"];
+                [replacementContact2 setObject:[UIImage imageNamed:@"unknown_small.png"] forKey:@"image"];
             }
             
             [importContactsData replaceObjectAtIndex:[myString intValue] withObject:replacementContact2];
@@ -474,11 +546,13 @@ bool sendSMS;
     
     UILabel *myName;
     myName = (UILabel *)[cell viewWithTag:1];
+    myName.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
     
     UILabel *keoLabel;
     keoLabel = (UILabel *)[cell viewWithTag:2];
     keoLabel.lineBreakMode = NSLineBreakByWordWrapping;
     keoLabel.numberOfLines = 0;
+    keoLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:12];
     
     UIImageView *selectPic;
     selectPic = (UIImageView *)[cell viewWithTag:3];
@@ -490,9 +564,10 @@ bool sendSMS;
     [profilePic setImage:nil];
     profilePic.contentMode = UIViewContentModeScaleAspectFill;
     profilePic.clipsToBounds = YES;
-    profilePic.layer.cornerRadius = profilePic.frame.size.width / 2;
+    profilePic.layer.cornerRadius = 3;
     profilePic.layer.masksToBounds = YES;
-    profilePic.image = [UIImage imageNamed:@"NoPhoto.png"];
+    profilePic.backgroundColor = thePicteverGrayColor;
+    profilePic.image = [UIImage imageNamed:@"unknown_small.png"];
 
     NSArray *sectionArray;
     NSMutableDictionary *contactInfoDict;
@@ -518,7 +593,7 @@ bool sendSMS;
             profilePic.image = [contactInfoDict objectForKey:@"image"];
         }
         else{
-            profilePic.image = [UIImage imageNamed:@"NoPhoto.png"];
+            profilePic.image = [UIImage imageNamed:@"unknown_small.png"];
         }
     }
     NSString *myFullName = @"";
@@ -538,6 +613,14 @@ bool sendSMS;
     else{
         if([contactInfoDict objectForKey:@"email"]){
             myName.text = [contactInfoDict objectForKey:@"email"];
+        }
+    }
+    
+    
+    //------------traduction-------
+    if([myLocaleString isEqualToString:@"FR"]){
+        if([[myName.text stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@"Myself"]){
+            myName.text = @"Moi";
         }
     }
 
@@ -685,7 +768,7 @@ bool sendSMS;
             [importKeoPhotosLocal setObject:[contWithPhoto objectForKey:@"image"] forKey:sKey];
         }
         if([[contWithPhoto objectForKey:@"phoneNumber1"] isEqualToString:myCurrentPhoneNumber]){
-            [importKeoPhotosLocal setObject:[UIImage imageNamed:@"my_keo_image.png"] forKey:sKey];
+            [importKeoPhotosLocal setObject:[UIImage imageNamed:@"myself_small.png"] forKey:sKey];
         }
     }
     return importKeoPhotosLocal;

@@ -42,6 +42,7 @@ NSString *mytimeStamp;
 NSString *numberOfMessagesInTheFuture;
 NSString *myDeviceToken;
 NSString *myAppVersion;
+NSString *myLocaleString;
 
 NSUserDefaults *prefs;
 
@@ -160,10 +161,15 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     if(![myStatus isEqualToString:previousStatus]){
         [PickContact updateMyStatus];
         NSString *prMessage = [NSString stringWithFormat:@"You are now a %@!",myStatus];
+        NSString *titleStatus = @"New Status";
+        if ([myLocaleString isEqualToString:@"FR"]) {
+            prMessage = [NSString stringWithFormat:@"Tu es maintenant un %@!",myStatus];
+            titleStatus = @"Nouveau statut";
+        }
         if(![previousStatus isEqualToString:@""]){
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
-                                      initWithTitle:@"New Status"
+                                      initWithTitle:titleStatus
                                       message:prMessage delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
@@ -1203,12 +1209,14 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             if(![mymyForceBooleanAsString isEqualToString:@"true"]){
                 
                 NSString *versionAlertTitle = [NSString stringWithFormat:@"Pictever version %@ is available!",mymyAppVersionAsString];
+                NSString *titleCancel = @"Cancel";
+                NSString *titleInstall = @"Install";
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     UIAlertView *versionAlert = [[UIAlertView alloc]
                                                  initWithTitle:versionAlertTitle
                                                  message:my_actionsheet_install_it_now delegate:sender
-                                                 cancelButtonTitle:@"Cancel" otherButtonTitles:@"Install",nil];
+                                                 cancelButtonTitle:titleCancel otherButtonTitles:titleInstall,nil];
                     [versionAlert show];
                 });
                 
@@ -1332,28 +1340,54 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     if(sendTipCounter < 6){
         if (sendTipCounter == 1) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *title5 = @"Congrats, your message is sent!!";
+                NSString *alertMessage5 = @"Little tip: you can send a message to anybody in your adress book ;)";
+                if([myLocaleString isEqualToString:@"FR"]){
+                    title5 = @"Félicitations, tu as envoyé ton premier message!";
+                    alertMessage5 = @"Petite astuce: tu peux envoyer des messages à n'importe qui dans ton carnet d'adresse;)";
+                }
                 UIAlertView *alert = [[UIAlertView alloc]
-                                      initWithTitle:@"Congrats, your message is sent!!"
-                                      message:@"Little tip: you can send a message to anybody in your adress book ;)" delegate:sender
+                                      initWithTitle:title5
+                                      message:alertMessage5 delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
         }
         else if (sendTipCounter == 3) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *title5 = my_actionsheet_wanna_help_us;
+                NSString *alertMessage5 = @"Please like us or leave a comment on the AppStore!";
+                NSString *answerCancel = @"No, thanks";
+                NSString *yesAnswer = @"Yes I like Pictever :)";
+                if([myLocaleString isEqualToString:@"FR"]){
+                    title5 = my_actionsheet_wanna_help_us_french;
+                    alertMessage5 = @"Laisse nous un petit commentaire sur l'AppStore!";
+                    answerCancel = @"Non, merci";
+                    yesAnswer = @"Oui j'aime Pictever :)";
+                }
                 UIAlertView *alert = [[UIAlertView alloc]
-                                      initWithTitle:my_actionsheet_wanna_help_us
-                                      message:@"Please like us or leave a comment on the AppStore!" delegate:sender
-                                      cancelButtonTitle:@"No, thanks" otherButtonTitles:@"Yes I like Pictever :)",nil];
+                                      initWithTitle:title5
+                                      message:alertMessage5 delegate:sender
+                                      cancelButtonTitle:answerCancel otherButtonTitles:yesAnswer,nil];
                 [alert show];
             });
         }
         else if (sendTipCounter == 5){
             dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *title5 = my_actionsheet_you_are_great;
+                NSString *alertMessage5 = @"Please like Pictever on facebook!";
+                NSString *answerCancel = @"No, thanks";
+                NSString *yesAnswer = @"Yes I want to join the community!";
+                if([myLocaleString isEqualToString:@"FR"]){
+                    title5 = my_actionsheet_you_are_great_french;
+                    alertMessage5 = @"Viens liker notre page facebook!";
+                    answerCancel = @"Non, merci";
+                    yesAnswer = @"Oui je veux rejoindre la communauté!";
+                }
                 UIAlertView *alert = [[UIAlertView alloc]
-                                      initWithTitle:my_actionsheet_you_are_great
-                                      message:@"Please like Pictever on facebook!" delegate:sender
-                                      cancelButtonTitle:@"No, thanks" otherButtonTitles:@"Yes I want to join the community!",nil];
+                                      initWithTitle:title5
+                                      message:alertMessage5 delegate:sender
+                                      cancelButtonTitle:answerCancel otherButtonTitles:yesAnswer,nil];
                 [alert show];
             });
         }
@@ -1379,10 +1413,16 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     if(receiveTipCounter < 5){
         if (receiveTipCounter == 1 || receiveTipCounter == 4) {
             APLLog(@"RESEND TIP");
+            NSString *title6 = @"You just received a message in your timeline!";
+            NSString *alertMessage6 = @"Little tip: if you like a message you receive, press the orange button to resend it, so you can be surprised again!";
+            if([myLocaleString isEqualToString:@"FR"]){
+                title6 = @"Tu viens de recevoir un message dans ta timeline!";
+                alertMessage6 = @"Petite astuce: si un message que tu recois te plait, presse le bouton orange pour le renvoyer dans le futur, afin d'avoir à nouveau la surprise dans quelques temps!";
+            }
             dispatch_async(dispatch_get_main_queue(), ^{
                 UIAlertView *alert = [[UIAlertView alloc]
-                                      initWithTitle:@"You just received a message in your timeline!"
-                                      message:@"Little tip: if you like a message you receive, press the orange button to resend it, so you can be surprised again!" delegate:sender
+                                      initWithTitle:title6
+                                      message:alertMessage6 delegate:sender
                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });

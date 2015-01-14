@@ -63,7 +63,7 @@
     return setDescription;
 }
 
--(NSUInteger) size{
+-(NSUInteger)size{
     return [_shyftsForTableView count];
 }
 

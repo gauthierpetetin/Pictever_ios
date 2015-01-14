@@ -22,6 +22,9 @@
 @property (weak, nonatomic) IBOutlet UIImageView *userProfileImageView;
 @property (weak, nonatomic) IBOutlet UIButton *resendButton;
 @property (weak, nonatomic) IBOutlet UIButton *fbButton;
+@property (weak, nonatomic) IBOutlet UIButton *downloadButton;
+@property (weak, nonatomic) IBOutlet UIButton *imageButton;
+@property (weak, nonatomic) IBOutlet UIButton *detailButton;
 
 @property (weak, nonatomic) IBOutlet UILabel *messageLabel;
 /*@property (weak, nonatomic) IBOutlet UILabel *messageLabelBis;

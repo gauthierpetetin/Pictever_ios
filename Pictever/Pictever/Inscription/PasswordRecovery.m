@@ -28,7 +28,6 @@
 
 bool firstUseEver;
 
-NSString *backgroundImage; //global
 
 bool openingWindow;
 NSString *storyboardName;
@@ -64,6 +63,7 @@ NSString *myCurrentPhoneNumber;//global
 
 bool logIn;//global
 
+NSString *myLocaleString;
 NSString *password;
 NSString *password1;
 NSString *reponseLogIn;
@@ -82,6 +82,12 @@ int yEspace;
 int elevation;
 int xUsernameTitle;
 
+UIColor *theKeoOrangeColor;//global
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
+
 UIActivityIndicatorView *confirmCodeSpinner;
 
 @implementation PasswordRecovery
@@ -90,7 +96,7 @@ UIActivityIndicatorView *confirmCodeSpinner;
 -(void)viewDidLoad{
     [super viewDidLoad];
     
-    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    self.view.backgroundColor = theKeoOrangeColor;
     
     
     [self initControls2];
@@ -144,36 +150,44 @@ UIActivityIndicatorView *confirmCodeSpinner;
 - (IBAction)myActionConfirmCode:(id)sender {
     NSString *confirmationCode = @"";
     if([textFieldConfirmationCode.text isEqualToString:@""]){
+        NSString *title5 = @"Error";
+        NSString *message5 = @"Please enter your confirmation code first!";
         UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:@"Error"
-                              message:@"Please enter your confirmation code first!" delegate:self
+                              initWithTitle:title5
+                              message:message5 delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
         textFieldResetPassword1.text=@"";
         textFieldResetPassword2.text=@"";
     }
     else if ([textFieldResetPassword1.text isEqualToString:@""]){
+        NSString *title5 = @"Error";
+        NSString *message5 = @"Please enter your password first!";
         UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:@"Error"
-                              message:@"Please enter your password first!" delegate:self
+                              initWithTitle:title5
+                              message:message5 delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
         textFieldResetPassword1.text=@"";
         textFieldResetPassword2.text=@"";
     }
     else if (![textFieldResetPassword1.text isEqualToString:textFieldResetPassword2.text]){
+        NSString *title5 = @"Error";
+        NSString *message5 = @"The two passwords are different!";
         UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:@"Error"
-                              message:@"The two passwords are different!" delegate:self
+                              initWithTitle:title5
+                              message:message5 delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
         textFieldResetPassword1.text=@"";
         textFieldResetPassword2.text=@"";
     }
     else if ([textFieldResetPassword1.text length] < 6){
+        NSString *title5 = @"Error";
+        NSString *message5 = @"Please enter a password with at least 6 characters";
         UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle:@"Error"
-                              message:@"Please enter a password with at least 6 characters" delegate:self
+                              initWithTitle:title5
+                              message:message5 delegate:self
                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert show];
         textFieldResetPassword1.text=@"";
@@ -305,13 +319,13 @@ UIActivityIndicatorView *confirmCodeSpinner;
 //-------------initialization of all labels and buttons---------------------
 
 -(void)initControls2{
-    yInitial=110;
+    yInitial=80;
     xPassword=190;
-    xUsername=250;
+    xUsername=screenWidth-40;
     xUsernameTitle=300;
     yEspace=50;
     //xButton=100;
-    xButton=250;
+    xButton=170;
     yUsername=30;
     
     //------------Create tap gesture recognizer
@@ -321,12 +335,14 @@ UIActivityIndicatorView *confirmCodeSpinner;
     
     
     //---------------creation of label confirmation code
-    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsernameTitle),40,xUsernameTitle,60);
+    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsernameTitle),20,xUsernameTitle,60);
     myResetInfoLabel = [[UILabel alloc] initWithFrame: rectLabUsername];
     [myResetInfoLabel setTextAlignment:NSTextAlignmentCenter];
     [myResetInfoLabel setFont:[UIFont systemFontOfSize:16]];
     myResetInfoLabel.lineBreakMode = NSLineBreakByWordWrapping;
     myResetInfoLabel.numberOfLines = 0;
+    myResetInfoLabel.textColor = [UIColor whiteColor];
+    myResetInfoLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
     myResetInfoLabel.text = @"You will receive a verification code per email";
     
     //---------------Création du textField confirmation code
@@ -335,44 +351,58 @@ UIActivityIndicatorView *confirmCodeSpinner;
     textFieldConfirmationCode.textAlignment = NSTextAlignmentCenter;
     textFieldConfirmationCode.borderStyle = UITextBorderStyleLine;
     textFieldConfirmationCode.delegate=self;
-    textFieldConfirmationCode.backgroundColor = [UIColor whiteColor];
+    textFieldConfirmationCode.backgroundColor = [UIColor clearColor];
     textFieldConfirmationCode.placeholder = @"Enter your verification code";
     textFieldConfirmationCode.autocapitalizationType = UITextAutocapitalizationTypeNone;
     textFieldConfirmationCode.borderStyle = UITextBorderStyleRoundedRect;
+    textFieldConfirmationCode.layer.borderWidth = 2;
+    textFieldConfirmationCode.layer.borderColor = [UIColor whiteColor].CGColor;
+    textFieldConfirmationCode.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
+    textFieldConfirmationCode.layer.cornerRadius = 4;
+    textFieldConfirmationCode.textColor = [UIColor whiteColor];
     
     //----------------Creation of textField Password1
-    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername,xUsername,yUsername);; // Définition d'un rectangle
+    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername+10,xUsername,yUsername);; // Définition d'un rectangle
     textFieldResetPassword1 = [[UITextField alloc] initWithFrame:rectTFPassword1];
     textFieldResetPassword1.textAlignment = NSTextAlignmentCenter;
     textFieldResetPassword1.borderStyle = UITextBorderStyleLine;
     textFieldResetPassword1.delegate=self;
-    textFieldResetPassword1.backgroundColor = [UIColor whiteColor];
+    textFieldResetPassword1.backgroundColor = [UIColor clearColor];
     textFieldResetPassword1.placeholder = @"Enter a new password";
     textFieldResetPassword1.borderStyle = UITextBorderStyleRoundedRect;
     textFieldResetPassword1.secureTextEntry = YES;
+    textFieldResetPassword1.layer.borderWidth = 2;
+    textFieldResetPassword1.layer.borderColor = [UIColor whiteColor].CGColor;
+    textFieldResetPassword1.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
+    textFieldResetPassword1.layer.cornerRadius = 4;
+    textFieldResetPassword1.textColor = [UIColor whiteColor];
     
     //------------Creation of textField Password2
-    CGRect rectTFPassword2 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername+yUsername,xUsername,yUsername);; // Définition d'un rectangle
+    CGRect rectTFPassword2 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+2*yUsername+20,xUsername,yUsername);; // Définition d'un rectangle
     textFieldResetPassword2 = [[UITextField alloc] initWithFrame:rectTFPassword2];
     textFieldResetPassword2.textAlignment = NSTextAlignmentCenter;
     textFieldResetPassword2.borderStyle = UITextBorderStyleLine;
     textFieldResetPassword2.delegate=self;
-    textFieldResetPassword2.backgroundColor = [UIColor whiteColor];
+    textFieldResetPassword2.backgroundColor = [UIColor clearColor];
     textFieldResetPassword2.placeholder = @"Re-Enter your new password";
     textFieldResetPassword2.borderStyle = UITextBorderStyleRoundedRect;
     textFieldResetPassword2.secureTextEntry = YES;
+    textFieldResetPassword2.layer.borderWidth = 2;
+    textFieldResetPassword2.layer.borderColor = [UIColor whiteColor].CGColor;
+    textFieldResetPassword2.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
+    textFieldResetPassword2.layer.cornerRadius = 4;
+    textFieldResetPassword2.textColor = [UIColor whiteColor];
     
     
     //------------Creation of confirm code button
     confirmCodeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    confirmCodeButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+2*yUsername+20,xButton,yUsername);
-    confirmCodeButton.backgroundColor = [UIColor whiteColor];
-    [confirmCodeButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    confirmCodeButton.layer.cornerRadius = 10; // arrondir les
+    confirmCodeButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+3*yUsername+30,xButton,yUsername);
+    confirmCodeButton.backgroundColor = thePicteverYellowColor;
+    [confirmCodeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    confirmCodeButton.layer.cornerRadius = 4; // arrondir les
     confirmCodeButton.clipsToBounds = YES;     // angles du bouton
     [confirmCodeButton setTitle:@"Reset password" forState:UIControlStateNormal];
-    [confirmCodeButton.titleLabel setFont:[UIFont fontWithName:@"System-Bold" size:15]];
-    [[confirmCodeButton layer] setBorderWidth:1.0f];
+    [confirmCodeButton.titleLabel setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
     [confirmCodeButton addTarget:self
                      action:@selector(myActionConfirmCode:)
            forControlEvents:UIControlEventTouchUpInside];
@@ -381,10 +411,11 @@ UIActivityIndicatorView *confirmCodeSpinner;
     //---------Creation of back button
     backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     backButton.frame = CGRectMake(5,screenHeight-45,70,30);
-    backButton.backgroundColor = [UIColor clearColor];
+    backButton.backgroundColor = thePicteverGreenColor;
     [backButton setTitle:@"Back" forState:UIControlStateNormal];
-    [backButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [backButton.titleLabel setFont:[UIFont systemFontOfSize:18]];
+    [backButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [backButton.titleLabel setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
+    backButton.layer.cornerRadius = 4;
     [backButton addTarget:self
                    action:@selector(backPressed3)
          forControlEvents:UIControlEventTouchUpInside];
@@ -392,7 +423,7 @@ UIActivityIndicatorView *confirmCodeSpinner;
     //-----------------Creation of register spinner---------
     confirmCodeSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     confirmCodeSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton-25,yInitial+yUsername+0.5*yUsername+80);
-    confirmCodeSpinner.color = [UIColor blackColor];
+    confirmCodeSpinner.color = [UIColor whiteColor];
     confirmCodeSpinner.hidesWhenStopped = YES;
     
     [self.view addSubview: backButton];
@@ -411,5 +442,10 @@ UIActivityIndicatorView *confirmCodeSpinner;
 -(void) backPressed3{
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+- (BOOL)prefersStatusBarHidden {
+    return YES;
+}
+
 
 @end

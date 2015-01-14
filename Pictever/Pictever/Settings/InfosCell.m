@@ -10,6 +10,7 @@
 
 @implementation InfosCell
 
+NSString *myLocaleString;
 NSString *username;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
@@ -18,9 +19,13 @@ NSString *username;
     if (self) {
         // Initialization code
         _titleLabel.text = @"My Infos";
-        _emailTitleLabel.text = @"Email adress";
+        _emailTitleLabel.text = @"Email address";
         _phoneTitleLabel.text = @"Phone Number";
-        _infosImgv.image = [UIImage imageNamed:@"bulle_info.png"];
+        if([myLocaleString isEqualToString:@"FR"]){
+            _titleLabel.text = @"Mes Infos";
+            _emailTitleLabel.text = @"Adresse mail";
+            _phoneTitleLabel.text = @"Téléphone";
+        }
     }
     return self;
 }

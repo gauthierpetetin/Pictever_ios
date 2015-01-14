@@ -27,8 +27,6 @@
 
 bool firstUseEver;
 
-NSString * backgroundImage; //global
-
 bool openingWindow;
 NSString *storyboardName;
 
@@ -50,12 +48,13 @@ UITextField *textFieldUsernameSignUp;
 UITextField *textFieldPassword1SignUp;
 
 
-UILabel *myWelcomeLabelSignUp;
+//UILabel *myWelcomeLabelSignUp;
 UILabel *monLabelPassword1;
 
 UIButton *backButton;
 UIButton *signUpButton;
 
+NSString *myLocaleString;
 NSString *username;//global
 NSString *hashPassword;//global
 NSString *myCurrentPhoneNumber;//global
@@ -70,6 +69,10 @@ NSString *myDeviceToken;
 bool *connectionDidFinishLoadingOver;
 
 UIColor *theKeoOrangeColor;
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
 
 int height;
 int yInitial;
@@ -87,8 +90,7 @@ UIActivityIndicatorView *registerSpinner;
 {
     [super viewDidLoad];
 
-    //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
-    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FillesTrekEmpty@2x.png"]]];
+    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"RegisterBackground@2x.png"]]];
     //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"GarconMontagneEmpty@2x.png"]]];
     
     logIn = false;
@@ -340,9 +342,7 @@ UIActivityIndicatorView *registerSpinner;
 //-------------back to welcome screen pressed--------------
 
 -(void) backPressed{
-    /*UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
-    UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"WelcomeScreen"];
-    [self presentViewController:vc animated:NO completion:nil];*/
+    [myGeneralMethods initializeAllAccountVariables];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -350,13 +350,13 @@ UIActivityIndicatorView *registerSpinner;
 //-------------initialization of all labels and buttons---------------------
 
 -(void)initControls{
-    yInitial=110;
+    yInitial=130;
     xPassword=190;
-    xUsername=250;
+    xUsername=screenWidth-40;
     xUsernameTitle=300;
     yEspace=50;
     //xButton=100;
-    xButton=90;
+    xButton=140;
     yUsername=30;
     
     //------------Create tap gesture recognizer
@@ -366,13 +366,13 @@ UIActivityIndicatorView *registerSpinner;
     
     
     //---------------creation of label Pictever
-    CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsernameTitle),40,xUsernameTitle,60);
+    /*CGRect rectLabUsername = CGRectMake(0.5*screenWidth-(0.5*xUsernameTitle),40,xUsernameTitle,60);
     myWelcomeLabelSignUp = [[UILabel alloc] initWithFrame: rectLabUsername];
     [myWelcomeLabelSignUp setTextAlignment:NSTextAlignmentCenter];
     [myWelcomeLabelSignUp setFont:[UIFont systemFontOfSize:30]];
     [myWelcomeLabelSignUp setFont:[UIFont fontWithName:@"Gabriola" size:42]];
     myWelcomeLabelSignUp.textColor = theKeoOrangeColor;
-    myWelcomeLabelSignUp.text = @"Register with email";
+    myWelcomeLabelSignUp.text = @"Register with email";*/
     
     //---------------Création du textField Username
     CGRect rectTFUsername = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial,xUsername,yUsername); // Définition d'un rectangle
@@ -380,35 +380,42 @@ UIActivityIndicatorView *registerSpinner;
     textFieldUsernameSignUp.textAlignment = NSTextAlignmentCenter;
     textFieldUsernameSignUp.borderStyle = UITextBorderStyleLine;
     textFieldUsernameSignUp.delegate=self;
-    textFieldUsernameSignUp.backgroundColor = [UIColor whiteColor];
-    textFieldUsernameSignUp.placeholder = @"Your preferred email";
+    textFieldUsernameSignUp.backgroundColor = [UIColor clearColor];
+    textFieldUsernameSignUp.placeholder = @"Your preferred email address";
     textFieldUsernameSignUp.autocapitalizationType = UITextAutocapitalizationTypeNone;
     textFieldUsernameSignUp.borderStyle = UITextBorderStyleRoundedRect;
     textFieldUsernameSignUp.keyboardType = UIKeyboardTypeEmailAddress;
+    textFieldUsernameSignUp.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
+    textFieldUsernameSignUp.layer.borderWidth = 2.0f;
+    textFieldUsernameSignUp.layer.borderColor = [UIColor whiteColor].CGColor;
+    textFieldUsernameSignUp.layer.cornerRadius = 4.0f;
+    textFieldUsernameSignUp.textColor = [UIColor whiteColor];
     
     //----------------Creation of textField Password1
-    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername,xUsername,yUsername);; // Définition d'un rectangle
+    CGRect rectTFPassword1 = CGRectMake(0.5*screenWidth-(0.5*xUsername),yInitial+yUsername+10,xUsername,yUsername);; // Définition d'un rectangle
     textFieldPassword1SignUp = [[UITextField alloc] initWithFrame:rectTFPassword1];
     textFieldPassword1SignUp.textAlignment = NSTextAlignmentCenter;
     textFieldPassword1SignUp.borderStyle = UITextBorderStyleLine;
     textFieldPassword1SignUp.delegate=self;
-    textFieldPassword1SignUp.backgroundColor = [UIColor whiteColor];
+    textFieldPassword1SignUp.backgroundColor = [UIColor clearColor];
     textFieldPassword1SignUp.placeholder = @"Your password (6 min)";
     textFieldPassword1SignUp.borderStyle = UITextBorderStyleRoundedRect;
     textFieldPassword1SignUp.secureTextEntry = YES;
-    
+    textFieldPassword1SignUp.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
+    textFieldPassword1SignUp.layer.borderWidth = 2.0f;
+    textFieldPassword1SignUp.layer.borderColor = [UIColor whiteColor].CGColor;
+    textFieldPassword1SignUp.layer.cornerRadius = 4.0f;
+    textFieldPassword1SignUp.textColor = [UIColor whiteColor];
 
     //------------Creation of Sign Up button
     signUpButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     signUpButton.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),yInitial+yUsername+yUsername+20,xButton,yUsername);
-    signUpButton.backgroundColor = [UIColor whiteColor];
-    [signUpButton setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    signUpButton.layer.cornerRadius = 10; // arrondir les
+    signUpButton.backgroundColor = thePicteverYellowColor;
+    [signUpButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    signUpButton.layer.cornerRadius = 4; // arrondir les
     signUpButton.clipsToBounds = YES;     // angles du bouton
-    [signUpButton setTitle:@"Let's go!" forState:UIControlStateNormal];
-    [signUpButton.titleLabel setFont:[UIFont fontWithName:@"System-Bold" size:15]];
-    [[signUpButton layer] setBorderWidth:1.0f];
-    [[signUpButton layer] setBorderColor:[[UIColor grayColor] CGColor]];
+    [signUpButton setTitle:@"Create account" forState:UIControlStateNormal];
+    [signUpButton.titleLabel setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
     [signUpButton addTarget:self
                      action:@selector(myActionLogIn:)
            forControlEvents:UIControlEventTouchUpInside];
@@ -417,24 +424,24 @@ UIActivityIndicatorView *registerSpinner;
     //---------Creation of back button
     backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     backButton.frame = CGRectMake(5,screenHeight-45,70,30);
-    backButton.backgroundColor = [UIColor blackColor];
-    backButton.alpha = 0.61;
-    backButton.layer.cornerRadius = 8;
+    backButton.backgroundColor = thePicteverGreenColor;
+    backButton.alpha = 1.0;
+    backButton.layer.cornerRadius = 4;
     [backButton setTitle:@"Back" forState:UIControlStateNormal];
     [backButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [backButton.titleLabel setFont:[UIFont systemFontOfSize:18]];
+    [backButton.titleLabel setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
     [backButton addTarget:self
                    action:@selector(backPressed)
          forControlEvents:UIControlEventTouchUpInside];
     
     //-----------------Creation of register spinner---------
     registerSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    registerSpinner.center = CGPointMake(0.5*screenWidth+xButton-25,yInitial+yUsername+0.5*yUsername+50);
-    registerSpinner.color = [UIColor blackColor];
+    registerSpinner.center = CGPointMake(0.5*screenWidth+0.5*xButton+20,yInitial+yUsername+0.5*yUsername+50);
+    registerSpinner.color = [UIColor whiteColor];
     registerSpinner.hidesWhenStopped = YES;
     
     [self.view addSubview: backButton];
-    [self.view addSubview: myWelcomeLabelSignUp];
+    //[self.view addSubview: myWelcomeLabelSignUp];
     [self.view addSubview: textFieldUsernameSignUp];
     [self.view addSubview: textFieldPassword1SignUp];
     [self.view addSubview: signUpButton];

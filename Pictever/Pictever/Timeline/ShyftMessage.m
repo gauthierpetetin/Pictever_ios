@@ -21,6 +21,8 @@ CGFloat screenHeight;//global
 
 NSString *myCurrentPhotoPath;//global
 
+NSString *myLocaleString;
+
 NSMutableDictionary *importKeoContacts;//global
 NSMutableDictionary *importKeoPhotos;//global
 
@@ -57,22 +59,22 @@ NSMutableDictionary *importKeoPhotos;//global
         
         if(![self isTextMessage]){//----------case of photo message-------
             if([_photo isEqualToString:image_not_downloaded_string]){
-                _uiControl = [myGeneralMethods scaleImage:[UIImage imageNamed:default_image_name]];
+                _uiControl = [myGeneralMethods scaleImageForTimeline:[UIImage imageNamed:default_image_name]];
             }
             else{
                 _uiControl = [self imageWithPhotoID:_photo];
             }
         }
         else{//--------------------case of text message------------------
-            UIColor *aWhiteColor = [myGeneralMethods getColorFromHexString:whiteColorString];
-            UIImage *receivedImage = [ShyftMessage fillImgOfSize:CGSizeMake(screenWidth, screenHeight) withColor:aWhiteColor];
+            //UIColor *aWhiteColor = [myGeneralMethods getColorFromHexString:whiteColorString];//used before for the background color of images
+            UIImage *receivedImage = [ShyftMessage fillImgOfSize:CGSizeMake(screenWidth, screenHeight) withColor:_color];
             if(receivedImage){
                 _uiControl = receivedImage;
             }
         }
         
         if(_uiControl.size.height>default_cropped_image_heigth){//-----------in case image is higher than 300, crop it
-            _croppedImage = [ShyftMessage cropIm:_uiControl toRect:CGRectMake(0, 0.5*(_uiControl.size.height-default_cropped_image_heigth), screenWidth, default_cropped_image_heigth)];
+            _croppedImage = [ShyftMessage cropIm:_uiControl toRect:CGRectMake(timeline_marge_width, 0.5*(_uiControl.size.height-default_cropped_image_heigth), screenWidth-2*timeline_marge_width, default_cropped_image_heigth)];
         }
         else{
             _croppedImage = _uiControl;
@@ -96,6 +98,13 @@ NSMutableDictionary *importKeoPhotos;//global
             _fullName = _from_facebook_name;
         }
         
+        //------------traduction-------
+        if([myLocaleString isEqualToString:@"FR"]){
+            if([[_fullName stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@"Myself"]){
+                _fullName = @"Moi";
+            }
+        }
+        
     }
     return self;
 }
@@ -103,10 +112,10 @@ NSMutableDictionary *importKeoPhotos;//global
 -(void)refreshProfilePic{
     //---------------photo of the sender-----------------------------------
     if([importKeoPhotos objectForKey:_from_numero]){
-        _userProfileImage = [ShyftMessage scaleImage4:[importKeoPhotos objectForKey:_from_numero] toWidth:50];
+        _userProfileImage = [importKeoPhotos objectForKey:_from_numero];
     }
     else{
-        _userProfileImage = [ShyftMessage scaleImage4:[UIImage imageNamed:@"NoPhoto.png"] toWidth:50];
+        _userProfileImage = [ShyftMessage scaleImage4:[UIImage imageNamed:@"unknown_small"] toWidth:30];
     }
 }
 

@@ -35,6 +35,7 @@ ShyftSet *myShyftSet;//global
 
 NSUserDefaults *prefs;//global
 
+NSString *myLocaleString;
 NSString *username;//global
 bool logIn;
 NSString *myStatus;//global
@@ -58,7 +59,6 @@ CGFloat screenWidth;//global
 CGFloat screenHeight;//global
 CGFloat tabBarHeight;//global
 
-NSString *backgroundImage;//global
 bool firstGlobalOpening;//global
 
 NSMutableArray *sendToMail;//global
@@ -76,6 +76,7 @@ NSMutableDictionary *importKeoPhotos;//global
 int openingWindow;//global
 
 UITextView *myTextView;
+UITextView *myBackgroundTextView;
 UILabel *hideRectangle;
 UIButton *sendButton;
 
@@ -101,6 +102,10 @@ int initialOriginY;
 UIColor *theBackgroundColor;//global
 UIColor *theKeoOrangeColor;//global
 UIColor *theBackgroundColorDarker;//global
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
 
 int topBarHeight;
 
@@ -123,6 +128,7 @@ bool sendSMS;
 
 int pandasize;
 
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -136,9 +142,52 @@ int pandasize;
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    
+    //--------------navigation bar color (code couleur transformé du orangekeo sur
+    //http://htmlpreview.github.io/?https://github.com/tparry/Miscellaneous/blob/master/UINavigationBar_UIColor_calculator.html)
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:244/255.0f green:58/255.0f blue:0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barStyle=UIStatusBarStyleLightContent;
+    [self setNeedsStatusBarAppearanceUpdate];//status bar text color
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                     [[UIColor whiteColor] colorWithAlphaComponent:1.0],
+                                                                     NSForegroundColorAttributeName,
+                                                                     [UIFont fontWithName:@"GothamRounded-Bold" size:18.0],
+                                                                     NSFontAttributeName,
+                                                                     nil]];
+    //----------------confirm and cancel buttons----------------------------------
+    UIButton *backButtonLabelM = [UIButton buttonWithType:UIButtonTypeCustom];
+    [backButtonLabelM setFrame:CGRectMake(16,9,45,25)];
+    backButtonLabelM.backgroundColor = [UIColor clearColor];
+    [backButtonLabelM setTitle:@"Back" forState:UIControlStateNormal];
+    backButtonLabelM.titleLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:16.0];
+    backButtonLabelM.titleLabel.textColor = [UIColor whiteColor];
+    backButtonLabelM.titleLabel.textAlignment = NSTextAlignmentLeft;
+    [backButtonLabelM addTarget:self action:@selector(camerapressed2:) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *backItemM = [[UIBarButtonItem alloc] initWithCustomView:backButtonLabelM];
+    
+    self.navigationItem.leftBarButtonItem = backItemM;
+    
+    
+    
+    NSDictionary *barButtonAppearanceDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [[UIColor whiteColor] colorWithAlphaComponent:1.0],
+                                             NSForegroundColorAttributeName,
+                                             [UIFont fontWithName:@"GothamRounded-Light" size:16.0],
+                                             NSFontAttributeName,
+                                             nil];
+    
+    [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
+     setTitleTextAttributes:barButtonAppearanceDict forState:UIControlStateNormal];
+    //--------------
+    
+    
+    
+    self.view.backgroundColor = [UIColor whiteColor];
     
     textViewInitialMessage = @"Share a thought to remember!";
+    if([myLocaleString isEqualToString:@"FR"]){
+        textViewInitialMessage = @"Ecris une phrase dont tu souhaites te souvenir!";
+    }
     
     if(firstGlobalOpening){
         APLLog(@"FIRST MESSAGE OPENING");
@@ -154,7 +203,7 @@ int pandasize;
         //-------------progressview to inform the user a photo is actually being uploaded (in Takepicture2.m)
         progressView3 = [[UIProgressView alloc] init];
         progressView3.frame = CGRectMake(0,64,screenWidth,2);
-        [progressView3 setProgressTintColor:[UIColor orangeColor]];
+        [progressView3 setProgressTintColor:thePicteverGreenColor];
         [progressView3 setUserInteractionEnabled:NO];
         [progressView3 setProgressViewStyle:UIProgressViewStyleBar];
         [progressView3 setTrackTintColor:[UIColor clearColor]];
@@ -171,22 +220,40 @@ int pandasize;
         openingWindow = 0;
     }
     
-    
+    self.automaticallyAdjustsScrollViewInsets = NO;
     //--------------------text view to type the message---------------------
     //topBarHeight = 62;
     topBarHeight = 0;
+    
     //myTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, topBarHeight+100, screenWidth, screenHeight-tabBarHeight-topBarHeight-100)];//41
-    myTextView = [[UITextView alloc] initWithFrame:CGRectMake(10, topBarHeight+70, screenWidth-20, 180)];
+    myTextView = [[UITextView alloc] initWithFrame:CGRectMake(10, topBarHeight+70, screenWidth-20, 155)];
     myTextView.backgroundColor = [UIColor clearColor];
-    myTextView.text  = textViewInitialMessage;
-    myTextView.textColor = [UIColor grayColor];
+    //myTextView.text  = @"";
+    myTextView.text = textViewInitialMessage;
+    myTextView.textColor = thePicteverGrayColor;
     myTextView.textAlignment = NSTextAlignmentCenter;
-    myTextView.returnKeyType = UIReturnKeyDone;
+    myTextView.returnKeyType = UIReturnKeySend;
     
     initialOriginY = myTextView.frame.origin.y;
     myTextView.delegate = self;
-    [myTextView setFont:[UIFont systemFontOfSize:19]];
+    [myTextView setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:18.0]];
+    myTextView.contentInset = UIEdgeInsetsMake(30.0f,0.0f,0.0f,0.0f);
+    
+    //myTextView.backgroundColor = thePicteverGrayColor;
+    
+    myBackgroundTextView = [[UITextView alloc] initWithFrame:CGRectMake(myTextView.frame.origin.x, myTextView.frame.origin.y, myTextView.frame.size.width, myTextView.frame.size.height)];
+    myBackgroundTextView.text  = textViewInitialMessage;
+    myBackgroundTextView.textColor = thePicteverGrayColor;
+    myBackgroundTextView.textAlignment = NSTextAlignmentCenter;
+    [myBackgroundTextView setUserInteractionEnabled:NO];
+    myBackgroundTextView.delegate = self;
+    [myBackgroundTextView setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:18.0]];
+    myBackgroundTextView.backgroundColor = [UIColor clearColor];
+    myBackgroundTextView.contentInset = myTextView.contentInset;
+    
+    [self.view addSubview:myBackgroundTextView];
     [self.view addSubview:myTextView];
+    
     
     //--------------initialize labels and buttons--------
     [self initializeView];
@@ -225,7 +292,7 @@ int pandasize;
     
     //[self setTabBarVisible:YES animated:YES];
     
-    //------------------replace the tabbar in case it is not--------------
+    /*//------------------replace the tabbar in case it is not--------------
     CGRect frame2 = self.tabBarController.tabBar.frame;
     CGFloat height2 = frame2.size.height;
     
@@ -233,7 +300,11 @@ int pandasize;
     CGFloat duration = (animated)? 0.3 : 0.0;
     [UIView animateWithDuration:duration animations:^{
         self.tabBarController.tabBar.frame = CGRectMake(0, screenHeight-height2, frame2.size.width, frame2.size.height);
-    }];
+    }];*/
+    
+    if([self tabBarIsVisible]){
+        [self setTabBarVisible:NO animated:YES];
+    }
     
     
     APLLog(@"WriteMessage2 did appear over");
@@ -281,7 +352,6 @@ int pandasize;
         
         if(![myTextView.text isEqualToString:@""]){
             if(![myTextView.text isEqualToString:textViewInitialMessage]){
-                //[self.view addSubview:sendButton];
                 
                 sendToDateAsText = @"";
                 sendToName = @"";
@@ -290,13 +360,20 @@ int pandasize;
             }
         }
         else{
+            myBackgroundTextView.text = textViewInitialMessage;
             myTextView.text = textViewInitialMessage;
-            myTextView.textColor = [UIColor grayColor];
+            myTextView.textColor = thePicteverGrayColor;
         }
         
         
         return NO;
     }
+    
+    myBackgroundTextView.text=@"";
+    if([text isEqualToString:@""]&&([myTextView.text length]==1)){
+        myBackgroundTextView.text = textViewInitialMessage;
+    }
+
     
     //NSUInteger oldLength = [myTextView.text length];
     //NSUInteger replacementLength = [text length];
@@ -457,53 +534,92 @@ int pandasize;
     APLLog(@"SENDPRESSED");
     if([GPRequests connected]){
         if(![myTextView.text isEqualToString:textViewInitialMessage]){
-            if([sendToName isEqualToString:@""]){
-                [self switchScreenToContacts];
-            }
-            else{
-                if([sendToDateAsText isEqualToString:@""]){
-                    [self timePressed];
+            if(![myTextView.text isEqualToString:@""]){
+                if([sendToName isEqualToString:@""]){
+                    [self switchScreenToContacts];
                 }
                 else{
-                    if([sendToMail count] > 0){
-                        destinataire3 = [self stringFromArray:sendToMail];
-                        if(![sendToDate isEqualToString:@""]){
-                            APLLog([NSString stringWithFormat:@"Send to friend: %@  at date: %@", destinataire3, sendToDateAsText]);
-                            
-                            [self sendPostRequestAtDate:sendToDate];
-                            
-                        }
-                        else{
-                            UIAlertView *alert4 = [[UIAlertView alloc]
-                                                   initWithTitle:@"No date selected"
-                                                   message:@"Pick a date first!" delegate:self
-                                                   cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                            [alert4 show];
-                        }
+                    if([sendToDateAsText isEqualToString:@""]){
+                        [self timePressed];
                     }
                     else{
-                        UIAlertView *alert3 = [[UIAlertView alloc]
-                                               initWithTitle:@"No contact selected"
-                                               message:@"Pick a contact first!" delegate:self
-                                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                        [alert3 show];
+                        if([sendToMail count] > 0){
+                            destinataire3 = [self stringFromArray:sendToMail];
+                            if(![sendToDate isEqualToString:@""]){
+                                APLLog([NSString stringWithFormat:@"Send to friend: %@  at date: %@", destinataire3, sendToDateAsText]);
+                                
+                                [self sendPostRequestAtDate:sendToDate];
+                                
+                            }
+                            else{
+                                NSString *title4 = @"No date selected";
+                                NSString *message4 = @"Pick a date first!";
+                                if([myLocaleString isEqualToString:@"FR"]){
+                                    title4 = @"Pas de date sélectionnée";
+                                    message4 = @"Veuillez selectionner une date d'envoi!";
+                                }
+                                UIAlertView *alert4 = [[UIAlertView alloc]
+                                                       initWithTitle:title4
+                                                       message:message4 delegate:self
+                                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                                [alert4 show];
+                            }
+                        }
+                        else{
+                            NSString *title3 = @"No contact selected";
+                            NSString *message3 = @"Pick a date first!";
+                            if([myLocaleString isEqualToString:@"FR"]){
+                                title3 = @"Pas de contact sélectionné";
+                                message3 = @"Veuillez selectionner un destinataire!";
+                            }
+                            UIAlertView *alert3 = [[UIAlertView alloc]
+                                                   initWithTitle:title3
+                                                   message:message3 delegate:self
+                                                   cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                            [alert3 show];
+                        }
+                        
                     }
-                    
                 }
+            }
+            else{
+                NSString *title5 = @"Empty text";
+                NSString *message5 = @"Please type your message first";
+                if([myLocaleString isEqualToString:@"FR"]){
+                    title5 = @"Texte vide";
+                    message5 = @"Veuillez taper votre message!";
+                }
+                UIAlertView *alert5 = [[UIAlertView alloc]
+                                       initWithTitle:title5
+                                       message:message5 delegate:self
+                                       cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert5 show];
             }
         }
         else{
+            NSString *title5 = @"Empty text";
+            NSString *message5 = @"Please type your message first";
+            if([myLocaleString isEqualToString:@"FR"]){
+                title5 = @"Texte vide";
+                message5 = @"Veuillez taper votre message!";
+            }
             UIAlertView *alert5 = [[UIAlertView alloc]
-                                   initWithTitle:@"Empty text"
-                                   message:@"Please type your message first" delegate:self
+                                   initWithTitle:title5
+                                   message:message5 delegate:self
                                    cancelButtonTitle:@"Ok" otherButtonTitles:nil];
             [alert5 show];
         }
     }
     else{
+        NSString *title5 = @"Connection problem";
+        NSString *message5 = @"You have no internet connection";
+        if([myLocaleString isEqualToString:@"FR"]){
+            title5 = @"Problème de connexion";
+            message5 = @"Vous n'avez pas de connexion internet";
+        }
         UIAlertView *alert5 = [[UIAlertView alloc]
-                               initWithTitle:@"Connection problem"
-                               message:@"You have no internet connection" delegate:self
+                               initWithTitle:title5
+                               message:message5 delegate:self
                                cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert5 show];
     }
@@ -524,11 +640,11 @@ int pandasize;
 
 //----------------------Send the message--------------------------------------------
 -(void) sendPostRequestAtDate:(NSString *) theDateToSend{
+    sendButton.userInteractionEnabled = NO;
     
     NSString *locKeoTime = [self stringForKeoChoice:sendToDate withParameter:sendToTimeStamp];
     [[[GPSession alloc] init] sendRequest:myTextView.text to:destinataire3 withPhotoString:@"" withKeoTime:locKeoTime for:self];
     
-    //[sendButton removeFromSuperview];
     
     [self alertNonShyftUsersPerSMS];
     
@@ -553,6 +669,9 @@ int pandasize;
         if([MFMessageComposeViewController canSendText])
         {
             controller.body = @"Hello! I just sent you a message in the future on Pictever! Download the app to receive it: http://pictever.com";
+            if([myLocaleString isEqualToString:@"FR"]){
+                controller.body = @"Salut! Je viens de t'envoyer un message dans le futur grâce à l'application Pictever! Télécharges l'application, comme ça tu pourras le recevoir;)  http://pictever.com";
+            }
             controller.recipients = sendToSMS;
             controller.messageComposeDelegate = self;
             //[self presentModalViewController:controller animated:YES];
@@ -573,13 +692,14 @@ int pandasize;
     sendToDateAsText = @"";
     
     //myTextView.backgroundColor = [UIColor whiteColor];
-    myTextView.textColor = [UIColor grayColor];
+    myBackgroundTextView.text = textViewInitialMessage;
+    
+
     myTextView.text = textViewInitialMessage;
+    myTextView.textColor = thePicteverGrayColor;
     //[myTextView setFrame:CGRectMake(0, topBarHeight+100, screenWidth, screenHeight-tabBarHeight-topBarHeight-100)];//41
-    [myTextView setFrame:CGRectMake(10, topBarHeight+70, screenWidth-20, 180)];
+    //[myTextView setFrame:CGRectMake(10, topBarHeight+70, screenWidth-20, 180)];
     myTextView.userInteractionEnabled = YES;
-    myTextView.textColor = [UIColor grayColor];
-    myTextView.returnKeyType = UIReturnKeySend;
     UITapGestureRecognizer *tapRecognizer3 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(respondToTapGesture2:)];
     tapRecognizer3.numberOfTapsRequired = 1;
     [myTextView addGestureRecognizer:tapRecognizer3];
@@ -589,23 +709,25 @@ int pandasize;
     hideRectangle.backgroundColor = [UIColor blackColor];
     hideRectangle.alpha = 0.75;
     
-    int xButton6 = 100;
-    int yButton6 = 100;
+    int xButton6 = 95;
+    int yButton6 = 95;
     //Creation of Send button
     sendButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    sendButton.frame = CGRectMake(0.5*screenWidth-0.5*xButton6,screenHeight-110-tabBarHeight,xButton6,yButton6);
+    sendButton.userInteractionEnabled = YES;
+    sendButton.frame = CGRectMake(0.5*screenWidth-0.5*xButton6,screenHeight-110,xButton6,yButton6);
     sendButton.backgroundColor = [UIColor clearColor];
-    UIImage *sendButtonImage = [UIImage imageNamed:@"Send-grey2.png"];
-    sendButtonImage = [myGeneralMethods scaleImage3:sendButtonImage withFactor:6];
+    UIImage *sendButtonImage = [UIImage imageNamed:@"send_button_orange_small.png"];
+    sendButtonImage = [myGeneralMethods scaleImage:sendButtonImage toWidth:sendButton.frame.size.width];
     [sendButton setImage:sendButtonImage forState:UIControlStateNormal];
     //[sendButton setFont:[UIFont systemFontOfSize:20]];
     [sendButton addTarget:self action:@selector(sendPressed) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:sendButton];
     
     
-    pandasize = 75;
-    newMessageButtonM = [[UIButton alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*pandasize, 25-100, pandasize, pandasize)];
+    pandasize = 100;
+    newMessageButtonM = [[UIButton alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*pandasize, 25-110, pandasize, pandasize)];
     newMessageButtonM.contentMode = UIViewContentModeScaleAspectFit;
-    [newMessageButtonM setImage:[UIImage imageNamed:@"bouton_panda.png"] forState:UIControlStateNormal];
+    [newMessageButtonM setImage:[UIImage imageNamed:@"newMessageRobot_small.png"] forState:UIControlStateNormal];
     [newMessageButtonM addTarget:self action:@selector(switchScreenToKeo) forControlEvents:UIControlEventTouchUpInside];
     
     [self.parentViewController.view addSubview:newMessageButtonM];
@@ -614,16 +736,19 @@ int pandasize;
     
     
     sentSuccessfullyLabelM = [[UILabel alloc] initWithFrame:CGRectMake(0, -30, screenWidth, 30)];
-    sentSuccessfullyLabelM.backgroundColor = theKeoOrangeColor;
+    sentSuccessfullyLabelM.backgroundColor = thePicteverYellowColor;
     sentSuccessfullyLabelM.textColor = [UIColor whiteColor];
-    sentSuccessfullyLabelM.font = [UIFont fontWithName:@"Gabriola" size:22];
+    sentSuccessfullyLabelM.font = [UIFont fontWithName:@"GothamRounded-Bold" size:18];
     sentSuccessfullyLabelM.textAlignment = NSTextAlignmentCenter;
-    sentSuccessfullyLabelM.alpha = 0.95;
+    sentSuccessfullyLabelM.alpha = 1;
     sentSuccessfullyLabelM.text = @"Message sent successfully!";
+    if([myLocaleString isEqualToString:@"FR"]){
+        sentSuccessfullyLabelM.text = @"Message envoyé!";
+    }
     
     sentSuccessfullyLabelM2 = [[UILabel alloc] initWithFrame:CGRectMake(0, -48, screenWidth, 18)];
-    sentSuccessfullyLabelM2.backgroundColor = theKeoOrangeColor;
-    sentSuccessfullyLabelM2.alpha = 0.95;
+    sentSuccessfullyLabelM2.backgroundColor = thePicteverYellowColor;
+    sentSuccessfullyLabelM2.alpha = 1;
 
     [self.parentViewController.view addSubview:sentSuccessfullyLabelM2];
     [self.parentViewController.view addSubview:sentSuccessfullyLabelM];
@@ -635,14 +760,16 @@ int pandasize;
 
 - (IBAction)respondToTapGesture2:(UITapGestureRecognizer *)recognizer{
     APLLog(@"respondToTapGesture2");
+
+
     if(myTextView.isFirstResponder){
         [myTextView resignFirstResponder];
-        //[self.view addSubview:sendButton];
         sendToDateAsText = @"";
         sendToName = @"";
         if([myTextView.text isEqualToString:@""]){
-            myTextView.textColor = [UIColor grayColor];
+            myTextView.textColor = thePicteverGrayColor;
             myTextView.text = textViewInitialMessage;
+            myBackgroundTextView.text = textViewInitialMessage;
         }
     }
     else{
@@ -671,7 +798,7 @@ int pandasize;
 -(void)hideAnimateForNewMessageM{
     [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
                      animations:^{
-                         newMessageButtonM.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25-100, pandasize, pandasize);
+                         newMessageButtonM.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25-110, pandasize, pandasize);
                      }
                      completion:nil];
 }
@@ -680,8 +807,8 @@ int pandasize;
 //-----------------------------animation when message is sent succesfully--------------------------------
 
 -(void)showAnimateMessageSentSuccessfullyM{
-    [self.view bringSubviewToFront:sentSuccessfullyLabelM];
-    [self.view bringSubviewToFront:sentSuccessfullyLabelM2];
+    [self.parentViewController.view bringSubviewToFront:sentSuccessfullyLabelM];
+    [self.parentViewController.view bringSubviewToFront:sentSuccessfullyLabelM2];
     
     [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
                      animations:^{
@@ -699,11 +826,6 @@ int pandasize;
 }
 
 
-
--(void)cancelPressed2{
-    //[sendButton removeFromSuperview];
-    [myTextView becomeFirstResponder];
-}
 
 
 //-------------------save the occurences (for the favorites)--------------------------------------------
@@ -750,17 +872,29 @@ int pandasize;
                         
                     }
                     else{
+                        NSString *title4 = @"No date selected";
+                        NSString *alertMessage4 = @"Pick a date first!";
+                        if([myLocaleString isEqualToString:@"FR"]){
+                            title4 = @"Pas de date sélectionnée";
+                            alertMessage4 = @"Veuillez sélectionner une date svp";
+                        }
                         UIAlertView *alert4 = [[UIAlertView alloc]
-                                               initWithTitle:@"No date selected"
-                                               message:@"Pick a date first!" delegate:self
+                                               initWithTitle:title4
+                                               message:alertMessage4 delegate:self
                                                cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                         [alert4 show];
                     }
                 }
                 else{
+                    NSString *title3 = @"No contact selected";
+                    NSString *alertMessage3 = @"Pick a contact first!";
+                    if([myLocaleString isEqualToString:@"FR"]){
+                        title3 = @"Pas de contact sélectionné";
+                        alertMessage3 = @"Veuillez sélectionner un destinataire svp";
+                    }
                     UIAlertView *alert3 = [[UIAlertView alloc]
-                                           initWithTitle:@"No contact selected"
-                                           message:@"Pick a contact first!" delegate:self
+                                           initWithTitle:title3
+                                           message:alertMessage3 delegate:self
                                            cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert3 show];
                 }
@@ -830,6 +964,43 @@ int pandasize;
     [self presentViewController:vc animated:YES completion:nil];
 }
 
+- (IBAction)camerapressed2:(id)sender {
+    [myTextView resignFirstResponder];
+    
+    // Get the views.
+    UITabBarController * tabBarController = (UITabBarController *)self.tabBarController;
+    int controllerIndex = 1;
+    UIView * fromView = tabBarController.selectedViewController.view;
+    UIView * toView = [[tabBarController.viewControllers objectAtIndex:controllerIndex] view];
+    
+    // Get the size of the view area.
+    CGRect viewSize = fromView.frame;
+    BOOL scrollRight = controllerIndex > tabBarController.selectedIndex;
+    
+    // Add the to view to the tab bar view.
+    [fromView.superview addSubview:toView];
+    
+    // Position it off screen.
+    toView.frame = CGRectMake((scrollRight ? 320 : -320), viewSize.origin.y, 320, viewSize.size.height);
+    
+    [UIView animateWithDuration:0.3
+                     animations: ^{
+                         
+                         // Animate the views on and off the screen. This will appear to slide.
+                         fromView.frame =CGRectMake((scrollRight ? -320 : 320), viewSize.origin.y, 320, viewSize.size.height);
+                         toView.frame =CGRectMake(0, viewSize.origin.y, 320, viewSize.size.height);
+                     }
+     
+                     completion:^(BOOL finished) {
+                         if (finished) {
+                             
+                             // Remove the old view from the tabbar view.
+                             [fromView removeFromSuperview];
+                             tabBarController.selectedIndex = controllerIndex;                
+                         }
+                     }];
+}
+
 -(NSString *)stringFromArray:(NSMutableArray *)array{
     
     NSError *errorC = nil;
@@ -882,7 +1053,11 @@ int pandasize;
             
         case MessageComposeResultFailed:
         {
-            UIAlertView *warningAlert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Failed to send SMS!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            NSString* titleWarning = @"Failed to send SMS!";
+            if([myLocaleString isEqualToString:@"FR"]){
+                titleWarning = @"Echec de l'envoi de SMS!";
+            }
+            UIAlertView *warningAlert = [[UIAlertView alloc] initWithTitle:@"Error" message:titleWarning delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [warningAlert show];
             break;
         }
@@ -930,13 +1105,13 @@ int pandasize;
 //------------------alertView delegate (first tips for the user)-----------------------------------
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]||[alertView.title isEqualToString:my_actionsheet_wanna_help_us_french]){
         if (buttonIndex == 1) {
             APLLog(@"Give a good comment on the app store! %@",myVersionInstallUrl);
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
         }
     }
-    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]||[alertView.title isEqualToString:my_actionsheet_you_are_great_french]){
         if (buttonIndex == 1) {
             APLLog(@"Like our facebook page! %@", my_facebook_page_adress);
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];

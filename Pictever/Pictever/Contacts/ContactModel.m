@@ -211,7 +211,7 @@ NSMutableArray *importContactIDs;
             
             
             if (!image) {
-                image = [UIImage imageNamed:@"NoPhoto.png"];
+                image = [UIImage imageNamed:@"unknown_small.png"];
             }
             if(image){
                 [contacts setObject:image forKey:@"image"];
@@ -303,7 +303,7 @@ NSMutableArray *importContactIDs;
             [contactMe setObject:@"Myself" forKey:@"firstNames"];
             [contactMe setObject:@"" forKey:@"lastNames"];
             [contactMe setObject:@"Myself" forKey:@"fullName"];
-            [contactMe setObject:[UIImage imageNamed:@"my_keo_image.png"] forKey:@"image"];
+            [contactMe setObject:[UIImage imageNamed:@"myself_small.png"] forKey:@"image"];
             if(myCurrentPhoneNumber){
                 [contactMe setObject:myCurrentPhoneNumber forKey:@"phoneNumber1"];
             }
@@ -359,7 +359,7 @@ NSMutableArray *importContactIDs;
     [contactMe setObject:@"Myself" forKey:@"firstNames"];
     [contactMe setObject:@"" forKey:@"lastNames"];
     [contactMe setObject:@"Myself" forKey:@"fullName"];
-    [contactMe setObject:[UIImage imageNamed:@"my_keo_image.png"] forKey:@"image"];
+    [contactMe setObject:[UIImage imageNamed:@"myself_small.png"] forKey:@"image"];
     if(myCurrentPhoneNumber){
         [contactMe setObject:myCurrentPhoneNumber forKey:@"phoneNumber1"];
     }

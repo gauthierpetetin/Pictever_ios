@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.4</string>
+	<string>2.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -28,7 +28,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>FacebookAppID</key>
 	<string>581957685266291</string>
 	<key>FacebookDisplayName</key>
@@ -37,6 +37,8 @@
 	<true/>
 	<key>UIAppFonts</key>
 	<array>
+		<string>GothamRounded-Light.otf</string>
+		<string>GothamRounded-Bold.otf</string>
 		<string>Gabriola.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>

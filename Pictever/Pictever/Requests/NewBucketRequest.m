@@ -23,6 +23,7 @@
 
 NSString *downloadPhotoRequestName;
 NSString *storyboardName;
+NSString *myLocaleString;
 
 NSMutableArray *loadBox;//global
 

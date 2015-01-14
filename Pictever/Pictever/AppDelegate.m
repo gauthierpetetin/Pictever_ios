@@ -61,6 +61,7 @@ AWSMobileAnalytics* analytics;
 NSUserDefaults *prefs;//preferences where all the variable are saved when the app is killed
 
 //Crucial information about the users account
+NSString *myLocaleString;
 NSString *myAppVersion;
 NSString *username;
 NSString *hashPassword;
@@ -154,6 +155,10 @@ bool loadAllcontacts;//to be sure all the contacts are loaded before to continue
 UIColor *theBackgroundColor;//global
 UIColor *theBackgroundColorDarker;//global
 UIColor *theKeoOrangeColor;//global
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
 ///////////////////////////////////
 
 
@@ -190,7 +195,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     APLLog(@"didFinishLaunchingWithOptions-------Pictever---------");
     
     firstUseEver = false;
-
+    
     
     //--------------initialize Applause--------------
     [self initializeApplause];
@@ -216,8 +221,11 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     //----------Colors
     theBackgroundColor = [UIColor colorWithRed:250/255.0f green:241/255.0f blue:236/255.0f alpha:1.0f];
     theBackgroundColorDarker = [UIColor colorWithRed:252/255.0f green:239/255.0f blue:232/255.0f alpha:1.0f];
-    theKeoOrangeColor = [UIColor colorWithRed:246/255.0f green:89/255.0f blue:30/255.0f alpha:1.0f];
-    
+    theKeoOrangeColor = [myGeneralMethods getColorFromHexString:@"f6591e"];
+    thePicteverGreenColor = [myGeneralMethods getColorFromHexString:@"6bb690"];
+    thePicteverYellowColor = [myGeneralMethods getColorFromHexString:@"ffdc1a"];
+    thePicteverRedColor = [myGeneralMethods getColorFromHexString:@"f36f4d"];
+    thePicteverGrayColor = [myGeneralMethods getColorFromHexString:@"d1d3d4"];
     
     //--------------initialize amazon-------------
     [self importAmazonData];
@@ -263,7 +271,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     //--------work in local or not
     localWork=false;
     //localWork=true;
-    //adresseIp2=@"http://192.168.42.65:5000/";
+    //adresseIp2=@"http://192.168.42.52:5000/";
     
     
     
@@ -625,6 +633,13 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 }
 
 -(void)importAccountData{
+    
+    NSLocale *mylocale = [NSLocale currentLocale];//-----my locale
+    myLocaleString = [mylocale objectForKey: NSLocaleCountryCode];
+    APLLog(@"myLocale: %@", myLocaleString);
+    if([myLocaleString isEqualToString:@"FR"]){
+        NSLog(@"Francais");
+    }
 
     bool logInCopy = [prefs boolForKey:my_prefs_login_key];
     if(logInCopy){
@@ -686,9 +701,9 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     }
     
     myStatus = @"";
-    if([prefs objectForKey:@"myStatus"]){
+    if([prefs objectForKey:my_prefs_mystatus_key]){
         NSString *myStatusCopy;
-        myStatusCopy = [prefs objectForKey:@"myStatus"];
+        myStatusCopy = [prefs objectForKey:my_prefs_mystatus_key];
         myStatus = [[NSString alloc] initWithString:myStatusCopy];
     }
     else{
@@ -716,9 +731,9 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         APLLog(@"no countrycode");
     }
     
-    if([prefs objectForKey:@"myUserID"]){
+    if([prefs objectForKey:my_prefs_userid_key]){
         NSString *myUserIDCopy;
-        myUserIDCopy = [prefs objectForKey:@"myUserID"];
+        myUserIDCopy = [prefs objectForKey:my_prefs_userid_key];
         myUserID = [[NSString alloc] initWithString:myUserIDCopy];
         APLLog(@"myUserID: %@",myUserID);
     }
@@ -727,9 +742,9 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     }
     
     
-    if([prefs objectForKey:@"numberOfMessagesInTheFuture"]){
+    if([prefs objectForKey:my_prefs_numberoffuturemessages_key]){
         NSString *numberOfMessagesInTheFutureCopy;
-        numberOfMessagesInTheFutureCopy = [prefs objectForKey:@"numberOfMessagesInTheFuture"];
+        numberOfMessagesInTheFutureCopy = [prefs objectForKey:my_prefs_numberoffuturemessages_key];
         numberOfMessagesInTheFuture = [[NSString alloc] initWithString:numberOfMessagesInTheFutureCopy];
         APLLog(@"numberOfMessagesInTheFuture: %@",numberOfMessagesInTheFuture);
     }

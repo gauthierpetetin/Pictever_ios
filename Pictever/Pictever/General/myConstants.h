@@ -58,6 +58,9 @@ extern NSString *const default_image_name;
 
 const int default_cropped_image_heigth;
 
+//----------------timeline dimensions---------------------------------------------
+const int timeline_marge_width;
+
 //----------------saving constants------------------------------------------------
 extern NSString *const my_status_saving_Key;
 
@@ -121,6 +124,9 @@ extern NSString *const my_prefs_fb_name_key;
 extern NSString *const my_prefs_fb_id_key;
 extern NSString *const my_prefs_fb_birthday_key;
 extern NSString *const my_prefs_contacts_data_key;
+extern NSString *const my_prefs_userid_key;
+extern NSString *const my_prefs_numberoffuturemessages_key;
+extern NSString *const my_prefs_mystatus_key;
 
 //-------------------------sendBoxContent------------------------------------------
 extern NSString *const my_sendbox_date;
@@ -132,8 +138,11 @@ extern NSString *const my_sendbox_path;
 //---------------------------actionsheet titles----------------------------------
 extern NSString *const my_actionsheet_pick_a_date;
 extern NSString *const my_actionsheet_wanna_help_us;
+extern NSString *const my_actionsheet_wanna_help_us_french;
 extern NSString *const my_actionsheet_you_are_great;
+extern NSString *const my_actionsheet_you_are_great_french;
 extern NSString *const my_actionsheet_want_to_remember;
+extern NSString *const my_actionsheet_want_to_remember_french;
 extern NSString *const my_actionsheet_install_it_now;
 
 //---------------------------notification names------------------------

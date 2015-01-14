@@ -48,6 +48,10 @@
 
 + (UIImage*) scaleImage:(UIImage*)image;
 
++ (UIImage*) scaleImageForTimeline:(UIImage*)image;
+
++ (UIImage*) scaleImage:(UIImage*)image toWidth:(CGFloat)desiredWidth;
+
 + (UIImage*) scaleImage3:(UIImage*)image withFactor:(CGFloat)myFactor;
 
 +(NSString *)stringFromArrayPh:(NSMutableArray *)array;
@@ -63,5 +67,7 @@
 +(NSString *) getStringToPrint: (NSDate *)dateToPrint;
 
 +(NSString *) getStringToPrint2: (NSDate *)dateToPrint;
+
++(void)initializeAllAccountVariables;
 
 @end

@@ -31,7 +31,7 @@ AWSMobileAnalytics* analytics;//global
 NSString *myAppVersion;
 
 NSString *myUserID;
-
+NSString *myLocaleString;
 NSString *myStatus;//global
 
 NSString *myFacebookName;

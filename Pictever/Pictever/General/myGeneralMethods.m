@@ -16,6 +16,8 @@
 #define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 
 
+
+
 //------------loadbox containing messages for which the photos are not downloaded-------------
 NSMutableArray *loadBox;//global
 NSMutableArray *messagesDataFile;//global
@@ -34,6 +36,18 @@ CGFloat screenHeight;//global
 bool downloadPhotoOnAmazon;//global
 
 NSString *mytimeStamp;//global
+
+NSString *myLocaleString;
+NSString *username;
+NSString *hashPassword;
+bool logIn;
+NSString *myCurrentPhoneNumber;
+NSString *myCountryCode;
+NSString *myUserID;
+NSString *myStatus;
+NSString *myFacebookName;
+NSString *myFacebookID;
+NSString *myFacebookBirthDay;
 
 
 @implementation myGeneralMethods
@@ -190,14 +204,8 @@ NSString *mytimeStamp;//global
     
     if(![dwnAmazonPhotoPath isEqualToString:@"pathError"]){//-----------if photoPath exist------
         
-        UIImage *imageInKeo;
         UIImage *imageInKeoIfExists = [myGeneralMethods loadImageAtPath:[NSString stringWithFormat:@"%@/%@",myCurrentPhotoPath,amzPhotoID]];
-        if(imageInKeoIfExists != nil){
-            imageInKeo = imageInKeoIfExists;
-        }
-        else{
-            imageInKeo = [UIImage imageNamed:default_image_name];
-        }
+        
         
         if(amzPhotoID && (imageInKeoIfExists != nil)){
             [shyftFromSession setObject:amzPhotoID forKey:my_photo_Key];
@@ -403,6 +411,48 @@ NSString *mytimeStamp;//global
     UIGraphicsEndImageContext();
     
     return scaledImage;
+}
+
+//---------------scale image for tableview (such that it has the same width as the screen of the device)------------------
++ (UIImage*) scaleImage:(UIImage*)image toWidth:(CGFloat)desiredWidth{
+    
+    CGSize scaledSize = CGSizeMake(image.size.width, image.size.height);
+    CGFloat scaleFactor = scaledSize.height / scaledSize.width;
+    
+    scaledSize.width = desiredWidth;
+    scaledSize.height = desiredWidth * scaleFactor;
+    
+    UIGraphicsBeginImageContextWithOptions( scaledSize, NO, 0.0 );
+    CGRect scaledImageRect = CGRectMake( 0.0, 0.0, scaledSize.width, scaledSize.height );
+    [image drawInRect:scaledImageRect];
+    UIImage* scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return scaledImage;
+}
+
+//---------------scale image for tableview (such that it has the same width as the screen of the device)------------------
++ (UIImage*) scaleImageForTimeline:(UIImage*)image{
+    CGFloat timelineWidth = screenWidth - 2*timeline_marge_width;
+    return [myGeneralMethods scaleImage:image toWidth:timelineWidth];
+    /*
+    CGSize scaledSize = CGSizeMake(image.size.width, image.size.height);
+    CGFloat scaleFactor = scaledSize.height / scaledSize.width;
+    
+    CGFloat timelineWidth = screenWidth - 2*timeline_marge_width;
+    
+    scaledSize.width = timelineWidth;
+    scaledSize.height = timelineWidth * scaleFactor;
+    
+    UIGraphicsBeginImageContextWithOptions( scaledSize, NO, 0.0 );
+    CGRect scaledImageRect = CGRectMake( 0.0, 0.0, scaledSize.width, scaledSize.height );
+    [image drawInRect:scaledImageRect];
+    UIImage* scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return scaledImage;*/
 }
 
 
@@ -867,10 +917,10 @@ NSString *mytimeStamp;//global
         }
         return answerString;
     }
-    if(timeSpacing < 2*24*60*60){
+    if(timeSpacing < timeSinceYesterday+24*60*60){
         return [NSString stringWithFormat:@"Yesterday, %@",time];
     }
-    if(timeSpacing < 7*24*60*60){
+    if(timeSpacing < timeSinceYesterday+6*24*60*60){
         return [NSString stringWithFormat:@"%@, %@",dayOfWeek ,time];
     }
     
@@ -906,6 +956,29 @@ NSString *mytimeStamp;//global
     
     return [NSString stringWithFormat:@"%@ %@ %@",day ,month ,year];
     
+}
+
++(void)initializeAllAccountVariables{
+    username = @"";
+    hashPassword = @"";
+    logIn = false;
+    myCurrentPhoneNumber=@"";
+    myCountryCode=@"";
+    myUserID=@"";
+    myStatus=@"";
+    myFacebookName=@"";
+    myFacebookID=@"";
+    myFacebookBirthDay=@"";
+    [prefs setObject:username forKey:my_prefs_username_key];
+    [prefs setObject:hashPassword forKey:my_prefs_password_key];
+    [prefs setBool:logIn forKey:my_prefs_login_key];
+    [prefs setObject:myCurrentPhoneNumber forKey:my_prefs_phoneNumber_key];
+    [prefs setObject:myCountryCode forKey:my_prefs_countryCode_key];
+    [prefs setObject:myUserID forKey:my_prefs_userid_key];
+    [prefs setObject:myStatus forKey:my_prefs_mystatus_key];
+    [prefs setObject:myFacebookName forKey:my_prefs_fb_name_key];
+    [prefs setObject:myFacebookID forKey:my_prefs_fb_id_key];
+    [prefs setObject:myFacebookBirthDay forKey:my_prefs_fb_birthday_key];
 }
 
 

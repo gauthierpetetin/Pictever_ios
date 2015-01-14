@@ -62,6 +62,7 @@ NSString *myUserID;
 
 NSString *adresseIp2;//global
 
+NSString *myLocaleString;
 NSString *username;//global
 NSString *myStatus;//global
 bool logIn;
@@ -93,7 +94,6 @@ int openingWindow;//global
 bool appOpenedOnNotification;//global
 
 NSString *storyboardName;//global
-NSString *backgroundImage;//global
 
 bool firstGlobalOpening;//global
 
@@ -114,19 +114,35 @@ NSMutableArray *vibrateBox;
 UIColor *theBackgroundColor;//global
 UIColor *theBackgroundColorDarker;//global
 UIColor *theKeoOrangeColor;//global
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
 UIColor *lightGrayColor;
+UIColor *theFacebookBlueColor;
+
+UIImage *facebookIconImage;
+UIImage *resendIconImage;
+UIImage *downloadIconImage;
 
 
 //------------shows the user when the table view is loading new messages------------------
 UITapGestureRecognizer *billyTapRecognizer;
 UILabel *futureLabel;
-UILabel *billyLabel;
 UIImageView *myBillyImageView;
 UIView *loadingView;
 UIActivityIndicatorView *spinner;
 //UIActivityIndicatorView *spinnerTop;
 UIActivityIndicatorView *loadSpinner;
 UIView *hdView;
+
+UILabel *firstInfoLabel;
+
+
+
+UITextView *infoTextView;
+UILabel* infoBarLabel;
+UIButton *okButton;
 
 bool zoomOn;//global
 bool reloaded2;
@@ -165,6 +181,8 @@ bool isLoadingLoadBox;//global
 
 myTabBarController *myController;
 
+UISwipeGestureRecognizer *swipeRecognizer3;
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -179,6 +197,39 @@ myTabBarController *myController;
 {
     viewDidAppear = false;
     [super viewDidLoad];
+    
+    //--------------navigation bar color (code couleur transformé du orangekeo sur
+    //http://htmlpreview.github.io/?https://github.com/tparry/Miscellaneous/blob/master/UINavigationBar_UIColor_calculator.html)
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:244/255.0f green:58/255.0f blue:0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barStyle=UIStatusBarStyleLightContent;
+    [self setNeedsStatusBarAppearanceUpdate];//status bar text color
+    
+    //----------------confirm and cancel buttons----------------------------------
+    //UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStylePlain target:self action:@selector(cameraPressed:)];
+    UIButton *backButtonLabel = [UIButton buttonWithType:UIButtonTypeCustom];
+    [backButtonLabel setFrame:CGRectMake(16,9,45,25)];
+    backButtonLabel.backgroundColor = [UIColor clearColor];
+    [backButtonLabel setTitle:@"Back" forState:UIControlStateNormal];
+    backButtonLabel.titleLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:16.0];
+    backButtonLabel.titleLabel.textColor = [UIColor whiteColor];
+    backButtonLabel.titleLabel.textAlignment = NSTextAlignmentLeft;
+    [backButtonLabel addTarget:self action:@selector(cameraPressed:) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithCustomView:backButtonLabel];
+    
+    self.navigationItem.leftBarButtonItem = backItem;
+    
+    
+    NSDictionary *barButtonAppearanceDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [[UIColor whiteColor] colorWithAlphaComponent:1.0],
+                                             NSForegroundColorAttributeName,
+                                             [UIFont fontWithName:@"GothamRounded-Light" size:16.0],
+                                             NSFontAttributeName,
+                                             nil];
+    
+    [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
+     setTitleTextAttributes:barButtonAppearanceDict forState:UIControlStateNormal];
+    //--------------
+    
     
     
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
@@ -200,20 +251,28 @@ myTabBarController *myController;
     theResendIndexPath = [[NSIndexPath alloc] init];
     
     lightGrayColor = [UIColor colorWithRed:240/255.0f green:245/255.0f blue:248/255.0f alpha:1.0f];
+    theFacebookBlueColor = [myGeneralMethods getColorFromHexString:@"3b579d"];
+    
+    facebookIconImage = [myGeneralMethods scaleImage:[UIImage imageNamed:@"facebook_small.png"] toWidth:35];
+    resendIconImage = [myGeneralMethods scaleImage:[UIImage imageNamed:@"resend_small.png"] toWidth:35];
+    downloadIconImage = [myGeneralMethods scaleImage:[UIImage imageNamed:@"download_small.png"] toWidth:35];
     
     //[self.tableView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
+    
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     
     //----------if the gallery contains messages----------------------------
     if([messagesDataFile count] > 0){
         APLLog(@"%d messages in the gallery",[messagesDataFile count]);
-        self.view.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
+        //self.view.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
+        self.view.backgroundColor = [UIColor whiteColor];
     }
     //----------if the gallery is empty----------------------------
     else{
         APLLog(@"No messages in the gallery");
-        self.view.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
-        //self.view.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"background_nomessages.png"]];
+        //self.view.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
+        self.view.backgroundColor = [UIColor whiteColor];
     }
     
     //keoTableView.frame = CGRectMake(0, 65, screenWidth, screenHeight-65-tabBarHeight);
@@ -246,29 +305,43 @@ myTabBarController *myController;
         //------------progressview to inform the user he is currently still uploading a photo (in the TakePicture2 view)
         progressView2 = [[UIProgressView alloc] init];
         progressView2.frame = CGRectMake(0,64,screenWidth,2);
-        [progressView2 setProgressTintColor:[UIColor orangeColor]];
+        [progressView2 setProgressTintColor:thePicteverGreenColor];
         [progressView2 setUserInteractionEnabled:NO];
         [progressView2 setProgressViewStyle:UIProgressViewStyleBar];
         [progressView2 setTrackTintColor:[UIColor clearColor]];
-        
     }
     else{
         
     }
     
     //----------------show the user he is currently downloading an image-------------------
-    _loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.14*screenWidth, 20, 100, 40)];
+    //_backgroundLoadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.04*screenWidth, 20, 100, 30)];
+    int widthOfLoadingLabel = 100;
+    _backgroundLoadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*widthOfLoadingLabel, tabBarHeight+20, widthOfLoadingLabel, 30)];
+    _backgroundLoadingLabel.backgroundColor = thePicteverYellowColor;
+    _backgroundLoadingLabel.clipsToBounds = YES;
+    _backgroundLoadingLabel.layer.cornerRadius = 4;
+    _backgroundLoadingLabel.alpha = 0.9;
+    _backgroundLoadingLabel.hidden = YES;
+    [self.parentViewController.view addSubview:_backgroundLoadingLabel];
+    
+    //_loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.14*screenWidth, 20, 100, 40)];
+    _loadingLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*widthOfLoadingLabel+35, tabBarHeight+20, widthOfLoadingLabel-35, 30)];
     _loadingLabel.backgroundColor = [UIColor clearColor];
-    [_loadingLabel setFont:[UIFont systemFontOfSize:12]];
+    _loadingLabel.textColor = [UIColor whiteColor];
+    //[_loadingLabel setFont:[UIFont systemFontOfSize:12]];
+    [_loadingLabel setFont:[UIFont fontWithName:@"GothamRounded-Light" size:14]];
     self.initialLoadingLabelYOffset = _loadingLabel.frame.origin.y;
     [self.parentViewController.view addSubview:_loadingLabel];
     
     _spinnerTop = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    _spinnerTop.center = CGPointMake(0.075*screenWidth, 40);
-    _spinnerTop.color = [UIColor blackColor];
+    //_spinnerTop.center = CGPointMake(0.075*screenWidth, 40);
+    _spinnerTop.center = CGPointMake(0.5*screenWidth-0.5*widthOfLoadingLabel+17, 83);
+    _spinnerTop.color = [UIColor whiteColor];
     _spinnerTop.hidesWhenStopped = YES;
     self.initialSpinnerTopYOffset = _spinnerTop.frame.origin.y;
     [self.parentViewController.view addSubview:_spinnerTop];
+    
     
     
     self.initialNavigationBarYOffset = self.navigationController.navigationBar.frame.origin.y;
@@ -292,6 +365,7 @@ myTabBarController *myController;
     _loadTbvLabel.text = @"";
     _loadTbvLabel.backgroundColor = [UIColor whiteColor];
     _loadTbvLabel.alpha = 0.85;
+    [_loadTbvLabel setFont:[UIFont fontWithName:@"GothamRounded-Light" size:14]];
     
     _loadTbvSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     _loadTbvSpinner.center = CGPointMake(0.5*screenWidth, 0.5*screenHeight-navBarHeight);
@@ -300,9 +374,28 @@ myTabBarController *myController;
     [_loadTbvLabel addSubview:_loadTbvSpinner];
     
     
+    //------------Create two swipe recognizers (one for left/right direction and one for top/down direction)----------------
+    swipeRecognizer3 = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(respondToSwipeGesture3:)];
+    [swipeRecognizer3 setDirection:(UISwipeGestureRecognizerDirectionRight)];
+    [self.view addGestureRecognizer:swipeRecognizer3];
+    
+    
     [self initHeaderView];
     
     [self initPopupViews];
+    
+    
+    int margeWidth = 20;
+    firstInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(margeWidth, 170, screenWidth-2*margeWidth, 100)];
+    firstInfoLabel.text = @"This is where you will receive your future messages!";
+    if([myLocaleString isEqualToString:@"FR"]){
+        firstInfoLabel.text = @"C'est ici qu'arriveront tes futurs messages!";
+    }
+    firstInfoLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:18];
+    firstInfoLabel.numberOfLines=0;
+    firstInfoLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    firstInfoLabel.textAlignment = NSTextAlignmentCenter;
+    firstInfoLabel.textColor = thePicteverGrayColor;
     
     if([self.tableView numberOfRowsInSection:0]>0){
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
@@ -310,36 +403,43 @@ myTabBarController *myController;
     
     [self.tableView reloadData];
     
+
     APLLog(@"KeoMessages didload");
 }
 
 -(void)initPopupViews{
     resentSuccessfullyLabelK = [[UILabel alloc] initWithFrame:CGRectMake(0, -30, screenWidth, 30)];
-    resentSuccessfullyLabelK.backgroundColor = theKeoOrangeColor;
+    resentSuccessfullyLabelK.backgroundColor = thePicteverGreenColor;
     resentSuccessfullyLabelK.textColor = [UIColor whiteColor];
-    resentSuccessfullyLabelK.font = [UIFont fontWithName:@"Gabriola" size:22];
+    resentSuccessfullyLabelK.font = [UIFont fontWithName:@"GothamRounded-Bold" size:18];
     resentSuccessfullyLabelK.textAlignment = NSTextAlignmentCenter;
-    resentSuccessfullyLabelK.alpha = 0.95;
+    resentSuccessfullyLabelK.alpha = 1;
     resentSuccessfullyLabelK.text = @"Message resent successfully!";
+    if([myLocaleString isEqualToString:@"FR"]){
+        resentSuccessfullyLabelK.text = @"Message renvoyé!";
+    }
     
     resentSuccessfullyLabelK2 = [[UILabel alloc] initWithFrame:CGRectMake(0, -48, screenWidth, 18)];
-    resentSuccessfullyLabelK2.backgroundColor = theKeoOrangeColor;
-    resentSuccessfullyLabelK2.alpha = 0.95;
+    resentSuccessfullyLabelK2.backgroundColor = thePicteverGreenColor;
+    resentSuccessfullyLabelK2.alpha = 1;
     
     [self.parentViewController.view addSubview:resentSuccessfullyLabelK2];
     [self.parentViewController.view addSubview:resentSuccessfullyLabelK];
     
     sentSuccessfullyLabelK = [[UILabel alloc] initWithFrame:CGRectMake(0, -30, screenWidth, 30)];
-    sentSuccessfullyLabelK.backgroundColor = theKeoOrangeColor;
+    sentSuccessfullyLabelK.backgroundColor = thePicteverYellowColor;
     sentSuccessfullyLabelK.textColor = [UIColor whiteColor];
-    sentSuccessfullyLabelK.font = [UIFont fontWithName:@"Gabriola" size:22];
+    sentSuccessfullyLabelK.font = [UIFont fontWithName:@"GothamRounded-Bold" size:18];
     sentSuccessfullyLabelK.textAlignment = NSTextAlignmentCenter;
-    sentSuccessfullyLabelK.alpha = 0.95;
+    sentSuccessfullyLabelK.alpha = 1;
     sentSuccessfullyLabelK.text = @"Message sent successfully!";
+    if([myLocaleString isEqualToString:@"FR"]){
+        sentSuccessfullyLabelK.text = @"Message envoyé!";
+    }
     
     sentSuccessfullyLabelK2 = [[UILabel alloc] initWithFrame:CGRectMake(0, -48, screenWidth, 18)];
-    sentSuccessfullyLabelK2.backgroundColor = theKeoOrangeColor;
-    sentSuccessfullyLabelK2.alpha = 0.95;
+    sentSuccessfullyLabelK2.backgroundColor = thePicteverYellowColor;
+    sentSuccessfullyLabelK2.alpha = 1;
     
     [self.parentViewController.view addSubview:sentSuccessfullyLabelK2];
     [self.parentViewController.view addSubview:sentSuccessfullyLabelK];
@@ -347,48 +447,53 @@ myTabBarController *myController;
 
 -(void)initHeaderView{
     //----------------subview to show the refresh spinner and label----------------------
-    hdView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, 210)];//50 before Billy
-    hdView.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
+    hdView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, 100)];//50 before Billy
+    //hdView.backgroundColor = [myGeneralMethods getColorFromHexString:@"e4e1e0"];
+    hdView.backgroundColor = [UIColor whiteColor];
     
     
     //---------------add Billy with flag-----------------------------
-    myBillyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.06*screenWidth, 0.02*screenHeight, screenWidth*0.875, 180)];
-    myBillyImageView.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:@"panda_top_timeline.png"] withFactor:2];
+    myBillyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.06*screenWidth, 0.43*hdView.frame.size.height, screenWidth*0.875, 0.6*hdView.frame.size.height)];
+    NSString *robotImageName = @"robot_plein_small.png";
+    if([myLocaleString isEqualToString:@"FR"]){
+        robotImageName = @"robot_plein_french_small.png";
+    }
+    myBillyImageView.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:robotImageName] withFactor:4];
     myBillyImageView.contentMode = UIViewContentModeCenter;
+    myBillyImageView.backgroundColor = [UIColor clearColor];
     
     billyTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(billyTapped)];
     billyTapRecognizer.numberOfTapsRequired = 1;
     [myBillyImageView addGestureRecognizer:billyTapRecognizer];
     myBillyImageView.userInteractionEnabled = YES;
     
-    //billyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.06*screenWidth, 0.34*screenHeight, screenWidth*0.875, 40)];
-    billyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.06*screenWidth, hdView.frame.size.height-45, screenWidth*0.875, 40)];
-    billyLabel.numberOfLines = 0;
-    billyLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    billyLabel.textAlignment = NSTextAlignmentCenter;
-    billyLabel.text = @"Wanna know how many messages you will receive in the future? Ask Billy!";
-    [billyLabel setFont:[UIFont fontWithName:@"Gabriola" size:18]];
-    
-    futureLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.43*screenWidth, 0.28
-                                                            *hdView.frame.size.height, 0.36*screenWidth, 40)];
+    futureLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.51*screenWidth, 0.51
+                                                            *hdView.frame.size.height, 0.39*screenWidth, 0.45*hdView.frame.size.height)];
     futureLabel.textAlignment = NSTextAlignmentCenter;
-    futureLabel.font = [UIFont fontWithName:@"Gabriola" size:30];
+    futureLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:28];
     futureLabel.textColor = [UIColor whiteColor];
     //futureLabel.backgroundColor = [UIColor yellowColor];
     
     [hdView addSubview:spinner];
     [hdView addSubview:refreshLabel];
     [hdView addSubview:myBillyImageView];
-    [hdView addSubview:billyLabel];
     [hdView addSubview:futureLabel];
     self.tableView.tableHeaderView = hdView;
 }
 
+-(IBAction)respondToSwipeGesture3:(UISwipeGestureRecognizer *)recognizer{
+    APLLog(@"respondToSwipeGesture3");
+    [self animateNavBarTo:20 withFixedAlpha:true];
+}
+
+
 //-----------------------------animation when message is sent succesfully--------------------------------
 
 -(void)showAnimateMessageSentSuccessfullyK{
-    [self.view bringSubviewToFront:sentSuccessfullyLabelK];
-    [self.view bringSubviewToFront:sentSuccessfullyLabelK2];
+    NSLog(@"showAnimateMessageSentSuccessfullyK");
+    
+    [self.parentViewController.view bringSubviewToFront:sentSuccessfullyLabelK];
+    [self.parentViewController.view bringSubviewToFront:sentSuccessfullyLabelK2];
     
     [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
                      animations:^{
@@ -444,7 +549,7 @@ myTabBarController *myController;
     billyTapRecognizer.enabled = NO;
     
     futureLabel.text = [NSString stringWithFormat:@"%@!",numberOfMessagesInTheFuture];
-    myBillyImageView.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:@"panda_parle.png"] withFactor:2];
+    myBillyImageView.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:@"robot_small.png"] withFactor:4];
     
     if(![GPRequests connected]){
         //the user will have only 1.3 seconds to see the info
@@ -479,7 +584,11 @@ myTabBarController *myController;
     APLLog(@"hide future messages");
     billyTapRecognizer.enabled = YES;
     futureLabel.text = @"";
-    myBillyImageView.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:@"panda_top_timeline.png"] withFactor:2];
+    NSString *robotImageName = @"robot_plein_small.png";
+    if([myLocaleString isEqualToString:@"FR"]){
+        robotImageName = @"robot_plein_french_small.png";
+    }
+    myBillyImageView.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:robotImageName] withFactor:4];
 }
 
 
@@ -505,6 +614,7 @@ myTabBarController *myController;
      _shownIndexes = [NSMutableSet set];
      [self.tableView reloadData];
      }*/
+    [firstInfoLabel removeFromSuperview];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -515,20 +625,27 @@ myTabBarController *myController;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showAnimateMessageSentSuccessfullyK) name:my_notif_messageSentSuccessfully_name object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showAnimateMessageResentSuccessfullyK) name:my_notif_messageResentSuccessfully_name object:nil];
+    
+    if([messagesDataFile count]==0){
+        [self.view addSubview:firstInfoLabel];
+    }
 }
 
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     
     //------------------replace the tabbar in case it is not--------------
-    CGRect frame2 = self.tabBarController.tabBar.frame;
+    /*CGRect frame2 = self.tabBarController.tabBar.frame;
     CGFloat height2 = frame2.size.height;
     
     // zero duration means no animation
     CGFloat duration = (animated)? 0.3 : 0.0;
     [UIView animateWithDuration:duration animations:^{
         self.tabBarController.tabBar.frame = CGRectMake(0, screenHeight-height2, frame2.size.width, frame2.size.height);
-    }];
+    }];*/
+    if([self tabBarIsVisible]){
+        [self setTabBarVisible:NO animated:YES];
+    }
     
     billyTapRecognizer.enabled = YES;
 
@@ -581,6 +698,7 @@ myTabBarController *myController;
 }
 
 
+
 //----------if more than 10 messages are loaded in the tableview, remove them to avoid memory errors---------------
 -(void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
@@ -626,6 +744,8 @@ myTabBarController *myController;
 
 -(void)insertNewRow:(NSNotification *)notification{
     APLLog(@"insertNewRow: %@",[notification.userInfo description]);
+    [firstInfoLabel removeFromSuperview];
+    
     NSMutableDictionary *newPhotoMessage = [notification.userInfo mutableCopy];
     ShyftMessage *shyftToInsert = [[ShyftMessage alloc] initWithShyft:newPhotoMessage];
     if(![myShyftSet containsShyft:shyftToInsert]){
@@ -660,6 +780,8 @@ myTabBarController *myController;
 }
 
 -(void)vibrateNow:(NSMutableDictionary *)newPhotoMessage{
+    [firstInfoLabel removeFromSuperview];
+    
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
     KeoMessages * vck = (KeoMessages *)[storyboard instantiateViewControllerWithIdentifier:my_storyboard_timeline_Name];
     // viewController is visible
@@ -730,6 +852,8 @@ myTabBarController *myController;
 
 //--------------------look in messagesdatafile (contains all the messages) if some of them didn't download the photo----------------------
 //----------------------------if yes put them in the loadbox and try to download the photos-----------------------------------------------
+
+
 -(void)loadUnloadImages{
     if(!isLoadingLoadBox){
         loadBox = [[NSMutableArray alloc] init];
@@ -773,12 +897,14 @@ myTabBarController *myController;
     APLLog(@"startLoadingAnimation");
     [_spinnerTop startAnimating];
     _loadingLabel.text = @"loading..";
+    _backgroundLoadingLabel.hidden = NO;
 }
 
 -(void)stopLoadingAnimation{
     APLLog(@"stopLoadingAnimation");
     [_spinnerTop stopAnimating];
     _loadingLabel.text = @"";
+    _backgroundLoadingLabel.hidden = YES;
 }
 
 -(void)emptyVibrateBox{
@@ -874,6 +1000,108 @@ myTabBarController *myController;
 
 //-------------the photo is selected to be put in full screen -----------------------
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+
+    if(indexPath.row < [myShyftSet size]){
+        
+    }
+}
+
+-(void)showInfoLabelForPict:(ShyftMessage *)pictToDetail{
+    [self okButtonPressed];
+    
+    NSString *stringForTextView = @"From:\n";
+    if(![pictToDetail.from_facebook_name isEqualToString:@""]){
+        stringForTextView = [NSString stringWithFormat:@"%@-%@\n",stringForTextView,pictToDetail.from_facebook_name];
+    }
+    if(![pictToDetail.from_email isEqualToString:@""]){
+        stringForTextView = [NSString stringWithFormat:@"%@-%@\n",stringForTextView,pictToDetail.from_email];
+    }
+    if(![pictToDetail.from_numero isEqualToString:@""]){
+        stringForTextView = [NSString stringWithFormat:@"%@-%@\n",stringForTextView,pictToDetail.from_numero];
+    }
+    stringForTextView = [stringForTextView stringByAppendingString:@"\nSent:\n"];
+    if(![pictToDetail.created_at isEqualToString:@""]){
+        NSDate *sentRealDate = [NSDate dateWithTimeIntervalSince1970:([pictToDetail.created_at doubleValue])];
+        stringForTextView = [NSString stringWithFormat:@"%@-%@\n",stringForTextView,[myGeneralMethods getStringToPrint:sentRealDate]];
+    }
+    stringForTextView = [stringForTextView stringByAppendingString:@"\nReceived:\n"];
+    if(![pictToDetail.received_at isEqualToString:@""]){
+        NSDate *receivedRealDate = [NSDate dateWithTimeIntervalSince1970:([pictToDetail.received_at doubleValue])];
+        stringForTextView = [NSString stringWithFormat:@"%@-%@\n\n",stringForTextView,[myGeneralMethods getStringToPrint:receivedRealDate]];
+    }
+    
+    int textViewWidth = screenWidth-50;
+    int textViewHeight = 300;
+    int barMarge = 10;
+    int bottomPlaceHeight = 50;
+    int okButtonSize = 40;
+    CGRect initialPointRect = CGRectMake(0, screenHeight, 0, 0);
+    CGRect infoTextViewFrame = CGRectMake(0.5*(screenWidth-textViewWidth), 100, textViewWidth, textViewHeight);
+    CGRect infoBarLabelFrame = CGRectMake(infoTextViewFrame.origin.x+barMarge, infoTextViewFrame.origin.y+infoTextViewFrame.size.height-bottomPlaceHeight, infoTextViewFrame.size.width-2*barMarge, 1);
+    CGRect okButtonFrame = CGRectMake(infoBarLabelFrame.origin.x, infoTextViewFrame.origin.y+infoTextViewFrame.size.height-bottomPlaceHeight+0.5*(bottomPlaceHeight-okButtonSize), infoBarLabelFrame.size.width, okButtonSize);
+    
+    infoTextView = [[UITextView alloc] initWithFrame:initialPointRect];
+    [infoTextView setEditable:NO];
+    [infoTextView setScrollEnabled:NO];
+    infoTextView.backgroundColor = thePicteverGreenColor;
+    infoTextView.layer.masksToBounds = YES;
+    infoTextView.layer.cornerRadius = 8;
+    infoTextView.textColor = [UIColor whiteColor];
+    infoTextView.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
+    infoTextView.alpha=0.9;
+    infoTextView.text = stringForTextView;
+    
+    infoBarLabel = [[UILabel alloc] initWithFrame:initialPointRect];
+    infoBarLabel.backgroundColor = [UIColor whiteColor];
+    
+    okButton = [[UIButton alloc] initWithFrame:initialPointRect];
+    okButton.backgroundColor = [UIColor clearColor];
+    okButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+    [okButton setTitle:@"Ok" forState:UIControlStateNormal];
+    okButton.titleLabel.textColor = [UIColor whiteColor];
+    okButton.titleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:18];
+    [okButton addTarget:self action:@selector(okButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.parentViewController.view addSubview:infoTextView];
+    [self.parentViewController.view addSubview:infoBarLabel];
+    [self.parentViewController.view addSubview:okButton];
+    
+    [UIView animateWithDuration:0.1
+                     animations: ^{
+                         [infoTextView setFrame:infoTextViewFrame];
+                         [infoBarLabel setFrame:infoBarLabelFrame];
+                         [okButton setFrame:okButtonFrame];
+                     }
+     
+                     completion:^(BOOL finished) {
+                         if (finished) {
+                             
+                         }
+                     }];
+}
+
+-(void)okButtonPressed{
+    [infoTextView removeFromSuperview];
+    [infoBarLabel removeFromSuperview];
+    [okButton removeFromSuperview];
+}
+
+- (IBAction)detailPressed:(id)sender {
+    APLLog(@"Detail pressed");
+    CGPoint buttonPosition = [sender convertPoint:CGPointZero toView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:buttonPosition];
+    if(indexPath.row < [myShyftSet size]){
+        ShyftMessage *thePictToDetail = [myShyftSet getShyftAtIndex:indexPath.row];
+        if(thePictToDetail){
+            [self showInfoLabelForPict:thePictToDetail];
+        }
+    }
+}
+
+- (IBAction)imagePressed:(id)sender {//-----------user wants to zoom image-------
+    APLLog(@"image pressed");
+    CGPoint buttonPosition = [sender convertPoint:CGPointZero toView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:buttonPosition];
     if(indexPath.row < [myShyftSet size]){
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
         PhotoDetail * vc = (PhotoDetail *)[storyboard instantiateViewControllerWithIdentifier:@"PhotoDetail"];
@@ -882,6 +1110,22 @@ myTabBarController *myController;
             zoomOn = true;
             [self presentViewController:vc animated:NO completion:nil];
         }
+    }
+}
+
+- (void)tableView:(UITableView *)tableView willBeginEditingRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(indexPath.row < [myShyftSet size]){
+        UITableViewCell *cellS = [tableView cellForRowAtIndexPath:indexPath];
+        ShyftCell *shyftCellS = (ShyftCell *)cellS;
+        [shyftCellS.imageButton setUserInteractionEnabled:NO];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didEndEditingRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(indexPath.row < [myShyftSet size]){
+        UITableViewCell *cellS = [tableView cellForRowAtIndexPath:indexPath];
+        ShyftCell *shyftCellS = (ShyftCell *)cellS;
+        [shyftCellS.imageButton setUserInteractionEnabled:YES];
     }
 }
 
@@ -904,6 +1148,11 @@ myTabBarController *myController;
         ShyftCell *shyftCell = (ShyftCell *)cell;
         
         
+        [shyftCell.nameLabel setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
+        [shyftCell.periodLabel setFont:[UIFont fontWithName:@"GothamRounded-Light" size:12]];
+        //shyftCell.periodLabel.textColor = shyftForCell.color;
+        //shyftCell.nameLabel.textColor = shyftForCell.color;
+        shyftCell.nameLabel.textColor = theKeoOrangeColor;
         
         //------------------sender name-------------------------------------
         if(![shyftForCell.fullName isEqualToString:@""]){
@@ -912,13 +1161,14 @@ myTabBarController *myController;
         }
         else{
             shyftCell.nameLabel.text = shyftForCell.from_numero;
-            shyftCell.emailLabel.text = shyftForCell.from_email;
+            //shyftCell.emailLabel.text = shyftForCell.from_email;
+            shyftCell.emailLabel.text = @"";
         }
         
         
         //--------------------in 3 days, in 3 months, in a year--------------------------
         if(shyftForCell.receive_label){
-            if(![shyftForCell.receive_label isEqualToString:@"calendar"]){
+            /*if(![shyftForCell.receive_label isEqualToString:@"calendar"]){
                 shyftCell.periodLabel.text = shyftForCell.receive_label;
             }
             else{
@@ -926,32 +1176,40 @@ myTabBarController *myController;
                     NSDate *realDate = [NSDate dateWithTimeIntervalSince1970:([shyftForCell.created_at doubleValue])];
                     shyftCell.periodLabel.text = [NSString stringWithFormat:@"Sent: %@",[myGeneralMethods getStringToPrint:realDate]];
                 }
-            }
+            }*/
+            NSDate *realDate = [NSDate dateWithTimeIntervalSince1970:([shyftForCell.created_at doubleValue])];
+            shyftCell.periodLabel.text = [myGeneralMethods getStringToPrint2:realDate];
         }
-        shyftCell.periodLabel.backgroundColor = shyftForCell.color;
-        [shyftCell.periodLabel setFont:[UIFont fontWithName:@"Gabriola" size:24]];
+        //shyftCell.periodLabel.backgroundColor = shyftForCell.color;
+        //[shyftCell.periodLabel setFont:[UIFont fontWithName:@"Gabriola" size:24]];
         
         //-----------------date of reception-----------------------------------------
-        if(shyftForCell.receive_date){
-            shyftCell.dateLabel.text = [myGeneralMethods getStringToPrint2:shyftForCell.receive_date];
-        }
+        //if(shyftForCell.receive_date){
+            //shyftCell.dateLabel.text = [myGeneralMethods getStringToPrint2:shyftForCell.receive_date];
+        //}
         
         //------------------PHOTO----------------------------
+        shyftCell.bigImageView.backgroundColor = [UIColor blackColor];
+        shyftCell.bigImageView.layer.cornerRadius = 10;
+        shyftCell.bigImageView.layer.masksToBounds = YES;
         shyftCell.bigImageView.image = shyftForCell.croppedImage;
         
         //------------------text if textmessage----------------
+        shyftCell.messageLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:20];
         if ([shyftForCell isTextMessage]) {
             
             shyftCell.messageLabel.text = shyftForCell.message;
-            shyftCell.messageLabel.textColor = shyftForCell.color;
+            shyftCell.messageLabel.textColor = [UIColor whiteColor];
         }
         else{
             shyftCell.messageLabel.text = @"";
         }
         
         //-------------------sender profile picture---------------------
-        shyftCell.userProfileImageView.layer.cornerRadius = shyftCell.userProfileImageView.frame.size.width / 2;
+        shyftCell.userProfileImageView.layer.cornerRadius = 3;
         shyftCell.userProfileImageView.layer.masksToBounds = YES;
+        shyftCell.userProfileImageView.backgroundColor = thePicteverGrayColor;
+        shyftCell.userProfileImageView.contentMode = UIViewContentModeScaleAspectFill;
         
         if(shyftForCell.userProfileImage != nil){
             shyftCell.userProfileImageView.image = shyftForCell.userProfileImage;
@@ -959,10 +1217,27 @@ myTabBarController *myController;
         
         
         //-------------buttons-------------------------
+        
+        [shyftCell.imageButton setUserInteractionEnabled:YES];
+        
+        shyftCell.fbButton.layer.cornerRadius = 3;
+        shyftCell.fbButton.layer.masksToBounds = YES;
+        shyftCell.fbButton.backgroundColor = theFacebookBlueColor;//facebook blue color
         [shyftCell.fbButton addTarget:self action:@selector(shareOnFB:) forControlEvents:UIControlEventTouchUpInside];
-        [shyftCell.fbButton setImage:[myGeneralMethods scaleImage3:[UIImage imageNamed:@"buton_fb.png"] withFactor:1.5] forState:UIControlStateNormal];
+        [shyftCell.fbButton setImage:facebookIconImage forState:UIControlStateNormal];
+        
+        shyftCell.resendButton.layer.cornerRadius = 3;
+        shyftCell.resendButton.layer.masksToBounds = YES;
+        shyftCell.resendButton.backgroundColor = theKeoOrangeColor;
         [shyftCell.resendButton addTarget:self action:@selector(resendPressed:) forControlEvents:UIControlEventTouchUpInside];
-        [shyftCell.resendButton setImage:[myGeneralMethods scaleImage3:[UIImage imageNamed:@"bulle_resend.png"] withFactor:1.5] forState:UIControlStateNormal];
+        [shyftCell.resendButton setImage:resendIconImage forState:UIControlStateNormal];
+        
+        shyftCell.downloadButton.layer.cornerRadius = 3;
+        shyftCell.downloadButton.layer.masksToBounds = YES;
+        shyftCell.downloadButton.backgroundColor = thePicteverGreenColor;
+        [shyftCell.downloadButton addTarget:self action:@selector(downloadImage:) forControlEvents:UIControlEventTouchUpInside];
+        [shyftCell.downloadButton setImage:downloadIconImage forState:UIControlStateNormal];
+        
         
         cell.backgroundColor = [UIColor clearColor];
         shyftCell.backgroundLabel.frame = CGRectMake(0, 0, screenWidth, 60);
@@ -976,16 +1251,43 @@ myTabBarController *myController;
         
         PandaCell *pandaCell = (PandaCell *)cell;
         
-        pandaCell.pandaSpeakLabel.text = @"Be careful! The timeline contains only your 10 last messages. Resend them in the future if you want to remember them!";
-        pandaCell.pandaSpeakLabel.font = [UIFont fontWithName:@"Gabriola" size:20];
-        pandaCell.contentMode = UIViewContentModeCenter;
-        pandaCell.pandaImgv.image = [myGeneralMethods scaleImage3:[UIImage imageNamed:@"little_billy_disco.png"] withFactor:1.7];
+        pandaCell.pandaSpeakLabel.text = @"Be careful! The timeline contains only your 10 last messages. Resend them to the future if you want to remember them! (orange button)";
+        if([myLocaleString isEqualToString:@"FR"]){
+            pandaCell.pandaSpeakLabel.text = @"Attention! La timeline ne contient que les 10 derniers messages. Renvoie-les dans le futur si tu veux t'en souvenir! (bouton orange)";
+        }
+        //pandaCell.pandaSpeakLabel.font = [UIFont fontWithName:@"Gabriola" size:20];
+        pandaCell.pandaSpeakLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:16];
+        pandaCell.contentMode = UIViewContentModeScaleAspectFit;
+        pandaCell.pandaImgv.image = [myGeneralMethods scaleImage:[UIImage imageNamed:@"robot_disco_small.png"] toWidth:pandaCell.pandaImgv.frame.size.width];
     }
     
     
     
     return cell;
     
+}
+
+-(void)downloadImage:(id)sender{
+    CGPoint buttonPosition = [sender convertPoint:CGPointZero toView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:buttonPosition];
+    NSLog(@"downloadImage");
+    if (indexPath != nil){
+        ShyftMessage *thePictToDownload = [myShyftSet getShyftAtIndex:indexPath.row];
+        APLLog(@"DownloadPressed: %@",[thePictToDownload getDescription]);
+        UIImage *imageToDownload = [KeoMessages prepareImageForExport:thePictToDownload];
+        UIImageWriteToSavedPhotosAlbum(imageToDownload,nil,nil,nil);
+        NSString *title5 = @"Image saved";
+        NSString *message5 = @"The image was saved in your phone gallery";
+        if([myLocaleString isEqualToString:@"FR"]){
+            title5 = @"Image enregistrée";
+            message5 = @"L'image a été enregistrée dans la gallerie de ton téléphone";
+        }
+        UIAlertView *alert5 = [[UIAlertView alloc]
+                               initWithTitle:title5
+                               message:message5 delegate:self
+                               cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alert5 show];
+    }
 }
 
 
@@ -1000,22 +1302,7 @@ myTabBarController *myController;
             APLLog(@"ShareOnPressed: %@",[theShyftToShare getDescription]);
             UIImage *imageToShare;
             
-            //---------------------photo message
-            if((![theShyftToShare.photo isEqualToString:@"None"])&&(![theShyftToShare.photo isEqualToString:@""])){
-                imageToShare = theShyftToShare.uiControl;
-            }
-            else{//-----------------text message
-                NSString *shyftMessage = theShyftToShare.message;
-                UIFont *messageFont = [UIFont systemFontOfSize:18];
-                
-                CGSize messageLabelSize = [myGeneralMethods text:shyftMessage sizeWithFont:messageFont constrainedToSize:CGSizeMake(screenWidth-30, 180)];
-                imageToShare = theShyftToShare.croppedImage;
-                
-                imageToShare = [KeoMessages drawText2:shyftMessage inImage:imageToShare inRect:CGRectMake(imageToShare.size.width*0.5-messageLabelSize.width*0.5, imageToShare.size.height*0.5-messageLabelSize.height*0.5, messageLabelSize.width,messageLabelSize.height) withFont:messageFont withColor:theShyftToShare.color];
-            }
-            
-            
-            imageToShare = [KeoMessages prepareImageForExport:imageToShare withLabel:theShyftToShare.receive_label];
+            imageToShare = [KeoMessages prepareImageForExport:theShyftToShare];
             
             // If the Facebook app is installed and we can present the share dialog
             if ([FBDialogs canPresentShareDialogWithPhotos]) {
@@ -1049,9 +1336,15 @@ myTabBarController *myController;
         
     }
     else{
+        NSString *title5 = @"Connection problem";
+        NSString *message5 = @"You have no internet connection";
+        if([myLocaleString isEqualToString:@"FR"]){
+            title5 = @"Problème de connexion";
+            message5 = @"Vous n'avez pas de connexion internet";
+        }
         UIAlertView *alert5 = [[UIAlertView alloc]
-                               initWithTitle:@"Connection problem"
-                               message:@"You have no internet connection" delegate:self
+                               initWithTitle:title5
+                               message:message5 delegate:self
                                cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert5 show];
     }
@@ -1059,10 +1352,41 @@ myTabBarController *myController;
 
 
 //------------------------------------------------------------------------------------------------------------------------
-//-------------------prepare image for facebook export (add shyft logo and name on the picture)---------------------------
+//-------------------prepare image for facebook export (add Pictever logo and name on the picture)---------------------------
 //------------------------------------------------------------------------------------------------------------------------
 
-+ (UIImage*) prepareImageForExport:(UIImage *)imageForExport withLabel:(NSString*)labelForExport{
+//---------------select image to share (photo or image with text if text message)------------
++(UIImage*)prepareImageForExport:(ShyftMessage *)thePictToShare{
+    UIImage *localImageToShare;
+    //---------------------photo message
+    if((![thePictToShare.photo isEqualToString:@"None"])&&(![thePictToShare.photo isEqualToString:@""])){
+        localImageToShare = thePictToShare.uiControl;
+        localImageToShare = [myGeneralMethods scaleImage:localImageToShare toWidth:2*localImageToShare.size.width];//--------image *2
+    }
+    else{//-----------------text message
+        NSString *shyftMessage = thePictToShare.message;
+        UIFont *messageFont = [UIFont fontWithName:@"GothamRounded-Bold" size:36];
+        
+        CGSize messageLabelSize = [myGeneralMethods text:shyftMessage sizeWithFont:messageFont constrainedToSize:CGSizeMake(2*(screenWidth-45),2*180)];
+        localImageToShare = thePictToShare.croppedImage;
+        localImageToShare = [myGeneralMethods scaleImage:localImageToShare toWidth:2*localImageToShare.size.width];//------image *2
+        
+        localImageToShare = [KeoMessages drawText2:shyftMessage inImage:localImageToShare inRect:CGRectMake(localImageToShare.size.width*0.5-messageLabelSize.width*0.5, localImageToShare.size.height*0.5-messageLabelSize.height*0.5, messageLabelSize.width,messageLabelSize.height) withFont:messageFont withColor:[UIColor whiteColor]];
+    }
+    
+    localImageToShare = [KeoMessages addPicteverBrandOnImage:localImageToShare];
+    return localImageToShare;
+}
+
+
++ (UIImage*) addPicteverBrandOnImage:(UIImage *)imageForExport{
+    UIImage *picteverLabel = [UIImage imageNamed:@"PicteverLabel.png"];
+    picteverLabel = [myGeneralMethods scaleImage:picteverLabel toWidth:0.3*imageForExport.size.width];
+    imageForExport = [KeoMessages addImage:picteverLabel atPoint:CGPointMake(5, imageForExport.size.height-picteverLabel.size.height-5) onImage:imageForExport];
+    //imageForExport = [KeoMessages addImage:picteverLabel atPoint:CGPointMake(10, 10) onImage:imageForExport];
+    return imageForExport;
+    
+    /*
     int topBandHeight = 40;
     UIImage *spirale = [myGeneralMethods scaleImage3:[UIImage imageNamed:@"spirale-white2.png"] withFactor:7];
     
@@ -1085,7 +1409,7 @@ myTabBarController *myController;
     
     imageForExport = [KeoMessages drawText2:title inImage:imageForExport inRect:CGRectMake(spirale.size.width-15+(topBande.size.width-spirale.size.width)*0.5-titleLabelSize.width*0.5, 10+topBande.size.height*0.5-titleLabelSize.height*0.5, titleLabelSize.width, titleLabelSize.height) withFont:titleLabelFont withColor:[UIColor whiteColor]];
     
-    return imageForExport;
+    return imageForExport;*/
 }
 
 + (UIImage*) fillImgOfSize:(CGSize)img_size withColor:(UIColor*)img_color{
@@ -1105,6 +1429,8 @@ myTabBarController *myController;
     /* return the value */
     return scaledImage;
 }
+
+
 
 + (UIImage*) addImage:(UIImage*)smallImage atPoint:(CGPoint)originPoint onImage:(UIImage*)backgroundImg{
     CGSize size = CGSizeMake(backgroundImg.size.width, backgroundImg.size.height);
@@ -1169,22 +1495,30 @@ myTabBarController *myController;
             APLLog(@"ResendPressed: %@",[theShyftToResend getDescription]);
             theResendIndexPath = indexPath;
             
-            if(![theShyftToResend.shyft_id isEqualToString:@""]){//----------------new way to resend (to keep)--------------
-                UIAlertView *resendAlert = [[UIAlertView alloc] initWithTitle:my_actionsheet_want_to_remember message:@"Resend it to yourself randomly in the future!"  delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles: @"Resend", nil];
-                [resendAlert show];
+            NSString *titleAlert = my_actionsheet_want_to_remember;
+            NSString *messageAlert = @"Resend it to yourself randomly in the future!";
+            NSString *titreCancel = @"Cancel";
+            NSString *titreResend = @"Resend";
+            if([myLocaleString isEqualToString:@"FR"]){
+                titleAlert = my_actionsheet_want_to_remember_french;
+                messageAlert = @"Renvoie-le à toi même dans le futur à une date au hasard!";
+                titreCancel = @"Annuler";
+                titreResend = @"Renvoyer";
             }
-            else{
-                //--------------old way to resend (to delete in a few weeks)---------------------
-                UIAlertView *resendAlert = [[UIAlertView alloc] initWithTitle:my_actionsheet_want_to_remember message:@"Resend it to yourself randomly in the future!"  delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles: @"Resend", nil];
-                [resendAlert show];
-                
-            }
+            UIAlertView *resendAlert = [[UIAlertView alloc] initWithTitle:titleAlert message:messageAlert  delegate:self cancelButtonTitle:titreCancel otherButtonTitles: titreResend, nil];
+            [resendAlert show];
         }
     }
     else{
+        NSString *titleAlert5 = @"Connection problem";
+        NSString *messageAlert5 = @"You have no internet connection";
+        if([myLocaleString isEqualToString:@"FR"]){
+            titleAlert5 = @"Problème de connexion";
+            messageAlert5 = @"Vous n'avez pas de connexion internet";
+        }
         UIAlertView *alert5 = [[UIAlertView alloc]
-                               initWithTitle:@"Connection problem"
-                               message:@"You have no internet connection" delegate:self
+                               initWithTitle:titleAlert5
+                               message:messageAlert5 delegate:self
                                cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert5 show];
     }
@@ -1205,7 +1539,7 @@ myTabBarController *myController;
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     
     
-    if([alertView.title isEqualToString:my_actionsheet_want_to_remember]){
+    if([alertView.title isEqualToString:my_actionsheet_want_to_remember]||[alertView.title isEqualToString:my_actionsheet_want_to_remember_french]){
         // the user clicked one of the OK/Cancel buttons
         if (buttonIndex == 0)
         {
@@ -1248,6 +1582,8 @@ myTabBarController *myController;
                         APLLog(@"last row");
                         [myShyftSet deleteShyftAtIndex:theResendIndexPath.row];
                         [self.tableView reloadData];
+                        
+                        [self.view addSubview:firstInfoLabel];
                     }
                     [myGeneralMethods saveMessagesData];
                     
@@ -1256,20 +1592,26 @@ myTabBarController *myController;
                 
             }
             else{
+                NSString *titleAlert5 = @"Connection problem";
+                NSString *messageAlert5 = @"You have no internet connection";
+                if([myLocaleString isEqualToString:@"FR"]){
+                    titleAlert5 = @"Problème de connexion";
+                    messageAlert5 = @"Vous n'avez pas de connexion internet";
+                }
                 UIAlertView *alert5 = [[UIAlertView alloc]
-                                       initWithTitle:@"Connection problem"
-                                       message:@"You have no internet connection" delegate:self
+                                       initWithTitle:titleAlert5
+                                       message:messageAlert5 delegate:self
                                        cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert5 show];
             }
         }
     }
-    else if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+    else if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]||[alertView.title isEqualToString:my_actionsheet_wanna_help_us_french]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
         }
     }
-    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]||[alertView.title isEqualToString:my_actionsheet_you_are_great_french]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
         }
@@ -1331,6 +1673,13 @@ myTabBarController *myController;
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [self.tableView reloadData];
+    
+    if(indexPath.row < [myShyftSet size]){//--------to avoid imageButton to be disabled-----
+        UITableViewCell *cellD = [tableView cellForRowAtIndexPath:indexPath];
+        ShyftCell *shyftCellD = (ShyftCell *)cellD;
+        [shyftCellD.imageButton setUserInteractionEnabled:YES];
+    }
+    
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         
         ShyftMessage *shyftToDelete = [myShyftSet getShyftAtIndex:indexPath.row];
@@ -1364,6 +1713,8 @@ myTabBarController *myController;
                 APLLog(@"last row");
                 [myShyftSet deleteShyftAtIndex:indexPath.row];
                 [self.tableView reloadData];
+                
+                [self.view addSubview:firstInfoLabel];
             }
             [myGeneralMethods saveMessagesData];
         }
@@ -1398,7 +1749,7 @@ myTabBarController *myController;
 - (CGFloat)tableView:(UITableView*)tableView heightForRowAtIndexPath:(NSIndexPath*)indexPath{
     //return 360;
     if(indexPath.row < [myShyftSet size]){
-        return 368;
+        return 371;
     }
     else{
         return 130;
@@ -1411,6 +1762,40 @@ myTabBarController *myController;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
     UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"SettingsScreen"];
     [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (IBAction)cameraPressed:(id)sender {
+    UITabBarController * tabBarController = (UITabBarController *)self.tabBarController;
+    int controllerIndex = 1;
+    UIView * fromView = tabBarController.selectedViewController.view;
+    UIView * toView = [[tabBarController.viewControllers objectAtIndex:controllerIndex] view];
+    
+    // Get the size of the view area.
+    CGRect viewSize = fromView.frame;
+    BOOL scrollRight = controllerIndex > tabBarController.selectedIndex;
+    
+    // Add the to view to the tab bar view.
+    [fromView.superview addSubview:toView];
+    
+    // Position it off screen.
+    toView.frame = CGRectMake((scrollRight ? 320 : -320), viewSize.origin.y, 320, viewSize.size.height);
+    
+    [UIView animateWithDuration:0.3
+                     animations: ^{
+                         
+                         // Animate the views on and off the screen. This will appear to slide.
+                         fromView.frame =CGRectMake((scrollRight ? -320 : 320), viewSize.origin.y, 320, viewSize.size.height);
+                         toView.frame =CGRectMake(0, viewSize.origin.y, 320, viewSize.size.height);
+                     }
+     
+                     completion:^(BOOL finished) {
+                         if (finished) {
+                             
+                             // Remove the old view from the tabbar view.
+                             [fromView removeFromSuperview];
+                             tabBarController.selectedIndex = controllerIndex;
+                         }
+                     }];
 }
 
 
@@ -1552,7 +1937,7 @@ myTabBarController *myController;
                 refreshLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.56*screenWidth, 5, 100, 40)];
                 refreshLabel.text = @"";
                 refreshLabel.backgroundColor = [UIColor clearColor];
-                [refreshLabel setFont:[UIFont systemFontOfSize:12]];
+                [refreshLabel setFont:[UIFont fontWithName:@"GothamRounded-Light" size:12]];
                 [self.view addSubview:refreshLabel];
                 
                 spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
@@ -1689,7 +2074,7 @@ myTabBarController *myController;
 {
     CGRect frame = self.navigationController.navigationBar.frame;
     if (frame.origin.y < 20) {
-        [self animateNavBarTo:-(frame.size.height - 21)];
+        [self animateNavBarTo:-(frame.size.height - 21) withFixedAlpha:false];
     }
 }
 
@@ -1705,19 +2090,23 @@ myTabBarController *myController;
     self.navigationController.navigationBar.tintColor = [self.navigationController.navigationBar.tintColor colorWithAlphaComponent:alpha];
 
     [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                     [[UIColor blackColor] colorWithAlphaComponent:alpha],
+                                                                     [[UIColor whiteColor] colorWithAlphaComponent:alpha],
                                                                      NSForegroundColorAttributeName,
-                                                                     [UIFont fontWithName:@"Helvetica-Bold" size:16.0],
+                                                                     [UIFont fontWithName:@"GothamRounded-Bold" size:18.0],
                                                                      NSFontAttributeName,
                                                                      nil]];
     
+    
 }
 
-- (void)animateNavBarTo:(CGFloat)y
+- (void)animateNavBarTo:(CGFloat)y withFixedAlpha:(bool)alphaFixed
 {
     [UIView animateWithDuration:0.2 animations:^{
         CGRect frame = self.navigationController.navigationBar.frame;
         CGFloat alpha = (frame.origin.y >= y ? 0 : 1);
+        if(alphaFixed){
+            alpha = 1;
+        }
         frame.origin.y = y;
         
         [self updateOtherViewsToFrame:frame withAlpha:alpha];
@@ -1735,13 +2124,22 @@ myTabBarController *myController;
     CGRect spinnerTopFrame = _spinnerTop.frame;
     spinnerTopFrame.origin.y = self.initialSpinnerTopYOffset+barFrame.origin.y-self.initialNavigationBarYOffset;
     [_spinnerTop setFrame:spinnerTopFrame];
-    _spinnerTop.alpha = alpha;
+    //_spinnerTop.alpha = alpha;
     
     CGRect loadingLabelFrame = _loadingLabel.frame;
     loadingLabelFrame.origin.y = self.initialLoadingLabelYOffset+barFrame.origin.y-self.initialNavigationBarYOffset;
     [_loadingLabel setFrame:loadingLabelFrame];
-    _loadingLabel.alpha = alpha;
+    //_loadingLabel.alpha = alpha;
+    
+    CGRect backgroundLoadingLabelFrame = _backgroundLoadingLabel.frame;
+    backgroundLoadingLabelFrame.origin.y = self.initialLoadingLabelYOffset+barFrame.origin.y-self.initialNavigationBarYOffset;
+    [_backgroundLoadingLabel setFrame:backgroundLoadingLabelFrame];
 }
+
+/*
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleLightContent;
+}*/
 
 
 @end

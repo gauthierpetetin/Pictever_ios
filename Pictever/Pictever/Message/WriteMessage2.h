@@ -16,19 +16,19 @@
 #import <AudioToolbox/AudioServices.h>
 
 
+
 @class myGeneralMethods;
 
 @interface WriteMessage2 : UIViewController  <MFMessageComposeViewControllerDelegate, UINavigationControllerDelegate, UITextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
 
 - (IBAction)settingsPressed2:(id)sender;
+- (IBAction)camerapressed2:(id)sender;
 
 -(NSString *)stringFromArray:(NSMutableArray *)array;
 
 -(NSString *)stringForKeoChoice:(NSString *)choice withParameter:(NSString *)parameter;
 
 -(void) askNewMessages2;
-
--(void)cancelPressed2;
 
 - (IBAction)respondToTapGesture2:(UITapGestureRecognizer *)recognizer;
 

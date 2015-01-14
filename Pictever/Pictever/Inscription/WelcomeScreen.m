@@ -62,6 +62,7 @@ NSString *myDeviceToken;
 
 NSString *myUserID;
 
+NSString *myLocaleString;
 NSString *username;
 NSString *hashPassword;
 NSString *myCurrentPhoneNumber;
@@ -94,8 +95,14 @@ UILabel *myWelcomeLabel2;
 UIButton *signUpButton2;
 UIButton *logInButton2;
 UIButton *installButton;
+UIImageView *facebookImageView;
+UIImageView *courrierImageView;
 
 UIColor *theKeoOrangeColor;//global
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
 
 NSString *storyboardName;//global
 
@@ -113,7 +120,6 @@ bool localWork;
 
 GPSession *myUploadContactSession;//global
 
-int myBlinkingCounter;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -137,9 +143,7 @@ int myBlinkingCounter;
                                cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert5 show];
     }
-    
-    myBlinkingCounter = 0;
-    
+
     [self doFirstLogin];
     //[NSThread detachNewThreadSelector:@selector(doFirstLogin) toTarget:self withObject:nil];
     
@@ -156,7 +160,7 @@ int myBlinkingCounter;
         if(logIn){//------------------------user already log in---------------------------
             APLLog(@"already logIn");
             
-            self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"Ecran_acceuil_orange5@2x.png"]]];
+            self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"BackgroundSendToTheFuture@2x.png"]]];
             
             
             //// Switch screen
@@ -195,14 +199,14 @@ int myBlinkingCounter;
         //---------------user not login --> needs to sign up or login----------------
         else{
             APLLog(@"not login - show controls");
-            //self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"Ecran_acceuil_orange_empty.png"]]];
-            self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"FillesTrek@2x.png"]]];
-            //self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"GarconMontagneOrange@2x.png"]]];
+            self.view.backgroundColor =  [[UIColor alloc] initWithPatternImage:[myGeneralMethods scaleImage:[UIImage imageNamed:@"WelcomeScreenBackground@2x.png"]]];
             [self initControls];
 
             [self.view addSubview:signUpButton2];
+            [self.view addSubview:courrierImageView];
             [self.view addSubview:logInButton2];
             [self.view addSubview:fbLoginView];
+            [self.view addSubview:facebookImageView];
         }
     }
     
@@ -290,12 +294,12 @@ int myBlinkingCounter;
             APLLog(@"Cancel (install new version) was selected.");
         }
     }
-    else if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+    else if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]||[alertView.title isEqualToString:my_actionsheet_wanna_help_us_french]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
         }
     }
-    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]||[alertView.title isEqualToString:my_actionsheet_you_are_great_french]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
         }
@@ -309,6 +313,7 @@ int myBlinkingCounter;
 
 -(void)signUpPressed{
     //// Switch screen
+    [myGeneralMethods initializeAllAccountVariables];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
     UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"registerScreen"];
     vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
@@ -319,6 +324,7 @@ int myBlinkingCounter;
 
 -(void)logInPressed{
     //// Switch screen
+    [myGeneralMethods initializeAllAccountVariables];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
     UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:@"logInScreen"];
     vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
@@ -342,9 +348,10 @@ int myBlinkingCounter;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"insertNewRow" object:nil];
     
     [signUpButton2 removeFromSuperview];
+    [courrierImageView removeFromSuperview];
     [logInButton2 removeFromSuperview];
     [fbLoginView removeFromSuperview];
-
+    [facebookImageView removeFromSuperview];
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -384,13 +391,14 @@ int myBlinkingCounter;
     // Align the button in the center horizontally
     fbLoginView.frame = CGRectMake(0.5*screenWidth-0.5*xButton,screenHeight-3*yButton-3*yButton2,xButton,yButton);
     fbLoginView.layer.cornerRadius = 4;
-    fbLoginView.alpha = 0.95;
+    fbLoginView.alpha = 1;
     for (id obj in fbLoginView.subviews)
     {
         if ([obj isKindOfClass:[UIButton class]])
         {
             UIButton * loginButton =  obj;
             UIImage *loginImage = [UIImage imageNamed:@"Facebookconnect.png"];
+            //loginButton.backgroundColor = [myGeneralMethods getColorFromHexString:@"3b579d"];
             [loginButton setBackgroundImage:loginImage forState:UIControlStateNormal];
             [loginButton setBackgroundImage:nil forState:UIControlStateSelected];
             [loginButton setBackgroundImage:nil forState:UIControlStateHighlighted];
@@ -400,39 +408,53 @@ int myBlinkingCounter;
         {
             UILabel * loginLabel =  obj;
             loginLabel.text = @"Connect with Facebook";
-            loginLabel.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+            loginLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
             loginLabel.textAlignment = NSTextAlignmentCenter;
             loginLabel.frame = CGRectMake(0, 0, fbLoginView.frame.size.width, fbLoginView.frame.size.height);
         }
     }
     fbLoginView.delegate = self;
     
+    int facebookHeight = 20;
+    int courrierHeight = 20;
+    int decalageFb = 0.5*(1.54*courrierHeight-facebookHeight);
+    
+    facebookImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*xButton+10+decalageFb,screenHeight-3*yButton-3*yButton2+0.5*(yButton-facebookHeight),facebookHeight,facebookHeight)];
+    facebookImageView.image = [UIImage imageNamed:@"facebookLogin_small.png"];
+    facebookImageView.contentMode=UIViewContentModeScaleAspectFill;
+    
     //---------------Creation of Sign Up button
     signUpButton2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    signUpButton2.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),screenHeight-2*yButton-yButton2-5,xButton,yButton);
-    signUpButton2.backgroundColor = [UIColor darkGrayColor];
+    signUpButton2.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),screenHeight-2*yButton-2*yButton2,xButton,yButton);
+    signUpButton2.backgroundColor = thePicteverGreenColor;
     signUpButton2.layer.cornerRadius = 4;
     signUpButton2.clipsToBounds = YES;
     //[[signUpButton2 layer] setBorderWidth:2.0f];
     //[[signUpButton2 layer] setBorderColor:[UIColor whiteColor].CGColor];
     [signUpButton2 setTitle:@"Register with email" forState:UIControlStateNormal];
     [signUpButton2 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    signUpButton2.alpha = 0.75;
+    signUpButton2.titleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
+    signUpButton2.alpha = 1;
     [signUpButton2 addTarget:self
                       action:@selector(signUpPressed)
             forControlEvents:UIControlEventTouchUpInside];
     
+    courrierImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.5*screenWidth-(0.5*xButton)+10, screenHeight-2*yButton-2*yButton2+0.5*(yButton-courrierHeight), 1.54*courrierHeight, courrierHeight)];
+    courrierImageView.image = [UIImage imageNamed:@"courrier_small.png"];
+    courrierImageView.contentMode=UIViewContentModeScaleAspectFill;
+    
     //-----------------Creation of Log IN button
     logInButton2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    logInButton2.frame = CGRectMake(0.5*screenWidth-(0.5*xButton),screenHeight-yButton-yButton2,xButton,yButton);
-    logInButton2.backgroundColor = [UIColor darkGrayColor];
+    logInButton2.frame = CGRectMake(0.5*screenWidth-(0.5*xButton2),screenHeight-yButton-yButton2,xButton2,yButton);
+    logInButton2.backgroundColor = thePicteverYellowColor;
     logInButton2.layer.cornerRadius = 4;
     logInButton2.clipsToBounds = YES;
+    logInButton2.titleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
     //[[logInButton2 layer] setBorderWidth:2.0f];
     //[[logInButton2 layer] setBorderColor:[UIColor whiteColor].CGColor];
     [logInButton2 setTitle:@"Log in" forState:UIControlStateNormal];
     [logInButton2 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    logInButton2.alpha = 0.61;
+    logInButton2.alpha = 1;
     [logInButton2 addTarget:self
                      action:@selector(logInPressed)
            forControlEvents:UIControlEventTouchUpInside];
@@ -459,7 +481,7 @@ int myBlinkingCounter;
     //-----------------Creation of loading facebook spinner---------
     facebookLoginSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     facebookLoginSpinner.center = CGPointMake(0.5*screenWidth,0.5*screenHeight);
-    facebookLoginSpinner.color = [UIColor blackColor];
+    facebookLoginSpinner.color = [UIColor whiteColor];
     facebookLoginSpinner.hidesWhenStopped = YES;
 
 }
@@ -485,8 +507,10 @@ int myBlinkingCounter;
                             user:(id<FBGraphUser>)user {
     
     [signUpButton2 removeFromSuperview];
+    [courrierImageView removeFromSuperview];
     [logInButton2 removeFromSuperview];
     [fbLoginView removeFromSuperview];
+    [facebookImageView removeFromSuperview];
     
     myFacebookName = [user name];
     myFacebookID = [user objectID];
@@ -511,6 +535,7 @@ int myBlinkingCounter;
     [prefs setObject:myFacebookName forKey:my_prefs_fb_name_key];
     [prefs setObject:myFacebookID forKey:my_prefs_fb_id_key];
     [prefs setObject:myFacebookBirthDay forKey:my_prefs_fb_birthday_key];
+    [prefs setObject:username forKey:my_prefs_username_key];
     
     
     [self localAsynchronousFacebookLoginWithID:myFacebookID withFbName:myFacebookName andBirthday:myFacebookBirthDay for:self];
@@ -608,8 +633,10 @@ int myBlinkingCounter;
                                                                        fromData:data completionHandler:^(NSData *data,NSURLResponse *response,NSError *error) {
                                                                            dispatch_async(dispatch_get_main_queue(), ^{
                                                                                [self.view addSubview:signUpButton2];
+                                                                               [self.view addSubview:courrierImageView];
                                                                                [self.view addSubview:logInButton2];
                                                                                [self.view addSubview:fbLoginView];
+                                                                               [self.view addSubview:facebookImageView];
                                                                                [facebookLoginSpinner stopAnimating];
                                                                                [facebookLoginSpinner removeFromSuperview];
                                                                            });
@@ -669,8 +696,10 @@ int myBlinkingCounter;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.view addSubview:signUpButton2];
+        [self.view addSubview:courrierImageView];
         [self.view addSubview:logInButton2];
         [self.view addSubview:fbLoginView];
+        [self.view addSubview:facebookImageView];
         [facebookLoginSpinner stopAnimating];
         [facebookLoginSpinner removeFromSuperview];
     });

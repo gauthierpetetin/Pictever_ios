@@ -15,8 +15,6 @@
 @implementation StatusInfoController
 
 
-NSString *backgroundImage;//global
-
 CGFloat screenWidth;//global
 CGFloat screenHeight;//global
 
@@ -44,7 +42,7 @@ UILabel *infoLabel4;
     
     //--------------We print the information for the user about how he can increase his status------------------------
     
-    self.view.backgroundColor=[[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+    self.view.backgroundColor=[UIColor whiteColor];
     
     /*
     int buttonWidth11 = 0.85*screenWidth;

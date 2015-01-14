@@ -90,6 +90,7 @@ NSString *storyboardName;//global
 int openingWindow;//global
 
 //---------info about user account----------
+NSString *myLocaleString;
 NSString *adresseIp2;//global
 NSString *username;//global
 NSString *hashPassword;//global
@@ -113,7 +114,8 @@ UIButton *flashButtonPh;
 UIButton *frontButtonPh;
 UIButton *cancelButtonPh;
 UIButton *imagePickerButton;
-UIButton *colorButton;
+UIButton *extendedColorButton;
+UILabel *colorLabel;
 int xButton;
 int yButton;
 int xButton2;
@@ -127,7 +129,7 @@ UIImage *theKeoImage;
 UIImage *imageSaved;
 
 UILabel *tapScreenLabel;
-UILabel *seeMenuLabel;
+//UILabel *seeMenuLabel;
 UIButton *newMessageButtonPh;
 UILabel *sentSuccessfullyLabelPh;
 
@@ -152,6 +154,10 @@ bool sendSMS;//global
 //-------colors----------
 UIColor *theBackgroundColor;//global
 UIColor *theKeoOrangeColor;//global
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
 
 CGFloat localTabbarheight;
 int xButton2;
@@ -160,6 +166,7 @@ CGPoint originalShooterposition;
 int xButton15;
 int yButton15;
 CGPoint originalPickerposition;
+
 
 int colorCounter;
 
@@ -220,15 +227,20 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     
     
     //create sections with alphabetical order
-    self.colorArray = [NSArray arrayWithObjects:@"F6591E", @"483d8b", @"008B8B", @"008000", @"FFCC00", @"EA160B", @"8A2BE2", @"e9967a",@"f41690", @"000000", nil];
+    //self.colorArray = [NSArray arrayWithObjects:@"F6591E", @"483d8b", @"008B8B", @"008000", @"FFCC00", @"EA160B", @"8A2BE2", @"e9967a",@"f41690", @"000000", nil];
+    self.colorArray = [NSArray arrayWithObjects:theKeoOrangeColor,thePicteverGreenColor,thePicteverYellowColor,thePicteverGrayColor,[UIColor clearColor], nil];
 
     colorCounter = 0;
     
     
     if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         
+        NSString *titreAlertView = @"Device has no camera";
+        if([myLocaleString isEqualToString:@"FR"]){
+            titreAlertView = @"Ton téléphone n'a pas de caméra";
+        }
         UIAlertView *myAlertView = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                              message:@"Device has no camera"
+                                                              message:titreAlertView
                                                              delegate:nil
                                                     cancelButtonTitle:@"OK"
                                                     otherButtonTitles: nil];
@@ -415,15 +427,15 @@ UISwipeGestureRecognizer *swipeRecognizer2;
             if (on) {
                 [device setTorchMode:AVCaptureTorchModeOn];
                 [device setFlashMode:AVCaptureFlashModeOn];
-                UIImage *flashButtonImage = [UIImage imageNamed:@"flash_on.png"];
-                flashButtonImage = [myGeneralMethods scaleImage3:flashButtonImage withFactor:1.7];
+                UIImage *flashButtonImage = [UIImage imageNamed:@"flash_on_small.png"];
+                flashButtonImage = [myGeneralMethods scaleImage3:flashButtonImage withFactor:5];
                 [flashButtonPh setImage:flashButtonImage forState:UIControlStateNormal];
                 //torchIsOn = YES; //define as a variable/property if you need to know status
             } else {
                 [device setTorchMode:AVCaptureTorchModeOff];
                 [device setFlashMode:AVCaptureFlashModeOff];
-                UIImage *flashButtonImage = [UIImage imageNamed:@"flash_off.png"];
-                flashButtonImage = [myGeneralMethods scaleImage3:flashButtonImage withFactor:1.7];
+                UIImage *flashButtonImage = [UIImage imageNamed:@"flash_off_small.png"];
+                flashButtonImage = [myGeneralMethods scaleImage3:flashButtonImage withFactor:5];
                 [flashButtonPh setImage:flashButtonImage forState:UIControlStateNormal];
                 //torchIsOn = NO;
             }
@@ -463,7 +475,7 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 - (IBAction)respondToTapGesture:(UITapGestureRecognizer *)recognizer {
     
     [tapScreenLabel removeFromSuperview];
-    [seeMenuLabel removeFromSuperview];
+    //[seeMenuLabel removeFromSuperview];
     
     [self respondToSwipeGesture:recognizer];
     
@@ -473,12 +485,14 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     else{
         if([[self.view subviews] containsObject:keoTextFieldPh]){
             [keoTextFieldPh removeFromSuperview];
-            [colorButton removeFromSuperview];
+            [extendedColorButton removeFromSuperview];
+            [colorLabel removeFromSuperview];
         }
         else{
             if(pictureIsTaken){
                 [self.view addSubview:keoTextFieldPh];
-                [self.view addSubview:colorButton];
+                [self.view addSubview:extendedColorButton];
+                [self.view addSubview:colorLabel];
                 [keoTextFieldPh becomeFirstResponder];
             }
         }
@@ -489,7 +503,7 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 //------------------swipe gesture recognizer to show or hide the textfield on the photo---------------
 - (IBAction)respondToSwipeGesture:(UITapGestureRecognizer *)recognizer {
     NSLog(@"respond to swipe gesture");
-    
+    /*
     if(myImageViewPh.image == nil){
         NSLog(@"respond to swipe gesture2");
         if (![self tabBarIsVisible]){
@@ -497,7 +511,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
             [self setTabBarVisible:YES animated:YES];
             [UIView animateWithDuration:0.3 animations:^{
                 shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y-localTabbarheight);
-                imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y-localTabbarheight);
+                messagesButtonPh.center = CGPointMake(messagesButtonPh.center.x, originalShooterposition.y-localTabbarheight);
+                //imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y-localTabbarheight);
             }];
         }
         else
@@ -506,10 +521,10 @@ UISwipeGestureRecognizer *swipeRecognizer2;
             [self setTabBarVisible:NO animated:YES];
             [UIView animateWithDuration:0.3 animations:^{
                 shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y);
-                imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y);
+                //imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y);
             }];
         }
-    }
+    }*/
 
 }
 
@@ -518,16 +533,6 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [keoTextFieldPh resignFirstResponder];
     return YES;
-}
-
-//-----------go to messages--------------
--(void)messagesPressed{
-    [self switchScreenToMessages];
-}
-
-//------------go to shyft gallery----------
--(void)keoPressed{
-    [self switchScreenToKeo];
 }
 
 
@@ -564,7 +569,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     myImageViewPh.image = nil;
     [myImageViewPh removeFromSuperview];
     [keoTextFieldPh removeFromSuperview];
-    [colorButton removeFromSuperview];
+    [extendedColorButton removeFromSuperview];
+    [colorLabel removeFromSuperview];
     
     [cancelButtonPh removeFromSuperview];
     //[labelCancelPh removeFromSuperview];
@@ -578,7 +584,7 @@ UISwipeGestureRecognizer *swipeRecognizer2;
         [self startCameraWithFrontCamera:NO];
     }
     
-    [self indicateMenuBarAtFirstUse];
+    //[self indicateMenuBarAtFirstUse];
 }
 
 
@@ -677,19 +683,31 @@ UISwipeGestureRecognizer *swipeRecognizer2;
             }
         }
         else{
+            NSString *title5 = @"Connection problem";
+            NSString *alertMessage5 = @"You have no internet connection";
+            if([myLocaleString isEqualToString:@"FR"]){
+                title5 = @"Problème de connexion";
+                alertMessage5 = @"Vous n'avez pas de connexion internet";
+            }
             UIAlertView *alert5 = [[UIAlertView alloc]
-                                   initWithTitle:@"Connection problem"
-                                   message:@"You have no internet connection" delegate:self
+                                   initWithTitle:title5
+                                   message:alertMessage5 delegate:self
                                    cancelButtonTitle:@"Ok" otherButtonTitles:nil];
             [alert5 show];
         }
     }
     else{
-        UIAlertView *alert5 = [[UIAlertView alloc]
-                               initWithTitle:@"The app is still sending your previous message"
-                               message:@"Please wait a few seconds" delegate:self
+        NSString *title6 = @"The app is still sending your previous message";
+        NSString *alertMessage6 = @"Please wait a few seconds";
+        if([myLocaleString isEqualToString:@"FR"]){
+            title6 = @"Le message précédent est toujours en cours d'envoi";
+            alertMessage6 = @"Veuillez patienter un cours instant svp";
+        }
+        UIAlertView *alert6 = [[UIAlertView alloc]
+                               initWithTitle:title6
+                               message:alertMessage6 delegate:self
                                cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [alert5 show];
+        [alert6 show];
     }
     
 }
@@ -701,10 +719,11 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     ///////SceenShot
     [sendButtonPh removeFromSuperview];
     [cancelButtonPh removeFromSuperview];
-    [colorButton removeFromSuperview];
+    [extendedColorButton removeFromSuperview];
+    [colorLabel removeFromSuperview];
     
     [tapScreenLabel removeFromSuperview];
-    [seeMenuLabel removeFromSuperview];
+    //[seeMenuLabel removeFromSuperview];
     
     [newMessageButtonPh removeFromSuperview];
     
@@ -728,7 +747,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     //[self.view addSubview:labelCancelPh];
     
     [self.view bringSubviewToFront:keoTextFieldPh];
-    [self.view bringSubviewToFront:colorButton];
+    [self.view bringSubviewToFront:extendedColorButton];
+    [self.view bringSubviewToFront:colorLabel];
     
     [self.view addSubview:newMessageButtonPh];
     ////////
@@ -790,7 +810,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
                 myImageViewPh.image = nil;
                 [myImageViewPh removeFromSuperview];
                 [keoTextFieldPh removeFromSuperview];
-                [colorButton removeFromSuperview];
+                [extendedColorButton removeFromSuperview];
+                [colorLabel removeFromSuperview];
                 
                 [cancelButtonPh removeFromSuperview];
                 //[labelCancelPh removeFromSuperview];
@@ -804,29 +825,47 @@ UISwipeGestureRecognizer *swipeRecognizer2;
                 }
                 
                 
-                [self indicateMenuBarAtFirstUse];
+                //[self indicateMenuBarAtFirstUse];
             }
             else{
-                UIAlertView *alert5 = [[UIAlertView alloc]
-                                       initWithTitle:@"The app is still sending your previous message"
-                                       message:@"Please wait a few seconds" delegate:self
+                NSString *title6 = @"The app is still sending your previous message";
+                NSString *alertMessage6 = @"Please wait a few seconds";
+                if([myLocaleString isEqualToString:@"FR"]){
+                    title6 = @"Le message précédent est toujours en cours d'envoi";
+                    alertMessage6 = @"Veuillez patienter un cours instant svp";
+                }
+                UIAlertView *alert6 = [[UIAlertView alloc]
+                                       initWithTitle:title6
+                                       message:alertMessage6 delegate:self
                                        cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert5 show];
+                [alert6 show];
             }
             
         }
         else{
+            NSString *title4 = @"No date selected";
+            NSString *alertMessage4 = @"Pick a date first!";
+            if([myLocaleString isEqualToString:@"FR"]){
+                title4 = @"Pas de date sélectionnée";
+                alertMessage4 = @"Veuillez sélectionner une date svp";
+            }
             UIAlertView *alert4 = [[UIAlertView alloc]
-                                   initWithTitle:@"No date selected"
-                                   message:@"Pick a date first!" delegate:self
+                                   initWithTitle:title4
+                                   message:alertMessage4 delegate:self
                                    cancelButtonTitle:@"Ok" otherButtonTitles:nil];
             [alert4 show];
         }
     }
     else{
+        NSString *title3 = @"No contact selected";
+        NSString *alertMessage3 = @"Pick a contact first!";
+        if([myLocaleString isEqualToString:@"FR"]){
+            title3 = @"Pas de contact sélectionné";
+            alertMessage3 = @"Veuillez sélectionner un destinataire svp";
+        }
         UIAlertView *alert3 = [[UIAlertView alloc]
-                               initWithTitle:@"No contact selected"
-                               message:@"Pick a contact first!" delegate:self
+                               initWithTitle:title3
+                               message:alertMessage3 delegate:self
                                cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alert3 show];
     }
@@ -852,6 +891,9 @@ UISwipeGestureRecognizer *swipeRecognizer2;
         if([MFMessageComposeViewController canSendText])
         {
             controller.body = @"Hello! I just sent you a message in the future on Pictever! Download the app to receive it: http://pictever.com";
+            if([myLocaleString isEqualToString:@"FR"]){
+                controller.body = @"Salut! Je viens de t'envoyer une photo dans le futur grâce à l'application Pictever! Télécharges l'application, comme ça tu pourras le recevoir;)  http://pictever.com";
+            }
             controller.recipients = sendToSMS;
             controller.messageComposeDelegate = self;
             [self presentViewController:controller animated:YES completion:nil];
@@ -1111,8 +1153,12 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(showAnimateForNewMessage) name:my_notif_showBilly_name object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(showAnimateMessageSentSuccessfully) name:my_notif_messageSentSuccessfully_name object:nil];
     
-    shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y-localTabbarheight);
-    imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y-localTabbarheight);
+    if([self tabBarIsVisible]){
+        [self setTabBarVisible:NO animated:NO];
+    }
+    
+    //shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y-localTabbarheight);
+    //imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y-localTabbarheight);
     
     if(myImageViewPh.image == nil){
         APLLog(@"STARTCAMERA");
@@ -1125,7 +1171,24 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     }
     
     [self.view bringSubviewToFront:keoTextFieldPh];
-    [self.view bringSubviewToFront:colorButton];
+    [self.view bringSubviewToFront:extendedColorButton];
+    [self.view bringSubviewToFront:colorLabel];
+    
+    
+    //---------when we come back from the PickContact view, we directly show the UIactionSheet with the send_choices-----------
+    if(showDatePicker && [sendToDateAsText isEqualToString:@""]&&([sendToMail count]>0)){
+        [self timePressed];//show the UIactionSheet with the send_choices
+    }
+    if(sendKeo){
+        [self sendPressed];
+        sendKeo = false;
+    }
+    else{
+        
+    }
+    showDatePicker = false;
+    
+    
 }
 
 //to keep
@@ -1150,11 +1213,11 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 - (void)viewDidAppear:(BOOL)animated {
     APLLog(@"TakePicture3 did appear");
     [super viewDidAppear:animated];
-    [self setTabBarVisible:NO animated:YES];
-    [UIView animateWithDuration:0.3 animations:^{
-        shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y);
-        imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y);
-    }];
+    //[self setTabBarVisible:NO animated:YES];
+    //[UIView animateWithDuration:0.3 animations:^{
+        //shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y);
+        //imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y);
+    //}];
     
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(insertNewRow:) name:@"insertNewRow" object: nil];
@@ -1163,18 +1226,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     if(firstGlobalOpening){
         firstGlobalOpening = false;
     }
-    //---------when we come back from the PickContact view, we directly show the UIactionSheet with the send_choices-----------
-    if(showDatePicker && [sendToDateAsText isEqualToString:@""]&&([sendToMail count]>0)){
-        [self timePressed];//show the UIactionSheet with the send_choices
-    }
-    if(sendKeo){
-        [self sendPressed];
-        sendKeo = false;
-    }
-    else{
-        
-    }
-    showDatePicker = false;
+    
+    
 }
 
 -(void)viewDidDisappear:(BOOL)animated{
@@ -1193,12 +1246,12 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 }
 
 -(void)switchScreenToMessages{
-
+    // Get the views.
     [self.tabBarController setSelectedIndex:0];
 }
 
 -(void)switchScreenToKeo{
-
+    // Get the views.
     [self.tabBarController setSelectedIndex:2];
 }
 
@@ -1244,8 +1297,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
         NSLog(@"tabBar IS VISIBLE");
         [self setTabBarVisible:NO animated:YES];
         [UIView animateWithDuration:0.3 animations:^{
-            shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y);
-            imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y);
+            //shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y);
+            //imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y);
         }];
     }
     
@@ -1343,8 +1396,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     [flashButtonPh removeFromSuperview];
     [frontButtonPh removeFromSuperview];
     [shootButtonPh removeFromSuperview];
-    //[keoButtonPh removeFromSuperview];
-    //[messagesButtonPh removeFromSuperview];
+    [keoButtonPh removeFromSuperview];
+    [messagesButtonPh removeFromSuperview];
     //[labelChatPh removeFromSuperview];
     //[labelKeoPh removeFromSuperview];
     
@@ -1419,10 +1472,14 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     [keoTextFieldPh setTag:101];
     keoTextFieldPh.textAlignment = NSTextAlignmentCenter;
     keoTextFieldPh.textColor = [UIColor whiteColor];
-    keoTextFieldPh.backgroundColor = [myGeneralMethods getColorFromHexString:self.colorArray[colorCounter]];
+    //keoTextFieldPh.backgroundColor = [myGeneralMethods getColorFromHexString:self.colorArray[colorCounter]];
+    keoTextFieldPh.backgroundColor = self.colorArray[colorCounter];
     //[keoTextFieldPh.layer setBorderColor:[UIColor whiteColor].CGColor];
     //[keoTextFieldPh.layer setBorderWidth:1.0];
-    [keoTextFieldPh setFont:[UIFont systemFontOfSize:16]];
+    
+    //[keoTextFieldPh setFont:[UIFont systemFontOfSize:16]];
+    [keoTextFieldPh setFont:[UIFont fontWithName:@"GothamRounded-Bold" size:16]];
+    
     //keoTextFieldPh.lineBreakMode = NSLineBreakByWordWrapping;
     //keoTextFieldPh.numberOfLines = 0;
     
@@ -1431,19 +1488,19 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     // add drag listener
     [keoTextFieldPh addTarget:self action:@selector(wasDragged:withEvent:) forControlEvents:UIControlEventTouchDragInside];
     
-    /*
+    
     int xButton = 100;
     int yButton = 100;
     //Creation of Messages button
     messagesButtonPh = [UIButton buttonWithType:UIButtonTypeCustom];
-    messagesButtonPh.frame = CGRectMake(0.15*screenWidth-0.5*xButton,screenHeight-52-0.5*yButton,xButton,yButton);
+    messagesButtonPh.frame = CGRectMake(0.15*screenWidth-0.5*xButton,screenHeight-40-0.5*yButton,xButton,yButton);
     messagesButtonPh.backgroundColor = [UIColor clearColor];
     //[shootButton setTitle:@"Shoot" forState:UIControlStateNormal];
     //[shootButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    UIImage *messagesButtonImage = [UIImage imageNamed:@"Message.png"];
-    messagesButtonImage = [myGeneralMethods scaleImage3:messagesButtonImage withFactor:2];
+    UIImage *messagesButtonImage = [UIImage imageNamed:@"lettresAA_small.png"];
+    messagesButtonImage = [myGeneralMethods scaleImage3:messagesButtonImage withFactor:5];
     [messagesButtonPh setImage:messagesButtonImage forState:UIControlStateNormal];
-    [messagesButtonPh addTarget:self action:@selector(messagesPressed) forControlEvents:UIControlEventTouchUpInside];*/
+    [messagesButtonPh addTarget:self action:@selector(switchScreenToMessages) forControlEvents:UIControlEventTouchUpInside];
     
     
     //Creation of TakePicture button
@@ -1452,8 +1509,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     shootButtonPh.backgroundColor = [UIColor clearColor];
     //[shootButton setTitle:@"Shoot" forState:UIControlStateNormal];
     //[shootButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    UIImage *shootButtonImage = [UIImage imageNamed:@"CameraShootSmall.png"];
-    shootButtonImage = [myGeneralMethods scaleImage3:shootButtonImage withFactor:1.5];
+    UIImage *shootButtonImage = [UIImage imageNamed:@"shoot_small.png"];
+    shootButtonImage = [myGeneralMethods scaleImage3:shootButtonImage withFactor:2.4];
     [shootButtonPh setImage:shootButtonImage forState:UIControlStateNormal];
     shootButtonPh.enabled = YES;
     [shootButtonPh addTarget:self action:@selector(pressTakePictureButton) forControlEvents:UIControlEventTouchUpInside];
@@ -1462,12 +1519,11 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     int yButton3 = 100;
     //Creation of flash button
     flashButtonPh = [UIButton buttonWithType:UIButtonTypeCustom];
-    flashButtonPh.frame = CGRectMake(0.15*screenWidth-0.5*xButton3,50-0.5*yButton3,xButton3,yButton3);
+    //flashButtonPh.frame = CGRectMake(0.15*screenWidth-0.5*xButton3,50-0.5*yButton3,xButton3,yButton3);
+    flashButtonPh.frame = CGRectMake(0.70*screenWidth-0.5*xButton3,40-0.5*yButton3,xButton3,yButton3);
     flashButtonPh.backgroundColor = [UIColor clearColor];
-    //[shootButton setTitle:@"Shoot" forState:UIControlStateNormal];
-    //[shootButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    UIImage *flashButtonImage = [UIImage imageNamed:@"flash_off.png"];
-    flashButtonImage = [myGeneralMethods scaleImage3:flashButtonImage withFactor:1.7];
+    UIImage *flashButtonImage = [UIImage imageNamed:@"flash_off_small.png"];
+    flashButtonImage = [myGeneralMethods scaleImage3:flashButtonImage withFactor:5];
     [flashButtonPh setImage:flashButtonImage forState:UIControlStateNormal];
     [flashButtonPh addTarget:self action:@selector(flashPressed) forControlEvents:UIControlEventTouchUpInside];
     
@@ -1476,24 +1532,25 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     int yButton4 = 100;
     //Creation of frontCamera
     frontButtonPh = [UIButton buttonWithType:UIButtonTypeCustom];
-    frontButtonPh.frame = CGRectMake(0.84*screenWidth-0.5*xButton4,50-0.5*yButton4,xButton4,yButton4);
+    frontButtonPh.frame = CGRectMake(0.87*screenWidth-0.5*xButton4,40-0.5*yButton4,xButton4,yButton4);
     frontButtonPh.backgroundColor = [UIColor clearColor];
-    UIImage *frontButtonImage = [UIImage imageNamed:@"front.png"];
-    frontButtonImage = [myGeneralMethods scaleImage3:frontButtonImage withFactor:2.65];
+    UIImage *frontButtonImage = [UIImage imageNamed:@"front_camera_small.png"];
+    frontButtonImage = [myGeneralMethods scaleImage3:frontButtonImage withFactor:5];
     [frontButtonPh setImage:frontButtonImage forState:UIControlStateNormal];
     [frontButtonPh addTarget:self action:@selector(frontCameraPressed) forControlEvents:UIControlEventTouchUpInside];
     
-    /*
+    
     int xButton5 = 100;
     int yButton5 = 100;
     //Creation of Keo button
     keoButtonPh = [UIButton buttonWithType:UIButtonTypeCustom];
-    keoButtonPh.frame = CGRectMake(0.84*screenWidth-0.5*xButton5,screenHeight-52-0.5*yButton5,xButton5,yButton5);
+    keoButtonPh.frame = CGRectMake(0.84*screenWidth-0.5*xButton5,screenHeight-40-0.5*yButton5,xButton5,yButton5);
     keoButtonPh.backgroundColor = [UIColor clearColor];
-    UIImage *keoButtonImage = [UIImage imageNamed:@"spirale-white.png"];
-    keoButtonImage = [myGeneralMethods scaleImage3:keoButtonImage withFactor:2.4];
+    UIImage *keoButtonImage = [UIImage imageNamed:@"timeline_small.png"];
+    keoButtonImage = [myGeneralMethods scaleImage3:keoButtonImage withFactor:5];
     [keoButtonPh setImage:keoButtonImage forState:UIControlStateNormal];
-    [keoButtonPh addTarget:self action:@selector(keoPressed) forControlEvents:UIControlEventTouchUpInside];*/
+    [keoButtonPh addTarget:self action:@selector(switchScreenToKeo) forControlEvents:UIControlEventTouchUpInside];
+
     
     int xButton6 = 100;
     int yButton6 = 100;
@@ -1501,8 +1558,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     sendButtonPh = [UIButton buttonWithType:UIButtonTypeCustom];
     sendButtonPh.frame = CGRectMake(0.5*screenWidth-0.5*xButton6,screenHeight-110,xButton6,yButton6);
     sendButtonPh.backgroundColor = [UIColor clearColor];
-    UIImage *sendButtonImage = [UIImage imageNamed:@"Send.png"];
-    sendButtonImage = [myGeneralMethods scaleImage3:sendButtonImage withFactor:1.5];
+    UIImage *sendButtonImage = [UIImage imageNamed:@"send_button_small.png"];
+    sendButtonImage = [myGeneralMethods scaleImage3:sendButtonImage withFactor:2];
     [sendButtonPh setImage:sendButtonImage forState:UIControlStateNormal];
     [sendButtonPh.titleLabel setFont:[UIFont systemFontOfSize:20]];
     sendButtonPh.hidden = NO;
@@ -1536,8 +1593,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     cancelButtonPh = [UIButton buttonWithType:UIButtonTypeCustom];
     cancelButtonPh.frame = CGRectMake(0.12*screenWidth-0.5*xButton13,15,xButton13,yButton13);
     cancelButtonPh.backgroundColor = [UIColor clearColor];
-    UIImage *cancelButtonImage = [UIImage imageNamed:@"croix-annuler4.png"];
-    cancelButtonImage = [myGeneralMethods scaleImage3:cancelButtonImage withFactor:3.5];
+    UIImage *cancelButtonImage = [UIImage imageNamed:@"cancel_small"];
+    cancelButtonImage = [myGeneralMethods scaleImage3:cancelButtonImage withFactor:4];
     [cancelButtonPh setImage:cancelButtonImage forState:UIControlStateNormal];
     cancelButtonPh.hidden = NO;
     [cancelButtonPh addTarget:self action:@selector(cancelPressed) forControlEvents:UIControlEventTouchUpInside];
@@ -1561,36 +1618,43 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     
     //Creation of ImagePicker button
     imagePickerButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    imagePickerButton.frame = CGRectMake(0.88*screenWidth-0.5*xButton15,0.92*screenHeight-0.5*yButton15,xButton15,yButton15);
+    imagePickerButton.frame = CGRectMake(0.15*screenWidth-0.5*xButton3,40-0.5*yButton15,xButton15,yButton15);
     imagePickerButton.backgroundColor = [UIColor clearColor];
-    UIImage *imagePickerButtonImage = [UIImage imageNamed:@"galleryImage.png"];
+    UIImage *imagePickerButtonImage = [UIImage imageNamed:@"gallery_small.png"];
     imagePickerButtonImage = [myGeneralMethods scaleImage3:imagePickerButtonImage withFactor:5];
     [imagePickerButton setImage:imagePickerButtonImage forState:UIControlStateNormal];
     [imagePickerButton addTarget:self action:@selector(pickImageFromGallery) forControlEvents:UIControlEventTouchUpInside];
     
     
-    int colorButtonSize = 40;
-    colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [colorButton addTarget:self action:@selector(colorButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    colorButton.frame = CGRectMake(screenWidth-50, 20, colorButtonSize,colorButtonSize);
-    colorButton.clipsToBounds = YES;
-    colorButton.backgroundColor = [myGeneralMethods getColorFromHexString:self.colorArray[colorCounter]];
-    colorButton.layer.cornerRadius = colorButtonSize/2.0f;
+    int colorButtonSize = 80;
+    colorLabel = [[UILabel alloc] initWithFrame:CGRectMake(screenWidth-30-0.25*colorButtonSize, 40-0.25*colorButtonSize, 0.5*colorButtonSize,0.5*colorButtonSize)];
+    colorLabel.clipsToBounds = YES;
+    colorLabel.layer.cornerRadius = colorButtonSize/4.0f;
+    //colorLabel.backgroundColor = [myGeneralMethods getColorFromHexString:self.colorArray[colorCounter]];
+    colorLabel.backgroundColor = self.colorArray[colorCounter];
+    
+    extendedColorButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [extendedColorButton addTarget:self action:@selector(colorButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    extendedColorButton.frame = CGRectMake(screenWidth-30-0.5*colorButtonSize, 40-0.5*colorButtonSize, colorButtonSize,colorButtonSize);
+    extendedColorButton.clipsToBounds = YES;
+    extendedColorButton.backgroundColor = [UIColor clearColor];
+    extendedColorButton.layer.cornerRadius = colorButtonSize/2.0f;
     //colorButton.layer.borderColor=[UIColor whiteColor].CGColor;
     //colorButton.layer.borderWidth=2.0f;
     
     [self.view addSubview:imagePickerButton];
     [self.view addSubview:shootButtonPh];
-    //[self.view addSubview:messagesButtonPh];
+    [self.view addSubview:messagesButtonPh];
     [self.view addSubview:frontButtonPh];
-    //[self.view addSubview:keoButtonPh];
+    [self.view addSubview:keoButtonPh];
     [self.view addSubview:flashButtonPh];
     
     //[self.view addSubview:labelChatPh];
     //[self.view addSubview:labelKeoPh];
     
     [self.view bringSubviewToFront:keoTextFieldPh];
-    [self.view bringSubviewToFront:colorButton];
+    [self.view bringSubviewToFront:extendedColorButton];
+    [self.view bringSubviewToFront:colorLabel];
     
     [self.view addGestureRecognizer:tapRecognizer];
     [self.view addGestureRecognizer:swipeRecognizer];
@@ -1604,26 +1668,28 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     int yPopLabel = 50;
     tapScreenLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*xPopLabel, 0.5*screenHeight-0.5*yPopLabel, xPopLabel, yPopLabel)];
     tapScreenLabel.clipsToBounds=YES;
-    tapScreenLabel.layer.cornerRadius = 8;
+    tapScreenLabel.layer.cornerRadius = 4;
     tapScreenLabel.backgroundColor = [UIColor blackColor];
     tapScreenLabel.textColor = [UIColor whiteColor];
     tapScreenLabel.textAlignment = NSTextAlignmentCenter;
+    tapScreenLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:16];
     tapScreenLabel.alpha = 0.75;
     tapScreenLabel.text = @"Tap to add some text";
+
     
-    seeMenuLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*xPopLabel, 0.5*screenHeight-0.5*yPopLabel, xPopLabel, yPopLabel)];
+    /*seeMenuLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*xPopLabel, 0.5*screenHeight-0.5*yPopLabel, xPopLabel, yPopLabel)];
     seeMenuLabel.clipsToBounds=YES;
     seeMenuLabel.layer.cornerRadius = 8;
     seeMenuLabel.backgroundColor = [UIColor blackColor];
     seeMenuLabel.textColor = [UIColor whiteColor];
     seeMenuLabel.textAlignment = NSTextAlignmentCenter;
     seeMenuLabel.alpha = 0.75;
-    seeMenuLabel.text = @"Tap to see menu bar";
+    seeMenuLabel.text = @"Tap to see menu bar";*/
     
-    pandasize = 75;
-    newMessageButtonPh = [[UIButton alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*pandasize, 25-100, pandasize, pandasize)];
+    pandasize = 100;
+    newMessageButtonPh = [[UIButton alloc] initWithFrame:CGRectMake(0.5*screenWidth-0.5*pandasize, 25-110, pandasize, pandasize)];
     newMessageButtonPh.contentMode = UIViewContentModeScaleAspectFit;
-    [newMessageButtonPh setImage:[UIImage imageNamed:@"bouton_panda.png"] forState:UIControlStateNormal];
+    [newMessageButtonPh setImage:[UIImage imageNamed:@"newMessageRobot_small.png"] forState:UIControlStateNormal];
     [newMessageButtonPh addTarget:self action:@selector(gotoTimeline) forControlEvents:UIControlEventTouchUpInside];
 
     [self.view addSubview:newMessageButtonPh];
@@ -1632,12 +1698,16 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     sentSuccessfullyLabelPh = [[UILabel alloc] initWithFrame:CGRectMake(0, -30, screenWidth, 30)];
     sentSuccessfullyLabelPh.backgroundColor = theKeoOrangeColor;
     sentSuccessfullyLabelPh.textColor = [UIColor whiteColor];
-    sentSuccessfullyLabelPh.font = [UIFont fontWithName:@"Gabriola" size:22];
+    sentSuccessfullyLabelPh.font = [UIFont fontWithName:@"GothamRounded-Bold" size:18];
     sentSuccessfullyLabelPh.textAlignment = NSTextAlignmentCenter;
     sentSuccessfullyLabelPh.alpha = 0.75;
     sentSuccessfullyLabelPh.text = @"Message sent successfully!";
+    if([myLocaleString isEqualToString:@"FR"]){
+        sentSuccessfullyLabelPh.text = @"Message envoyé!";
+    }
 
     [self.view addSubview:sentSuccessfullyLabelPh];
+    
 
 }
 
@@ -1663,7 +1733,7 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 -(void)hideAnimateForNewMessage{
     [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear
                      animations:^{
-                         newMessageButtonPh.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25-100, pandasize, pandasize);
+                         newMessageButtonPh.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25-110, pandasize, pandasize);
                      }
                      completion:nil];
 }
@@ -1700,9 +1770,18 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     if(!(colorCounter < [self.colorArray count])){
         colorCounter = 0;
     }
-    UIColor *newColor = [myGeneralMethods getColorFromHexString:self.colorArray[colorCounter]];
+    //UIColor *newColor = [myGeneralMethods getColorFromHexString:self.colorArray[colorCounter]];
+    UIColor *newColor = self.colorArray[colorCounter];
+    if(colorCounter == ([self.colorArray count]-1)){
+        [colorLabel.layer setBorderColor:[UIColor whiteColor].CGColor];
+        [colorLabel.layer setBorderWidth:3.0];
+    }
+    else{
+        [colorLabel.layer setBorderColor:[UIColor clearColor].CGColor];
+        [colorLabel.layer setBorderWidth:0.0];
+    }
     keoTextFieldPh.backgroundColor = newColor;
-    colorButton.backgroundColor = newColor;
+    colorLabel.backgroundColor = newColor;
 }
 
 
@@ -1712,7 +1791,16 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
     picker.allowsEditing = YES;
+    picker.navigationBar.barStyle = UIBarStyleBlackTranslucent;
+    //picker.navigationBar.tintColor = theKeoOrangeColor;
     picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    [picker.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                  [[UIColor whiteColor] colorWithAlphaComponent:1],
+                                                  NSForegroundColorAttributeName,
+                                                  [UIFont fontWithName:@"GothamRounded-Bold" size:18.0],
+                                                  NSFontAttributeName,
+                                                  nil]];
+
     
     [self presentViewController:picker animated:YES completion:NULL];
 }
@@ -1765,7 +1853,8 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     
     //-----adapt size of textfield
     
-    UIFont *lfont = [UIFont systemFontOfSize:16];
+    //UIFont *lfont = [UIFont systemFontOfSize:16];
+    UIFont *lfont = keoTextFieldPh.font;
     
     CGSize textViewSize = [myGeneralMethods text:keoTextFieldPh.text sizeWithFont:lfont constrainedToSize:CGSizeMake(screenWidth-20, 30)];
     
@@ -1785,7 +1874,11 @@ UISwipeGestureRecognizer *swipeRecognizer2;
             
         case MessageComposeResultFailed:
         {
-            UIAlertView *warningAlert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Failed to send SMS!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            NSString* titleWarning = @"Failed to send SMS!";
+            if([myLocaleString isEqualToString:@"FR"]){
+                titleWarning = @"Echec de l'envoi de SMS!";
+            }
+            UIAlertView *warningAlert = [[UIAlertView alloc] initWithTitle:@"Error" message:titleWarning delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [warningAlert show];
             break;
         }
@@ -1805,12 +1898,12 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     APLLog(@"Takepicture3 alertView clickedButtonAtIndex: %@", alertView.title);
-    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]||[alertView.title isEqualToString:my_actionsheet_wanna_help_us_french]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
         }
     }
-    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]||[alertView.title isEqualToString:my_actionsheet_you_are_great_french]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
         }
@@ -1818,11 +1911,11 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 }
 
 
--(void)indicateMenuBarAtFirstUse{
+/*-(void)indicateMenuBarAtFirstUse{
     if(firstUseEver){
         [self.view addSubview:seeMenuLabel];
     }
-}
+}*/
 
 
 

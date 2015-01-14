@@ -36,6 +36,7 @@ NSString *myCurrentPhoneNumber;
 
 NSUserDefaults *prefs;//global
 
+NSString *myLocaleString;
 NSString *username;//global
 NSString *hashPassword;//global
 bool logIn;//global
@@ -45,8 +46,6 @@ NSString *storyboardName;//global
 
 UIColor *theBackgroundColor;//global
 UIColor *theKeoOrangeColor;//global
-
-NSString *backgroundImage;//global
 
 NSString *myVersionInstallUrl;
 
@@ -60,7 +59,14 @@ UIButton *statusButton;
 UILabel *futureLabel;
 UILabel *infoLabel;
 
+UIColor *thePicteverGreenColor;//global
+UIColor *thePicteverYellowColor;//global
+UIColor *thePicteverRedColor;//global
+UIColor *thePicteverGrayColor;//global
+
 NSTimer *myFutureTimer;
+
+NSString *myVersionInstallUrl;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -76,9 +82,43 @@ NSTimer *myFutureTimer;
     [super viewDidLoad];
     
     self.tableView.backgroundColor = [UIColor clearColor];
-    self.parentViewController.view.backgroundColor=[[UIColor alloc] initWithPatternImage:[UIImage imageNamed:backgroundImage]];
+
+    self.parentViewController.view.backgroundColor = [UIColor whiteColor];
 
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+    
+    
+    //--------------navigation bar color (code couleur transformé du orangekeo sur
+    //http://htmlpreview.github.io/?https://github.com/tparry/Miscellaneous/blob/master/UINavigationBar_UIColor_calculator.html)
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:244/255.0f green:58/255.0f blue:0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barStyle=UIStatusBarStyleLightContent;
+    [self setNeedsStatusBarAppearanceUpdate];//status bar text color
+    [self.navigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                     [[UIColor whiteColor] colorWithAlphaComponent:1.0],
+                                                                     NSForegroundColorAttributeName,
+                                                                     [UIFont fontWithName:@"GothamRounded-Bold" size:18.0],
+                                                                     NSFontAttributeName,
+                                                                     nil]
+     ];
+    
+    
+    
+    //----------------confirm and cancel buttons----------------------------------
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStylePlain target:self action:@selector(backButton:)];
+    
+    self.navigationItem.rightBarButtonItem = backItem;
+
+    
+    NSDictionary *barButtonAppearanceDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [[UIColor whiteColor] colorWithAlphaComponent:1.0],
+                                             NSForegroundColorAttributeName,
+                                             [UIFont fontWithName:@"GothamRounded-Light" size:16.0],
+                                             NSFontAttributeName,
+                                             nil];
+    
+    [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
+     setTitleTextAttributes:barButtonAppearanceDict forState:UIControlStateNormal];
+    
     
     APLLog(@"SettingsViewDidLoad");
     
@@ -128,13 +168,14 @@ NSTimer *myFutureTimer;
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.row == 0){
+    /*if(indexPath.row == 0){
         return NO;
     }
     if(indexPath.row == 4){
         return NO;
-    }
-    return YES;
+    }*/
+    //return YES;
+    return NO;
 }
 
 #pragma mark - Table view data source
@@ -147,16 +188,16 @@ NSTimer *myFutureTimer;
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return 5;
+    return 3;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     if(indexPath.row==0){
-        return 133;
+        return 170;
         //return 155;
     }
     else{
-        return 67;
+        return 125;
         //return 82;
     }
 }
@@ -167,17 +208,37 @@ NSTimer *myFutureTimer;
         [self alertAnalyticsAskStatus];
     }
     if(indexPath.row == 2){
-        UIAlertView *alert = [[UIAlertView alloc]
+        /*UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Noooooo"
                               message:@"Why do you want to do this?" delegate:self
                               cancelButtonTitle:@"Cancel" otherButtonTitles:nil];
-        [alert show];
+        [alert show];*/
     }
     if(indexPath.row == 3){
         APLLog(@"open website");
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"http://www.pictever.com/"]];
+        //[[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"http://www.pictever.com/"]];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+-(void)deleteContact{
+    APLLog(@"deletecontact pressed");
+    NSString *titleAlert = @"Noooooo";
+    NSString *messageAlert = @"Why do you want to do this?";
+    if([myLocaleString isEqualToString:@"FR"]){
+        titleAlert = @"Nooooonnnn";
+        messageAlert = @"Pourquoi vouloir faire ca??";
+    }
+    UIAlertView *alert = [[UIAlertView alloc]
+                          initWithTitle:titleAlert
+                          message:messageAlert delegate:self
+                          cancelButtonTitle:@"Cancel" otherButtonTitles:nil];
+    [alert show];
+}
+
+-(void)gotoappStore{
+    APLLog(@"go to app store pressed");
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString: myVersionInstallUrl]];
 }
 
 
@@ -185,26 +246,87 @@ NSTimer *myFutureTimer;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     UITableViewCell *cell = nil;
     
+    NSLog(@"cellforrowatindexpath: %ld",(long)indexPath.row);
+    
     if(indexPath.row == 0){
-        cell = [tableView dequeueReusableCellWithIdentifier:@"InfosCell"];
+        cell = [tableView dequeueReusableCellWithIdentifier:@"InfosCell" forIndexPath:indexPath];
         InfosCell *infosCell = (InfosCell *)cell;
+        infosCell.backGroundLabel1.clipsToBounds = YES;
+        infosCell.backGroundLabel1.layer.cornerRadius = 5;
+        infosCell.titleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:18];
+        infosCell.emailTitleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:14];
+        infosCell.phoneTitleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:14];
+        infosCell.phoneContentLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:14];
+        infosCell.emailContentLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:14];
         infosCell.phoneContentLabel.text = myCurrentPhoneNumber;
         infosCell.emailContentLabel.text = username;
+        
+        infosCell.titleLabel.text = @"My Infos";
+        infosCell.emailTitleLabel.text = @"Email address";
+        infosCell.phoneTitleLabel.text = @"Phone Number";
+        if([myLocaleString isEqualToString:@"FR"]){
+            infosCell.titleLabel.text = @"Mes Infos";
+            infosCell.emailTitleLabel.text = @"Adresse mail";
+            infosCell.phoneTitleLabel.text = @"Téléphone";
+        }
+        
     }
     if(indexPath.row == 1){
-        cell = [tableView dequeueReusableCellWithIdentifier:@"StatusCell"];
-        InfosCell *infosCell = (InfosCell *)cell;
-        infosCell.emailTitleLabel.text = myStatus;
+        cell = [tableView dequeueReusableCellWithIdentifier:@"DoubleInfosCell" forIndexPath:indexPath];
+        InfosCell *doubleInfosCell = (InfosCell *)cell;
+        doubleInfosCell.button1.clipsToBounds = YES;
+        doubleInfosCell.button2.clipsToBounds = YES;
+        doubleInfosCell.button1.layer.cornerRadius = 5;
+        doubleInfosCell.button2.layer.cornerRadius = 5;
+        doubleInfosCell.emailTitleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:14];
+        doubleInfosCell.phoneTitleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:14];
+        doubleInfosCell.emailContentLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:14];
+        doubleInfosCell.phoneContentLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:14];
+        
+        doubleInfosCell.emailContentLabelbis.font = [UIFont fontWithName:@"GothamRounded-Bold" size:13];
+        doubleInfosCell.emailContentLabelbis.text = myStatus;
+        doubleInfosCell.button1.userInteractionEnabled = NO;
+        [doubleInfosCell.button2 addTarget:self action:@selector(deleteContact) forControlEvents:UIControlEventTouchUpInside];
+        
+
+        doubleInfosCell.emailTitleLabel.text = @"My Status";
+        doubleInfosCell.phoneTitleLabel.text = @"My Contacts";
+        doubleInfosCell.emailContentLabel.text = @"You're now a";
+        doubleInfosCell.phoneContentLabel.text = @"Block a contact.";
+        if([myLocaleString isEqualToString:@"FR"]){
+            doubleInfosCell.emailTitleLabel.text = @"Mon Statut";
+            doubleInfosCell.phoneTitleLabel.text = @"Mes Contacts";
+            doubleInfosCell.emailContentLabel.text = @"Tu es un";
+            doubleInfosCell.phoneContentLabel.text = @"Bloquer un contact.";
+        }
+        
     }
     if(indexPath.row == 2){
-        cell = [tableView dequeueReusableCellWithIdentifier:@"ContactsCell"];
+        cell = [tableView dequeueReusableCellWithIdentifier:@"ThirdInfosCell" forIndexPath:indexPath];
+        InfosCell *thirdInfosCell = (InfosCell *)cell;
+        thirdInfosCell.button1.clipsToBounds = YES;
+        thirdInfosCell.button2.clipsToBounds = YES;
+        thirdInfosCell.button1.layer.cornerRadius = 5;
+        thirdInfosCell.button2.layer.cornerRadius = 5;
+        thirdInfosCell.emailTitleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:14];
+        thirdInfosCell.phoneTitleLabel.font = [UIFont fontWithName:@"GothamRounded-Bold" size:14];
+        thirdInfosCell.emailContentLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:14];
+        thirdInfosCell.phoneContentLabel.font = [UIFont fontWithName:@"GothamRounded-Light" size:14];
+        thirdInfosCell.button2.userInteractionEnabled = NO;
+        [thirdInfosCell.button1 addTarget:self action:@selector(gotoappStore) forControlEvents:UIControlEventTouchUpInside];
+        
+        thirdInfosCell.emailTitleLabel.text = @"Help us";
+        thirdInfosCell.phoneTitleLabel.text = @"Any bug ?";
+        thirdInfosCell.emailContentLabel.text = @"Rate us on the app store.";
+        thirdInfosCell.phoneContentLabel.text = @"Shake your phone to report a bug;)";
+        if([myLocaleString isEqualToString:@"FR"]){
+            thirdInfosCell.emailTitleLabel.text = @"Nous aider";
+            thirdInfosCell.phoneTitleLabel.text = @"Un bug ?";
+            thirdInfosCell.emailContentLabel.text = @"Donne nous une note sur l'app store.";
+            thirdInfosCell.phoneContentLabel.text = @"Secoue pour nous signaler un bug;)";
+        }
     }
-    if(indexPath.row == 3){
-        cell = [tableView dequeueReusableCellWithIdentifier:@"LikeCell"];
-    }
-    if(indexPath.row == 4){
-        cell = [tableView dequeueReusableCellWithIdentifier:@"BugCell"];
-    }
+
     if (cell == nil) {
         APLLog(@"cell nil");
     }
@@ -212,7 +334,7 @@ NSTimer *myFutureTimer;
     
     
     cell.backgroundColor = [UIColor clearColor];
-
+    
     return cell;
 }
 
@@ -226,12 +348,12 @@ NSTimer *myFutureTimer;
 //------------------alertView delegate (first tips for the user)-----------------------------------
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]){
+    if([alertView.title isEqualToString:my_actionsheet_wanna_help_us]||[alertView.title isEqualToString:my_actionsheet_wanna_help_us_french]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:myVersionInstallUrl]];
         }
     }
-    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]){
+    else if ([alertView.title isEqualToString:my_actionsheet_you_are_great]||[alertView.title isEqualToString:my_actionsheet_you_are_great_french]){
         if (buttonIndex == 1) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:my_facebook_page_adress]];
         }

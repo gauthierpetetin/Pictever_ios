@@ -27,10 +27,6 @@
 
 -(void)switchScreenToKeo;
 
--(void)messagesPressed;
-
--(void)keoPressed;
-
 - (NSString *)saveImage: (UIImage*)image atKey:(NSString *)myKey;
 
 - (UIImage*) scaleImage2:(UIImage*)image;
