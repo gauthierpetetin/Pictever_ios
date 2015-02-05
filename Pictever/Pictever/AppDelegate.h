@@ -135,6 +135,7 @@ extern UIColor *thePicteverGrayColor;//global
 extern NSMutableArray *localKeoContacts;//global
 
 extern NSMutableArray *sendBox;//global
+extern NSMutableArray *resendBox;//global
 extern NSMutableArray *loadBox;//global
 extern bool isLoadingLoadBox;//global
 

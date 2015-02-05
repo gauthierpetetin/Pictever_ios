@@ -796,7 +796,7 @@ UISwipeGestureRecognizer *swipeRecognizer2;
                 
                 //[sendBox addObject:keoToSend];
                 [sendBox insertObject:keoToSend atIndex:0];
-                [prefs setObject:sendBox forKey:@"sendBox"];
+                [prefs setObject:sendBox forKey:my_prefs_sendbox_key];
                 
                 [self uploadNextPhotoOnAmazon];
                 
@@ -1843,13 +1843,13 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 //--------------------adapt the size of the textfield to the text contained (not very fluid)-------------------------
 #define MAXLENGTH 50
 - (BOOL)textField:(UITextField *) textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    NSUInteger oldLength = [textField.text length];
-    NSUInteger replacementLength = [string length];
+    //NSUInteger oldLength = [textField.text length];
+    //NSUInteger replacementLength = [string length];
     NSUInteger rangeLength = range.length;
     
-    NSUInteger newLength = oldLength - rangeLength + replacementLength;
+    //NSUInteger newLength = oldLength - rangeLength + replacementLength;
     
-    BOOL returnKey = [string rangeOfString: @"\n"].location != NSNotFound;
+    //BOOL returnKey = [string rangeOfString: @"\n"].location != NSNotFound;
     
     //-----adapt size of textfield
     
@@ -1860,8 +1860,14 @@ UISwipeGestureRecognizer *swipeRecognizer2;
     
     keoTextFieldPh.frame = CGRectMake(keoTextFieldPh.frame.origin.x, keoTextFieldPh.frame.origin.y, textViewSize.width+30, textViewSize.height+10);
     //
+    if(rangeLength>0){
+        return YES;
+    }
+    else{
+        return (keoTextFieldPh.frame.size.width > (screenWidth-10)) ? NO : YES;
+    }
     
-    return newLength <= MAXLENGTH || returnKey;
+    //return newLength <= MAXLENGTH || returnKey;
 }
 
 

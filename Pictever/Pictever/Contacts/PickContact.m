@@ -414,7 +414,7 @@ bool contactAlreadyInformed;
                 
                 if(!contactAlreadyInformed){
                     NSString *title3 = @"This contact is not on Pictever";
-                    NSString *message3 = @"You can send him a message but he will have to download Pictever to receive your message!";
+                    NSString *message3 = @"You can send him a message and he will just have to download Pictever to receive your message!";
                     if([myLocaleString isEqualToString:@"FR"]){
                         title3 = @"Ce contact n'a pas Pictever";
                         message3 = @"Tu peux lui envoyer un message mais il devra télécharger Pictever pour recevoir ton message!";

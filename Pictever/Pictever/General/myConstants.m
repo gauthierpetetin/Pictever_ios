@@ -145,6 +145,8 @@ NSString *const my_prefs_contacts_data_key = @"importcontactsdata";
 NSString *const my_prefs_userid_key = @"myUserID";
 NSString *const my_prefs_numberoffuturemessages_key = @"numberOfMessagesInTheFuture";
 NSString *const my_prefs_mystatus_key = @"myStatus";
+NSString *const my_prefs_sendbox_key = @"sendBox";
+NSString *const my_prefs_resendbox_key = @"resendBox";
 
 
 //-------------------------sendBoxContent------------------------------------------

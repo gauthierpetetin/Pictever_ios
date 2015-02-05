@@ -76,6 +76,8 @@ ShyftMessage * theShyftToResend;
 NSMutableDictionary *theKeoToResend;
 NSIndexPath *theResendIndexPath;
 
+NSMutableArray *resendBox;
+
 //size if the screen
 CGFloat screenWidth;//global
 CGFloat screenHeight;//global
@@ -694,6 +696,15 @@ UISwipeGestureRecognizer *swipeRecognizer3;
     
     //------------show all the navigationbar barbutton items-------------------
     [self updateOtherViewsToFrame:self.navigationController.navigationBar.frame withAlpha:1.0];
+    
+    
+    
+    //----------------retry to resend failed resent messages----------------
+    if(resendBox){
+        if([resendBox count]>0){
+            [[[GPSession alloc] init] resendRequest:[resendBox objectAtIndex:0] for:self];
+        }
+    }
     
 }
 
@@ -1371,7 +1382,7 @@ UISwipeGestureRecognizer *swipeRecognizer3;
         localImageToShare = thePictToShare.croppedImage;
         localImageToShare = [myGeneralMethods scaleImage:localImageToShare toWidth:2*localImageToShare.size.width];//------image *2
         
-        localImageToShare = [KeoMessages drawText2:shyftMessage inImage:localImageToShare inRect:CGRectMake(localImageToShare.size.width*0.5-messageLabelSize.width*0.5, localImageToShare.size.height*0.5-messageLabelSize.height*0.5, messageLabelSize.width,messageLabelSize.height) withFont:messageFont withColor:[UIColor whiteColor]];
+        localImageToShare = [KeoMessages drawText2:shyftMessage inImage:localImageToShare inRect:CGRectMake(localImageToShare.size.width*0.5-messageLabelSize.width*0.5, localImageToShare.size.height*0.5-messageLabelSize.height*0.5, messageLabelSize.width,messageLabelSize.height+50) withFont:messageFont withColor:[UIColor whiteColor]];//+50 par sécurité
     }
     
     localImageToShare = [KeoMessages addPicteverBrandOnImage:localImageToShare];

@@ -55,6 +55,7 @@ bool logIn;
 
 
 NSMutableArray* sendBox;
+NSMutableArray *resendBox;
 
 NSString *downloadPhotoRequestName;
 
@@ -450,40 +451,40 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
 -(void)sendSucceeded:(NSData *)data from:(id)sender{
     APLLog(@"Session succeeded! Received %d bytes of data Send",[data length]);
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        
-        if([_sendTextOrPhoto isEqualToString:@"text"]){//---------------message is a text---------
-            APLLog(@"initialize text viewcontroller");
-            
+    
+    if([_sendTextOrPhoto isEqualToString:@"text"]){//---------------message is a text---------
+        APLLog(@"initialize text viewcontroller");
+        dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:@"initializeViewM" object:nil];
-        }
-        else if ([_sendTextOrPhoto isEqualToString:@"photo"]){//--------------message is a photo----------
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"hideProgressBars" object: nil];
-            });
-
-            if(sendBox){
-                APLLog(@"sendBox exists: %@", [sendBox description]);
-                NSInteger deleteInd = [myGeneralMethods indexOfMessageInSendBox:_sendDictionary];
-                APLLog(@"sb delete index: %d", deleteInd);
-                if(deleteInd != -1){
-                    if (deleteInd < [sendBox count]) {
-                        //Supression from the memory of the phone
-                        APLLog(@"FULL SENDBOX: %@",[sendBox description]);
-                        if([sendBox[deleteInd] objectForKey:my_sendbox_path]){
-                            APLLog(@"delete image with path: %@%@",myCurrentPhotoPath,[[sendBox objectAtIndex:deleteInd] objectForKey:my_sendbox_path]);
-                            
-                            NSString *localPathEnd = [[sendBox objectAtIndex:deleteInd] objectForKey:my_sendbox_path];
-                            [myGeneralMethods deletePhotoAtPath:[NSString stringWithFormat:@"%@/%@",myCurrentPhotoPath,localPathEnd]];
-                            [sendBox removeObjectAtIndex:deleteInd];
-                            APLLog(@"EMPTY SENDBOX: %@",[sendBox description]);
-                            [prefs setObject:sendBox forKey:@"sendBox"];
-                        }
+        });
+    }
+    else if ([_sendTextOrPhoto isEqualToString:@"photo"]){//--------------message is a photo----------
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"hideProgressBars" object: nil];
+        });
+        
+        if(sendBox){
+            APLLog(@"sendBox exists: %@", [sendBox description]);
+            NSInteger deleteInd = [myGeneralMethods indexOfMessageInSendBox:_sendDictionary];
+            APLLog(@"sb delete index: %d", deleteInd);
+            if(deleteInd != -1){
+                if (deleteInd < [sendBox count]) {
+                    //Supression from the memory of the phone
+                    APLLog(@"FULL SENDBOX: %@",[sendBox description]);
+                    if([sendBox[deleteInd] objectForKey:my_sendbox_path]){
+                        APLLog(@"delete image with path: %@%@",myCurrentPhotoPath,[[sendBox objectAtIndex:deleteInd] objectForKey:my_sendbox_path]);
+                        
+                        NSString *localPathEnd = [[sendBox objectAtIndex:deleteInd] objectForKey:my_sendbox_path];
+                        [myGeneralMethods deletePhotoAtPath:[NSString stringWithFormat:@"%@/%@",myCurrentPhotoPath,localPathEnd]];
+                        [sendBox removeObjectAtIndex:deleteInd];
+                        APLLog(@"EMPTY SENDBOX: %@",[sendBox description]);
+                        [prefs setObject:sendBox forKey:my_prefs_sendbox_key];
                     }
                 }
             }
         }
-    });
+    }
+    
     [[[GPSession alloc] init] getStatusRequest:self];
     
     [self increaseSendTipCounter:sender];
@@ -511,6 +512,9 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         APLLog([NSString stringWithFormat:@"Resend session post: %@",postString]);
         
         NSError *error = nil;
+        
+        [resendBox insertObject:resendShyftID atIndex:0];
+        [prefs setObject:resendBox forKey:my_prefs_resendbox_key];
         
         if (!error) {
             // 4
@@ -582,7 +586,24 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:my_notif_messageResentSuccessfully_name object:nil];
     });
+    
     [[[GPSession alloc] init] getStatusRequest:self];
+    
+    if(resendBox){
+        APLLog(@"resendBox exists: %@", [resendBox description]);
+        NSInteger deleteIndR = [myGeneralMethods indexOfMessageInResendBox:_resendString];
+        APLLog(@"rsb delete index: %d", deleteIndR);
+        if(deleteIndR != -1){
+            if (deleteIndR < [resendBox count]) {
+                //Supression from the memory of the phone
+                APLLog(@"FULL RESENDBOX: %@",[resendBox description]);
+                [resendBox removeObjectAtIndex:deleteIndR];
+                APLLog(@"EMPTY RESENDBOX: %@",[resendBox description]);
+                [prefs setObject:resendBox forKey:my_prefs_resendbox_key];
+            }
+        }
+    }
+    
 }
 
 

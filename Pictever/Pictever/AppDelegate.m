@@ -163,6 +163,7 @@ UIColor *thePicteverGrayColor;//global
 
 
 NSMutableArray *sendBox;//PhotoShyfts are placed in the sendbox before being sent
+NSMutableArray *resendBox;//resent messages are placed in the resendbox before being resent
 
 bool showDatePicker;//Variable to know when the send_choice-picker has to be shown
 
@@ -614,10 +615,10 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     
     //sendBox (messages to send)
     sendBox = [[NSMutableArray alloc] init];
-    if([prefs arrayForKey:@"sendBox"]){
+    if([prefs arrayForKey:my_prefs_sendbox_key]){
         NSArray *sendBoxCopy;
-        if([prefs objectForKey:@"sendBox"]){
-            sendBoxCopy = [prefs arrayForKey:@"sendBox"];
+        if([prefs objectForKey:my_prefs_sendbox_key]){
+            sendBoxCopy = [prefs arrayForKey:my_prefs_sendbox_key];
         }
         if(sendBoxCopy){
             for(int i=0; i<[sendBoxCopy count]; i++){
@@ -630,6 +631,24 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     }
     APLLog(@"SENDBox: %@", [sendBox description]);
     
+    //resendBox (messages to resend)
+    resendBox = [[NSMutableArray alloc] init];
+    if([prefs arrayForKey:my_prefs_resendbox_key]){
+        NSArray *resendBoxCopy;
+        if([prefs objectForKey:my_prefs_resendbox_key]){
+            resendBoxCopy = [prefs arrayForKey:my_prefs_resendbox_key];
+        }
+        if(resendBoxCopy){
+            for(int i=0; i<[resendBoxCopy count]; i++){
+                [resendBox insertObject:resendBoxCopy[i] atIndex:[resendBox count]];
+            }
+        }
+    }
+    else{
+        APLLog(@"no messages in ResendBox");
+    }
+    APLLog(@"ResendBox: %@", [resendBox description]);
+    
 }
 
 -(void)importAccountData{
@@ -640,6 +659,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     if([myLocaleString isEqualToString:@"FR"]){
         NSLog(@"Francais");
     }
+    //myLocaleString = @"US";
 
     bool logInCopy = [prefs boolForKey:my_prefs_login_key];
     if(logInCopy){

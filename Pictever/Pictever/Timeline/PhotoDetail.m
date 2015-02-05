@@ -12,6 +12,7 @@
 #import "myGeneralMethods.h"
 #import "ShyftMessage.h"
 
+
 @interface PhotoDetail ()
 
 @end
@@ -65,13 +66,15 @@ bool zoomOn;//global
     
     if(_shyftToDetail){
         if(_shyftToDetail.message){
+            
+            //bigPhotoImgV.image = [PhotoDetail scaleImageForDetail:[KeoMessages prepareImageForExport:_shyftToDetail]];
+            
             //------------------if message is a photo---------------------------------
             if([_shyftToDetail.message isEqualToString:@""]){
                 if(_shyftToDetail.uiControl){
                     APLLog([_shyftToDetail getDescription]);
                     
                     bigPhotoImgV.image = [PhotoDetail scaleImageForDetail:_shyftToDetail.uiControl];
-                    //bigPhotoImgV.image = [PhotoDetail scaleImageForDetail:[KeoMessages prepareImageForExport:_shyftToDetail.uiControl withLabel:_shyftToDetail.receive_label]];
                 }
             }
             //-----------------if messages is a text message------------------------

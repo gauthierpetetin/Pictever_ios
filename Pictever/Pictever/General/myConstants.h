@@ -127,6 +127,8 @@ extern NSString *const my_prefs_contacts_data_key;
 extern NSString *const my_prefs_userid_key;
 extern NSString *const my_prefs_numberoffuturemessages_key;
 extern NSString *const my_prefs_mystatus_key;
+extern NSString *const my_prefs_sendbox_key;
+extern NSString *const my_prefs_resendbox_key;
 
 //-------------------------sendBoxContent------------------------------------------
 extern NSString *const my_sendbox_date;

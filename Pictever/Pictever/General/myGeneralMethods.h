@@ -28,6 +28,8 @@
 
 +(NSInteger)indexOfMessageInSendBox:(NSMutableDictionary *)messageSent;
 
++(NSInteger)indexOfMessageInResendBox:(NSString *)idOfResentMessage;
+
 +(NSMutableDictionary *)receiveAmazonDownLoadedPhotoFromSession:(NSMutableDictionary *)shyftFromSession;
 
 +(void)replaceMessage:(NSMutableDictionary *)replacingMessage andDeleteLoadBoxAtIndex:(NSUInteger)deleteIndex;

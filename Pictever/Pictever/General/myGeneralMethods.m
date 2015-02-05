@@ -23,6 +23,7 @@ NSMutableArray *loadBox;//global
 NSMutableArray *messagesDataFile;//global
 NSString *myCurrentPhotoPath;//global
 NSMutableArray *sendBox;//global
+NSMutableArray *resendBox;//global
 
 NSMutableDictionary *importKeoContacts;//global
 NSMutableArray *importContactsData;//global
@@ -180,6 +181,17 @@ NSString *myFacebookBirthDay;
                     }
                 }
             }
+        }
+    }
+    return -1;
+}
+
++(NSInteger)indexOfMessageInResendBox:(NSString *)idOfResentMessage{
+    
+    
+    for(NSString *resendThisId in [resendBox mutableCopy]){
+        if([resendThisId isEqualToString:idOfResentMessage]){
+            return [resendBox indexOfObject:resendThisId];
         }
     }
     return -1;
@@ -855,7 +867,7 @@ NSString *myFacebookBirthDay;
     if([dateToPrintAsString length] > 15){
         time= [dateToPrintAsString substringWithRange:NSMakeRange(11,5)];
         day = [dateToPrintAsString substringWithRange:NSMakeRange(8,2)];
-        if([[day substringWithRange:NSMakeRange(1,1)] isEqualToString:@"0"]){
+        if([[day substringWithRange:NSMakeRange(0,1)] isEqualToString:@"0"]){
             day = [day stringByReplacingOccurrencesOfString:@"0" withString:@""];
         }
         month = [dateToPrintAsString substringWithRange:NSMakeRange(5,2)];
@@ -950,7 +962,7 @@ NSString *myFacebookBirthDay;
         month = @"December";
     }
     
-    if(timeSpacing < 365*24*60*60){
+    if(timeSpacing < timeSinceYesterday+364*24*60*60){
         return [NSString stringWithFormat:@"%@ %@, %@",day ,month ,time];
     }
     
