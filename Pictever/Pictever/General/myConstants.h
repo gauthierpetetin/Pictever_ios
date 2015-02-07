@@ -34,6 +34,8 @@ extern NSString *const my_inprogress_string;
 extern NSString *const my_sendRequestName;
 extern NSString *const my_receiveRequestName;
 extern NSString *const my_uploadRequestName;
+extern NSString *const my_addressBookRequestName;
+extern NSString *const my_getABRequestName;
 extern NSString *const my_keoChoiceRequestName;
 extern NSString *const my_loginRequestName;
 extern NSString *const my_registerRequestName;
@@ -43,6 +45,10 @@ extern NSString *const my_getStatusRequestName;
 extern NSString *const my_resendRequestName;
 extern NSString *const my_sendResetMail;
 extern NSString *const my_defineNewPassword;
+
+//-------------ABREquest-----------------
+extern NSString *const my_AB_tel_Key;
+extern NSString *const my_AB_name_Key;
 
 extern NSString *const my_default_adresseIp;
 

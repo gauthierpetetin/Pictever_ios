@@ -1279,7 +1279,8 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
             else{
                 APLLog(@"=contatcs not loaded");
             }
-            [myUploadContactSession uploadContacts:[myGeneralMethods createJsonArrayOfContacts] withTableViewReload:YES for:self];
+            //[myUploadContactSession uploadContacts:[myGeneralMethods createJsonArrayOfContacts] withTableViewReload:YES for:self];
+            [myUploadContactSession uploadAddressBook:[myGeneralMethods abCreateJsonArrayOfContacts] for:self];
         }
     }
 }
@@ -1453,6 +1454,306 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     receiveTips = [NSString stringWithFormat:@"%d", receiveTipCounter];
     [prefs setObject:receiveTips forKey:my_prefs_receive_tips_key];
 }
+
+
+#pragma mark - uploadAddressBook
+
+-(void)uploadAddressBook:(NSMutableArray *)contactBookArray for:(id)sender{
+    _addressBookArray = contactBookArray;
+    
+    if([GPRequests connected]&&(!_isUploadingAddressBook)){
+        _isUploadingAddressBook = true;
+        APLLog(@"uploadAddressBook size: %d",[contactBookArray count]);
+        // 1
+        NSURL *uploadUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@",adresseIp2,my_addressBookRequestName]];
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
+        
+        // 2
+        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:uploadUrl];
+        request.HTTPMethod = @"POST";
+        
+        // 3
+        NSError *errorUpload = nil;
+        //NSData* jsonData = [NSJSONSerialization dataWithJSONObject:contactBookArray options:NSJSONWritingPrettyPrinted error:&errorUpload];
+        NSData* jsonData = [NSJSONSerialization dataWithJSONObject:contactBookArray options:nil error:&errorUpload];
+        
+        if(![jsonData bytes]){
+            APLLog(@"empty json databytes");
+        }
+        else{
+            APLLog(@"json databytes not empty");
+        }
+        NSMutableString * mutableContactString = [[NSMutableString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        if(!mutableContactString){
+            mutableContactString = [[NSMutableString alloc] initWithString:@""];
+        }
+        
+        
+        NSString *postString = [NSString stringWithFormat:@"%@%@",@"address_book=",mutableContactString];
+        //APLLog([NSString stringWithFormat:@"UploadContacts session post: %@",postString]);
+        NSData* data = [postString dataUsingEncoding:NSUTF8StringEncoding];
+        //NSLog(@"ADDRESSBOOK: %@", postString);
+        
+        NSError *error = nil;
+        
+        if (!error) {
+            // 4
+            APLLog(@"UploadAddressBook session: %@", uploadUrl);
+            NSURLSessionUploadTask *uploadTask = [session uploadTaskWithRequest:request
+                                                                       fromData:data completionHandler:^(NSData *data,NSURLResponse *response,NSError *error) {
+                                                                           if(error != nil){
+                                                                               APLLog(@"New upload AddressBook Error: [%@]", [error description]);
+                                                                               _isUploadingAddressBook = false;
+                                                                           }
+                                                                           else{
+                                                                               NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                                                                               NSInteger sessionErrorCode = [httpResponse statusCode];
+                                                                               [self uploadAddressBookDidReceiveResponse:data withErrorCode:sessionErrorCode from:sender];
+                                                                           }
+                                                                       }];
+            
+            // 5
+            [uploadTask resume];
+        }
+    }
+}
+
+-(void)uploadAddressBookDidReceiveResponse:(NSData *)data withErrorCode:(NSInteger)uploadErrorCode from:(id)sender{
+    APLLog(@"UploadAddressBook session did receive response with error code: %i",uploadErrorCode);
+    
+    if(uploadErrorCode != 200){
+        if(uploadErrorCode==500){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:@"uploadAddressBook: Error"
+                                      message:@"Server problem" delegate:sender
+                                      cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            });
+            [GPRequests goBackToFirstServer];
+        }
+        if(uploadErrorCode==404){
+            [GPRequests goBackToFirstServer];
+        }
+        if(uploadErrorCode==401){
+            NSInteger loginCheckAnswer =[GPRequests loginWithEmail:username withPassWord:hashPassword for:sender];
+            if(loginCheckAnswer == 200){
+                APLLog(@"restart uploadAddressBook request");
+                if([_reloadTableView isEqualToString:@"true"]){
+                    [myUploadContactSession uploadAddressBook:_addressBookArray for:sender];
+                }
+                else{
+                    [myUploadContactSession uploadAddressBook:_addressBookArray for:sender];
+                }
+            }
+        }
+    }
+    else{
+        [self uploadAddressBookSucceeded:data];
+    }
+}
+
+-(void)uploadAddressBookSucceeded:(NSData *)data{
+    APLLog(@"Session succeeded! Received %d bytes of data Upload adressbook",[data length]);
+}
+
+
+
+#pragma mark - getAddressBook
+
+-(void)getAddressBookFor:(id)sender withTableViewReload:(bool)rel{
+    if(rel){
+        _reloadTableView = @"true";
+    }
+    else{
+        _reloadTableView = @"false";
+    }
+    
+    if([GPRequests connected]){
+        NSString *getABUrl = [NSString stringWithFormat:@"%@%@",adresseIp2,my_getABRequestName];
+        APLLog(@"getAddressBook session: %@", getABUrl);
+        NSURLSession *session = [NSURLSession sharedSession];
+        [[session dataTaskWithURL:[NSURL URLWithString:getABUrl]
+                completionHandler:^(NSData *data,
+                                    NSURLResponse *response,
+                                    NSError *error) {
+                    if(error != nil){
+                        APLLog(@"New get Address Book Error: [%@]", [error description]);
+                    }
+                    else{
+                        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                        NSInteger sessionErrorCode = [httpResponse statusCode];
+                        [self getAddressBookDidReceiveResponse:data withErrorCode:sessionErrorCode from:sender];
+                    }
+                    
+                }] resume];
+    }
+    
+    
+}
+
+-(void)getAddressBookDidReceiveResponse:(NSData *)data withErrorCode:(NSInteger)uploadErrorCode from:(id)sender{
+    APLLog(@"getAddressBook session did receive response with error code: %i",uploadErrorCode);
+    
+    if(uploadErrorCode != 200){
+        if(uploadErrorCode==500){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc]
+                                      initWithTitle:@"getAddressBook: Error"
+                                      message:@"Server problem" delegate:sender
+                                      cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            });
+            [GPRequests goBackToFirstServer];
+        }
+        if(uploadErrorCode==404){
+            [GPRequests goBackToFirstServer];
+        }
+        if(uploadErrorCode==401){
+            NSInteger loginCheckAnswer =[GPRequests loginWithEmail:username withPassWord:hashPassword for:sender];
+            if(loginCheckAnswer == 200){
+                APLLog(@"restart getAddressBook request");
+                if([_reloadTableView isEqualToString:@"true"]){
+                    [myUploadContactSession getAddressBookFor:self withTableViewReload:YES];
+                }
+                else{
+                    [myUploadContactSession getAddressBookFor:self withTableViewReload:NO];
+                }
+            }
+        }
+    }
+    else{
+        [self getAddressBookSucceeded:data];
+    }
+}
+
+-(void)getAddressBookSucceeded:(NSData *)data{
+    APLLog(@"Session succeeded! Received %d bytes of data Get adressbook",[data length]);
+    
+    //NSLog(@"data description: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    NSMutableArray *localUpdateContactData = [[NSMutableArray alloc] init];
+    
+    NSError *myError = nil;
+    id res = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:&myError];
+    
+    
+    NSArray *resArray = (NSArray *)res;
+    APLLog(@"Number of Pictever contacts: %d",[resArray count]);
+    
+    APLLog(@"Pictever contacts: %@", [res description]);
+    for(id keoContactJson in res){
+        id emailOfContact = [keoContactJson objectForKey:my_uploadContact_email];
+        NSString * emailOfContactAsString;
+        if(![emailOfContact isKindOfClass:[NSNull class]]){
+            emailOfContactAsString = (NSString *)emailOfContact;
+        }
+        
+        else{
+            APLLog(@"EMPTY email");
+            emailOfContactAsString = @"";
+        }
+        
+        
+        
+        id phoneOfContact = [keoContactJson objectForKey:my_uploadContact_phoneNumber];
+        NSString * phoneOfContactAsString;
+        if(![phoneOfContact isKindOfClass:[NSNull class]]){
+            phoneOfContactAsString = (NSString *)phoneOfContact;
+        }
+        else{
+            APLLog(@"EMPTY phone");
+            phoneOfContactAsString = @"";
+        }
+        
+        
+        
+        id user_idOfContact = [keoContactJson objectForKey:my_uploadContact_user_id];
+        NSString * user_idOfContactAsString;
+        if(![user_idOfContact isKindOfClass:[NSNull class]]){
+            user_idOfContactAsString = (NSString *)user_idOfContact;
+        }
+        else{
+            APLLog(@"EMPTY user_id");
+            user_idOfContactAsString = @"";
+        }
+        
+        id statusOfContact = [keoContactJson objectForKey:my_uploadContact_status];
+        NSString * statusOfContactAsString;
+        if(![statusOfContact isKindOfClass:[NSNull class]]){
+            statusOfContactAsString = (NSString *)statusOfContact;
+        }
+        else{
+            APLLog(@"EMPTY status");
+            statusOfContactAsString = @"";
+        }
+        
+        id facebookIDOfContact = [keoContactJson objectForKey:my_uploadContact_facebook_id];
+        NSString * facebookIDOfContactAsString;
+        if(![facebookIDOfContact isKindOfClass:[NSNull class]]){
+            facebookIDOfContactAsString = (NSString *)facebookIDOfContact;
+        }
+        else{
+            APLLog(@"EMPTY facebook ID");
+            facebookIDOfContactAsString = @"";
+        }
+        
+        id facebookNameOfContact = [keoContactJson objectForKey:my_uploadContact_facebook_name];
+        NSString * facebookNameOfContactAsString;
+        if(![facebookNameOfContact isKindOfClass:[NSNull class]]){
+            facebookNameOfContactAsString = (NSString *)facebookNameOfContact;
+        }
+        else{
+            APLLog(@"EMPTY facebook name");
+            facebookNameOfContactAsString = @"";
+        }
+        
+        NSMutableDictionary *contactToUpadte = [[NSMutableDictionary alloc] init];
+        [contactToUpadte setObject:emailOfContactAsString forKey:my_uploadContact_email];
+        [contactToUpadte setObject:phoneOfContactAsString forKey:my_uploadContact_phoneNumber];
+        [contactToUpadte setObject:user_idOfContactAsString forKey:my_uploadContact_user_id];
+        [contactToUpadte setObject:statusOfContactAsString forKey:my_uploadContact_status];
+        [contactToUpadte setObject:facebookIDOfContactAsString forKey:my_uploadContact_facebook_id];
+        [contactToUpadte setObject:facebookNameOfContactAsString forKey:my_uploadContact_facebook_name];
+        
+        //APLLog(@"contact to upadate %@",[contactToUpadte description]);
+        [localUpdateContactData addObject:contactToUpadte];
+    }
+    
+    //-----------update the contact list--------------------------
+    [PickContact updateAllContacts:localUpdateContactData];
+    
+    //-----------prepare the contact list that already have the app for the tableview--------------
+    [PickContact initLocalKeoContacts];
+    
+    importKeoPhotos = [PickContact addPhotosToAllContacts];
+    
+    APLLog(@"tabs reloaded (ab)");
+    
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"reloadContactTableView" object:nil];
+    
+    if([_reloadTableView isEqualToString:@"true"]){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            APLLog(@"reloadContactTableView");
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadContactTableView" object:nil];
+        });
+    }
+    
+    APLLog(@"notif reloadContactTableView sent");
+    
+    [myShyftSet refreshAllProfilePics];
+    
+    APLLog(@"myShyftSet refreshed");
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadData" object:nil];
+    });
+    
+    _isUploadingAddressBook = false;
+    
+}
+
+
 
 
 

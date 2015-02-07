@@ -441,7 +441,7 @@ UIActivityIndicatorView *loginSpinnerLogin;
     
     //-----------------Creation of back button
     backButton2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    backButton2.frame = CGRectMake(5,screenHeight-45,70,30);
+    backButton2.frame = CGRectMake(15,screenHeight-45,70,30);
     backButton2.backgroundColor = thePicteverGreenColor;
     backButton2.alpha = 1;
     backButton2.layer.cornerRadius = 4;

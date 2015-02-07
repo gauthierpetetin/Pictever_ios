@@ -524,6 +524,48 @@ NSString *myFacebookBirthDay;
     return jsonContactArray;
 }
 
+//-----------We create the addressbook to send to the server------------------------
++(NSMutableArray *)abCreateJsonArrayOfContacts{
+    APLLog(@"createJsonOfContacts");
+    
+    NSMutableArray *jsonContactArray = [[NSMutableArray alloc] init];
+    
+    
+    for(NSDictionary *contact in [importContactsData mutableCopy]){
+        NSString *myCurrentFullName = @"";
+        if([contact objectForKey:my_full_name_Key]){
+            myCurrentFullName = [contact objectForKey:my_full_name_Key];
+        }
+        NSMutableDictionary * miniContactDic = [[NSMutableDictionary alloc] init];
+        
+        /*counter +=1;
+        if(counter == 15){
+            return jsonContactArray;
+        }*/
+        
+        if([contact objectForKey:@"phoneNumber1"]){
+            if(![[contact objectForKey:@"phoneNumber1"] isEqualToString:@""]){
+                [miniContactDic setObject:[contact objectForKey:@"phoneNumber1"] forKey:my_AB_tel_Key];
+                [miniContactDic setObject:myCurrentFullName forKey:my_AB_name_Key];
+
+                [jsonContactArray addObject:miniContactDic];
+            }
+        }
+        if([contact objectForKey:@"phoneNumber2"]){
+            if(![[contact objectForKey:@"phoneNumber2"] isEqualToString:@""]){
+                [miniContactDic setObject:[contact objectForKey:@"phoneNumber2"] forKey:my_AB_tel_Key];
+                [miniContactDic setObject:myCurrentFullName forKey:my_AB_name_Key];
+                
+                [jsonContactArray addObject:miniContactDic];
+            }
+        }
+    }
+    
+    APLLog(@"createJsonOfContacts-end");
+    
+    return jsonContactArray;
+}
+
 
 //-------------------deal with the new message received and add them to messagesDataFile (and inform the user)--------------
 
@@ -991,6 +1033,37 @@ NSString *myFacebookBirthDay;
     [prefs setObject:myFacebookName forKey:my_prefs_fb_name_key];
     [prefs setObject:myFacebookID forKey:my_prefs_fb_id_key];
     [prefs setObject:myFacebookBirthDay forKey:my_prefs_fb_birthday_key];
+}
+
++(NSMutableDictionary *)createContactMyself{
+    APLLog(@"createContactMyself");
+    NSMutableDictionary * contactMe = [[NSMutableDictionary alloc] init];
+    [contactMe setObject:@"Myself" forKey:@"firstNames"];
+    [contactMe setObject:@"" forKey:@"lastNames"];
+    [contactMe setObject:@"Myself" forKey:@"fullName"];
+    [contactMe setObject:[UIImage imageNamed:@"myself_small.png"] forKey:@"image"];
+    if(myCurrentPhoneNumber){
+        [contactMe setObject:myCurrentPhoneNumber forKey:@"phoneNumber1"];
+    }
+    else{
+        [contactMe setObject:@"" forKey:@"phoneNumber1"];
+    }
+    [contactMe setObject:@"" forKey:@"phoneNumber2"];
+    if(username){
+        [contactMe setObject:username forKey:@"email"];
+    }
+    else{
+        [contactMe setObject:@"" forKey:@"email"];
+    }
+    if(myUserID){
+        [contactMe setObject:myUserID forKey:@"user_id"];
+    }
+    else{
+        [contactMe setObject:@"" forKey:@"user_id"];
+    }
+    APLLog(@"contact Myself created");
+    
+    return contactMe;
 }
 
 

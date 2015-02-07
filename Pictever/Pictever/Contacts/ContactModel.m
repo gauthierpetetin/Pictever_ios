@@ -27,6 +27,7 @@ NSUserDefaults *prefs;
 NSString *myCurrentPhoneNumber;
 NSString *username;
 NSString *myCountryCode;
+NSString *myUserID;
 
 bool loadAllcontacts;
 
@@ -354,30 +355,9 @@ NSMutableArray *importContactIDs;
 //-----------------------create the contact myself and include it to the contact list importcontactsdata----------------
 
 -(void)createContactMyself{
-    APLLog(@"createContactMyself");
-    NSMutableDictionary * contactMe = [[NSMutableDictionary alloc] init];
-    [contactMe setObject:@"Myself" forKey:@"firstNames"];
-    [contactMe setObject:@"" forKey:@"lastNames"];
-    [contactMe setObject:@"Myself" forKey:@"fullName"];
-    [contactMe setObject:[UIImage imageNamed:@"myself_small.png"] forKey:@"image"];
-    if(myCurrentPhoneNumber){
-        [contactMe setObject:myCurrentPhoneNumber forKey:@"phoneNumber1"];
-    }
-    else{
-        [contactMe setObject:@"" forKey:@"phoneNumber1"];
-    }
-    [contactMe setObject:@"" forKey:@"phoneNumber2"];
-    if(username){
-        [contactMe setObject:username forKey:@"email"];
-    }
-    else{
-        [contactMe setObject:@"" forKey:@"email"];
-    }
-    [contactMe setObject:@"" forKey:@"user_id"];
-    [importContactsData addObject:contactMe];
     
-    //[importKeoContacts setObject:contactMe forKey:myCurrentPhoneNumber];
-    APLLog(@"contact Myself created");
+    [importContactsData addObject:[myGeneralMethods createContactMyself]];
+    APLLog(@"contact Myself created in Contact Model");
     
 }
 

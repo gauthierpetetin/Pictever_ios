@@ -270,10 +270,10 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     }
     
     //--------work in local or not
-    localWork=false;
-    //localWork=true;
-    //adresseIp2=@"http://192.168.42.52:5000/";
-    
+    //localWork=false;
+    localWork=true;
+    adresseIp2=@"http://192.168.0.25:5000/";
+    //adresseIp2=@"http://async-pictever.herokuapp.com/";
     
     
     //------------------import all account data----------------------------

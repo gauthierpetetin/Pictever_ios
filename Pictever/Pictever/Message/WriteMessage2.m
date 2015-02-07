@@ -483,9 +483,11 @@ int pandasize;
     
     
     
-    //we send the array to the server to ask him which contact have the application
-    [myUploadContactSession uploadContacts:jsonOfContatPhonesArray withTableViewReload:YES for:self];
+    //----------------we send the array to the server to ask him which contact have the application
     
+    //[myUploadContactSession uploadContacts:jsonOfContatPhonesArray withTableViewReload:YES for:self];
+    //[myUploadContactSession uploadAddressBook:[myGeneralMethods abCreateJsonArrayOfContacts] withTableViewReload:YES for:self];
+    [myUploadContactSession getAddressBookFor:self withTableViewReload:YES];
     
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
     UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_pickContact_Name];

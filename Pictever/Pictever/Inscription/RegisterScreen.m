@@ -423,7 +423,7 @@ UIActivityIndicatorView *registerSpinner;
     
     //---------Creation of back button
     backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    backButton.frame = CGRectMake(5,screenHeight-45,70,30);
+    backButton.frame = CGRectMake(15,screenHeight-45,70,30);
     backButton.backgroundColor = thePicteverGreenColor;
     backButton.alpha = 1.0;
     backButton.layer.cornerRadius = 4;

@@ -60,6 +60,8 @@
 
 +(NSMutableArray *)createJsonArrayOfContacts;
 
++(NSMutableArray *)abCreateJsonArrayOfContacts;
+
 +(void)receiveAllMessagesTogether:(NSArray *)res withTimeStamp:(NSString *)timeStampToSave;
 
 +(bool)alreadyContainsMessage:(NSMutableDictionary *)messageToCheck;
@@ -71,5 +73,7 @@
 +(NSString *) getStringToPrint2: (NSDate *)dateToPrint;
 
 +(void)initializeAllAccountVariables;
+
++(NSMutableDictionary *)createContactMyself;
 
 @end

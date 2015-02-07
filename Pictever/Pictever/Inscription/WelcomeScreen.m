@@ -260,7 +260,10 @@ GPSession *myUploadContactSession;//global
             if(contactsOk){
                 APLLog(@"Contacts loaded");
             }
-            [myUploadContactSession uploadContacts:[myGeneralMethods createJsonArrayOfContacts] withTableViewReload:YES for:self];
+            
+            //------------when not connected----------(not used so often)------------------
+            //[myUploadContactSession uploadContacts:[myGeneralMethods createJsonArrayOfContacts] withTableViewReload:YES for:self];
+            [myUploadContactSession uploadAddressBook:[myGeneralMethods abCreateJsonArrayOfContacts] for:self];
         }
     }
 }

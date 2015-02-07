@@ -18,9 +18,13 @@
 
 @property (strong, nonatomic) NSMutableArray *contArray;
 
+@property (strong, nonatomic) NSMutableArray *addressBookArray;
+
 @property (strong, nonatomic) NSString *reloadTableView;
 
 @property (nonatomic, assign) BOOL isUploadingContacts;
+
+@property (nonatomic, assign) BOOL isUploadingAddressBook;
 
 
 -(void)getStatusRequest:(id)sender;
@@ -42,5 +46,9 @@
 -(void)sendResetMailRequest:(NSString *)email for:(id)sender;
 
 -(void)increaseReceiveTipCounter:(id)sender;
+
+-(void)uploadAddressBook:(NSMutableArray *)contactBookArray for:(id)sender;
+
+-(void)getAddressBookFor:(id)sender withTableViewReload:(bool)rel;
 
 @end

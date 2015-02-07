@@ -42,6 +42,8 @@ NSString *const my_inprogress_string = @"in_progress";
 NSString *const my_sendRequestName = @"send";
 NSString *const my_receiveRequestName = @"receive_all";
 NSString *const my_uploadRequestName = @"upload_contacts";
+NSString *const my_addressBookRequestName = @"upload_address_book";
+NSString *const my_getABRequestName = @"get_address_book";
 NSString *const my_keoChoiceRequestName = @"get_send_choices";
 NSString *const my_loginRequestName = @"login";
 NSString *const my_registerRequestName = @"signup";
@@ -52,6 +54,9 @@ NSString *const my_resendRequestName = @"resend";
 NSString *const my_sendResetMail = @"send_reset_mail";
 NSString *const my_defineNewPassword = @"define_new_password";
 
+//-------------ABREquest-----------------
+NSString *const my_AB_tel_Key = @"tel";
+NSString *const my_AB_name_Key = @"name";
 
 NSString *const my_default_adresseIp=@"http://instant-pictever.herokuapp.com/";
 

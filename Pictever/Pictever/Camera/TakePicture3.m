@@ -177,6 +177,8 @@ UITapGestureRecognizer *tapRecognizer;
 UISwipeGestureRecognizer *swipeRecognizer;
 UISwipeGestureRecognizer *swipeRecognizer2;
 
+GPSession *myUploadContactSession;//global
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -1240,6 +1242,9 @@ UISwipeGestureRecognizer *swipeRecognizer2;
 
 //---------------different methods to switch the view---------------------
 -(void)switchScreenToContacts{
+    //[myUploadContactSession uploadAddressBook:[myGeneralMethods abCreateJsonArrayOfContacts] withTableViewReload:YES for:self];
+    [myUploadContactSession getAddressBookFor:self withTableViewReload:YES];
+    
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle: nil];
     UIViewController * vc = [storyboard instantiateViewControllerWithIdentifier:my_storyboard_pickContact_Name];
     [self presentViewController:vc animated:YES completion:nil];

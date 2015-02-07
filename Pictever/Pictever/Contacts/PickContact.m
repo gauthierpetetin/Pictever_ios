@@ -12,6 +12,7 @@
 #import "PickContact.h"
 
 #import "myConstants.h"
+#import "myGeneralMethods.h"
 
 //Amazon analytics
 #import <AWSiOSSDKv2/AWSMobileAnalytics.h>
@@ -214,6 +215,13 @@ bool contactAlreadyInformed;
         NSMutableDictionary *addContact = [[importKeoContacts objectForKey:ccc] mutableCopy];
         [localKeoContacts addObject:addContact];
     }
+    
+    
+    if([localKeoContacts count]==0){
+        APLLog(@"NO CONTACT AT ALL, ADD MYSELF");
+        [localKeoContacts addObject:[myGeneralMethods createContactMyself]];
+    }
+    
     
     [PickContact sortLocalKeoContacts];
 }
