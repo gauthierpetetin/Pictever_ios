@@ -1045,7 +1045,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
         // 3
         
         
-       NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",hashPassword,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion,@"&facebook_id=",myFacebookID,@"&facebook_name=",myFacebookName,@"&facebook_birthday=",myFacebookBirthDay];
+       NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",hashPassword,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion,@"&facebook_id=",myFacebookID,@"&facebook_name=",myFacebookName,@"&facebook_birthday=",myFacebookBirthDay,@"&country_code=",myLocaleString];
 
         APLLog([NSString stringWithFormat:@"asynchronous login session post: %@",postString]);
         NSData* data = [postString dataUsingEncoding:NSUTF8StringEncoding];

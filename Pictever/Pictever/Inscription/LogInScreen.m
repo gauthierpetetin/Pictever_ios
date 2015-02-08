@@ -264,7 +264,7 @@ UIActivityIndicatorView *loginSpinnerLogin;
         // 3
         
         
-        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@",@"email=",userN,@"&password=",hashP,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion];
+        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@",@"email=",userN,@"&password=",hashP,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion,@"&country_code=",myLocaleString];
         APLLog([NSString stringWithFormat:@" local asynchronous login session post: %@",postString]);
         NSData* data = [postString dataUsingEncoding:NSUTF8StringEncoding];
         

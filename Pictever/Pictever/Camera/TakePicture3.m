@@ -1048,10 +1048,17 @@ GPSession *myUploadContactSession;//global
     [choiceArray addObject:@"opp3"];
     APLLog(@"importKeoChoicesSize: %d",[importKeoChoices count]);
     
+    NSString *calendarTitle = @"Calendar";
+    NSString *acTitle = my_actionsheet_pick_a_date;
+    if([myLocaleString isEqualToString:@"FR"]){
+        calendarTitle = @"Calendrier";
+        acTitle = my_actionsheet_pick_a_date_french;
+    }
+    
     ////new
-    actionSheet = [[UIActionSheet alloc] initWithTitle:my_actionsheet_pick_a_date
+    actionSheet = [[UIActionSheet alloc] initWithTitle:acTitle
                                               delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil
-                                     otherButtonTitles:@"Calendar", nil];
+                                     otherButtonTitles:calendarTitle, nil];
     
     
     if([importKeoChoices count] > 0){
@@ -1072,7 +1079,7 @@ GPSession *myUploadContactSession;//global
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
 
-    if ([actionSheet.title isEqualToString:my_actionsheet_pick_a_date]){
+    if ([actionSheet.title isEqualToString:my_actionsheet_pick_a_date]||[actionSheet.title isEqualToString:my_actionsheet_pick_a_date_french]){
         sendToDate = @"0";
         
         if (!(buttonIndex == ([importKeoChoices count]+1))) { // Cancel
@@ -1221,7 +1228,6 @@ GPSession *myUploadContactSession;//global
         //imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y);
     //}];
     
-    
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(insertNewRow:) name:@"insertNewRow" object: nil];
     
     
@@ -1301,10 +1307,10 @@ GPSession *myUploadContactSession;//global
     if([self tabBarIsVisible]){
         NSLog(@"tabBar IS VISIBLE");
         [self setTabBarVisible:NO animated:YES];
-        [UIView animateWithDuration:0.3 animations:^{
+        //[UIView animateWithDuration:0.3 animations:^{
             //shootButtonPh.center = CGPointMake(shootButtonPh.center.x, originalShooterposition.y);
             //imagePickerButton.center = CGPointMake(imagePickerButton.center.x, originalPickerposition.y);
-        }];
+        //}];
     }
     
     AVCaptureConnection *videoConnection = nil;
@@ -1727,6 +1733,7 @@ GPSession *myUploadContactSession;//global
                          newMessageButtonPh.frame = CGRectMake(0.5*screenWidth-0.5*pandasize, 25, pandasize, pandasize);
                      }
                      completion:^(BOOL completed){
+                         
                          [NSTimer scheduledTimerWithTimeInterval:3.0
                                                           target:self
                                                         selector:@selector(hideAnimateForNewMessage)
@@ -1750,6 +1757,7 @@ GPSession *myUploadContactSession;//global
         [self switchScreenToKeo];
     }
 }
+
 
 //-----------------------------animation when message is sent succesfully--------------------------------
 

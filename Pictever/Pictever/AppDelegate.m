@@ -270,9 +270,9 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     }
     
     //--------work in local or not
-    //localWork=false;
-    localWork=true;
-    adresseIp2=@"http://192.168.0.25:5000/";
+    localWork=false;
+    //localWork=true;
+    //adresseIp2=@"http://192.168.0.25:5000/";
     //adresseIp2=@"http://async-pictever.herokuapp.com/";
     
     
@@ -659,7 +659,7 @@ NSString* receiveTips;//counter of messages received to give some tips to the us
     if([myLocaleString isEqualToString:@"FR"]){
         NSLog(@"Francais");
     }
-    //myLocaleString = @"US";
+    //myLocaleString = @"AZ";
 
     bool logInCopy = [prefs boolForKey:my_prefs_login_key];
     if(logInCopy){

@@ -164,6 +164,7 @@ NSString *const my_sendbox_path = @"path";
 
 //---------------------------actionsheet titles----------------------------------
 NSString *const my_actionsheet_pick_a_date = @"Pick a date!";
+NSString *const my_actionsheet_pick_a_date_french = @"Choisis une date!";
 NSString *const my_actionsheet_wanna_help_us = @"You like us?";
 NSString *const my_actionsheet_wanna_help_us_french = @"Tu nous aimes bien?";
 NSString *const my_actionsheet_you_are_great = @"You like us a lot?";

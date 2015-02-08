@@ -229,7 +229,7 @@ UIActivityIndicatorView *registerSpinner;
         
         
         
-        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@",@"email=",userN,@"&password=",hashP];
+        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@",@"email=",userN,@"&password=",hashP,@"&country_code=",myLocaleString];
         APLLog([NSString stringWithFormat:@" local asynchronous register session post: %@",postString]);
         NSData* data = [postString dataUsingEncoding:NSUTF8StringEncoding];
         

@@ -1179,25 +1179,10 @@ UISwipeGestureRecognizer *swipeRecognizer3;
         
         //--------------------in 3 days, in 3 months, in a year--------------------------
         if(shyftForCell.receive_label){
-            /*if(![shyftForCell.receive_label isEqualToString:@"calendar"]){
-                shyftCell.periodLabel.text = shyftForCell.receive_label;
-            }
-            else{
-                if(shyftForCell.created_at){
-                    NSDate *realDate = [NSDate dateWithTimeIntervalSince1970:([shyftForCell.created_at doubleValue])];
-                    shyftCell.periodLabel.text = [NSString stringWithFormat:@"Sent: %@",[myGeneralMethods getStringToPrint:realDate]];
-                }
-            }*/
+
             NSDate *realDate = [NSDate dateWithTimeIntervalSince1970:([shyftForCell.created_at doubleValue])];
             shyftCell.periodLabel.text = [myGeneralMethods getStringToPrint2:realDate];
         }
-        //shyftCell.periodLabel.backgroundColor = shyftForCell.color;
-        //[shyftCell.periodLabel setFont:[UIFont fontWithName:@"Gabriola" size:24]];
-        
-        //-----------------date of reception-----------------------------------------
-        //if(shyftForCell.receive_date){
-            //shyftCell.dateLabel.text = [myGeneralMethods getStringToPrint2:shyftForCell.receive_date];
-        //}
         
         //------------------PHOTO----------------------------
         shyftCell.bigImageView.backgroundColor = [UIColor blackColor];

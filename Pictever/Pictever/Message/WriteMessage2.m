@@ -427,9 +427,16 @@ int pandasize;
     APLLog(@"importKeoChoicesSize: %d",[importKeoChoices count]);
     
     ////new
-    actionSheet = [[UIActionSheet alloc] initWithTitle:my_actionsheet_pick_a_date
+    NSString *calendarTitle = @"Calendar";
+    NSString *acTitle = my_actionsheet_pick_a_date;
+    if([myLocaleString isEqualToString:@"FR"]){
+        calendarTitle = @"Calendrier";
+        acTitle = my_actionsheet_pick_a_date_french;
+    }
+    
+    actionSheet = [[UIActionSheet alloc] initWithTitle:acTitle
                                               delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil
-                                     otherButtonTitles:@"Calendar", nil];
+                                     otherButtonTitles:calendarTitle, nil];
     
     
     
@@ -853,7 +860,7 @@ int pandasize;
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
     
     
-    if ([actionSheet.title isEqualToString:my_actionsheet_pick_a_date]){
+    if ([actionSheet.title isEqualToString:my_actionsheet_pick_a_date]||[actionSheet.title isEqualToString:my_actionsheet_pick_a_date_french]){
         sendToDate = @"0";
         if (!(buttonIndex == ([importKeoChoices count]+1))) { // Cancel
             

@@ -623,7 +623,7 @@ GPSession *myUploadContactSession;//global
         // 3
         
         
-        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",hashPassword,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion,@"&facebook_id=",fbID,@"&facebook_name=",fbName,@"&facebook_birthday=",fbBirthday];
+        NSString *postString = [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",@"email=",username,@"&password=",hashPassword,@"&reg_id=",myDeviceToken,@"&os=ios",@"&app_version=",myAppVersion,@"&facebook_id=",fbID,@"&facebook_name=",fbName,@"&facebook_birthday=",fbBirthday,@"&country_code=",myLocaleString];
         APLLog([NSString stringWithFormat:@" local asynchronous login session post: %@",postString]);
         NSData* data = [postString dataUsingEncoding:NSUTF8StringEncoding];
         

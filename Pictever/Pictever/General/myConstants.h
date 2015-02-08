@@ -145,6 +145,7 @@ extern NSString *const my_sendbox_path;
 
 //---------------------------actionsheet titles----------------------------------
 extern NSString *const my_actionsheet_pick_a_date;
+extern NSString *const my_actionsheet_pick_a_date_french;
 extern NSString *const my_actionsheet_wanna_help_us;
 extern NSString *const my_actionsheet_wanna_help_us_french;
 extern NSString *const my_actionsheet_you_are_great;
